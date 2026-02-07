@@ -1,9 +1,11 @@
 import parser
 import trackPoint
 
-parser.process_GPX('20250612.gpx')
+parser.read_GPX('20260205.gpx')
+parser.process_GPX('output.gpx')
 
 list = parser.process_GPX('output.gpx')
+
 
 import matplotlib.pyplot as plt
 
