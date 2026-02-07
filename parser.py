@@ -16,7 +16,6 @@ def read_GPX(filename):
         print(f"File '{filename}' was not found.")
 
 def process_GPX(filename):
-    xmlns="http://www.topografix.com/GPX/1/0"
     ns = {"gpx": "http://www.topografix.com/GPX/1/0"}
     
     tree = ET.parse(filename)
