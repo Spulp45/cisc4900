@@ -1,7 +1,8 @@
 import gpxpy
 import xml.etree.ElementTree as ET
 from datetime import datetime
-from trackPoint import trackPoint
+from TrackPoint import trackPoint
+from Track import Track
 
 def getGPX(filename):
     try:
@@ -17,7 +18,7 @@ def getGPX(filename):
     tree = ET.parse(filename)
     root = tree.getroot()
 
-    trackPoints = []
+    track = Track(filename)
 
     for trkpt in root.findall(".//gpx:trkpt", ns):
         data = {
@@ -37,6 +38,19 @@ def getGPX(filename):
                 data[tag] = int(text)
             else:
                 data[tag] = text
-
-        trackPoints.append(trackPoint(**data))
-    return trackPoints
+        
+        track.add_point(
+                lat=data.get("lat"),
+                lon=data.get("lon"),
+                ele=data.get("ele"),
+                time=data.get("time"),
+                course=data.get("course"),
+                speed=data.get("speed"),
+                geoidheight=data.get("geoidheight"),
+                src=data.get("src"),
+                sat=data.get("sat"),
+                hdop=data.get("hdop"),
+                vdop=data.get("vdop"),
+                pdop=data.get("pdop"), 
+                )   
+    return track
