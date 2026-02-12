@@ -1,7 +1,7 @@
 import gpxpy
 import xml.etree.ElementTree as ET
 from datetime import datetime
-from TrackPoint import trackPoint
+
 from Track import Track
 
 def getGPX(filename):
@@ -52,5 +52,6 @@ def getGPX(filename):
                 hdop=data.get("hdop"),
                 vdop=data.get("vdop"),
                 pdop=data.get("pdop"), 
-                )   
+                )
+
     return track
