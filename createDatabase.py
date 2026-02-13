@@ -1,13 +1,14 @@
 import sqlite3
 
 conn = sqlite3.connect('test.db')
-c = conn.cursor()
+cur = conn.cursor()
 
 # Enable foreign key support
-c.execute("PRAGMA foreign_keys = ON;")
+conn.execute("PRAGMA foreign_keys = ON")
 
 # Create tables and index
-c.executescript("""
+cur.executescript("""
+
 CREATE TABLE IF NOT EXISTS track (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
@@ -29,12 +30,12 @@ CREATE TABLE IF NOT EXISTS track_point (
     hdop REAL,
     vdop REAL,
     pdop REAL,
-    FOREIGN KEY (track_id) REFERENCES track(id) ON DELETE CASCADE
+    FOREIGN KEY (track_id)
+        REFERENCES track (id)
+        ON DELETE CASCADE
 );
-
-CREATE INDEX IF NOT EXISTS id_gps_trip_time
-ON track_point (track_id, timestamp);
 """)
+
 
 conn.commit()
 conn.close()
