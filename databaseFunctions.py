@@ -66,7 +66,9 @@ def delete_track_by_id(id: str):
     from the track_point table
     
     Args:
-        id (str): id of the track    
+        id (str): id of the track
+    Returns:
+        True if deleted sucessfully 
     """
     with sqlite3.connect("test.db") as conn:
         cur = conn.cursor()
@@ -78,18 +80,43 @@ def delete_track_by_id(id: str):
             "DELETE FROM track_point WHERE track_id = ?",
             (id,)
         )
+    return True
 
 def delete_track_by_hash(track_hash: str):
+    """
+    Deletes a track by hash value
+    and CASCADE DELETE 
+    all related track points 
+    from the track_point table
     
-
+    Args:
+        track_hash (str): hash value
+    Returns:
+        True if deleted sucessfully 
+    
+    """
     with sqlite3.connect("test.db") as conn:
         cur = conn.cursor()
-        
+
+        # Get track id
+        cur.execute("SELECT id FROM track WHERE track_hash = ?", (track_hash,))
+        row = cur.fetchone()
+
+        if row is None:
+            return False
+
+        track_id = row[0]
+
+       
         cur.execute(
-            "DELETE FROM track WHERE track_hash = ? ",
-            (track_hash,)
+            "DELETE FROM track_point WHERE track_id = ?",
+            (track_id,)
         )
+        # delete track
         cur.execute(
-            "DELETE from track_"
+            "DELETE FROM track WHERE id = ?",
+            (track_id,)
         )
+        conn.commit()
+        return True
         
