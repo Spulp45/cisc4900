@@ -15,4 +15,4 @@ class trackPoint:
     sat: Optional[int] 
     hdop: Optional[float] 
     vdop: Optional[float] 
-    pdop: Optional[float] 
+    pdop: Optional[float]

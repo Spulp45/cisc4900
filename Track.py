@@ -1,6 +1,8 @@
 import hashlib
 
+    
 class Track:
+    
     def __init__(self, name):
         self.name = name
         self.lat = []
@@ -15,6 +17,8 @@ class Track:
         self.hdop = []
         self.vdop = []
         self.pdop = []
+        self.counter = 0
+
 
     def add_point(self, lat, lon, ele, time, course, speed,
                   geoidheight, src, sat, hdop, vdop, pdop):
@@ -30,7 +34,9 @@ class Track:
         self.hdop.append(hdop)
         self.vdop.append(vdop)
         self.pdop.append(pdop)
+        self.counter += 1
 
     def track_hash(self):
         points_str = "|".join(f"{lat},{lon},{ele},{time}" for lat, lon, ele, time in zip(self.lat, self.lon, self.ele, self.time))
         return hashlib.sha256(points_str.encode()).hexdigest()
+    

@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS track (
     track_hash TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE IF NOT EXISTS gps_data (
+CREATE TABLE IF NOT EXISTS track_point (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     track_id INTEGER NOT NULL,
     lat REAL NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS gps_data (
     timestamp TEXT NOT NULL,
     course REAL,
     speed REAL,
-    geoid_height REAL,
+    geoidheight REAL,
     src TEXT,
     sat INTEGER,
     hdop REAL,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS gps_data (
 );
 
 CREATE INDEX IF NOT EXISTS id_gps_trip_time
-ON gps_data (track_id, timestamp);
+ON track_point (track_id, timestamp);
 """)
 
 conn.commit()
