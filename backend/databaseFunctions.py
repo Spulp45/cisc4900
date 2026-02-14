@@ -173,19 +173,19 @@ def get_track_with_track_points_by_id(id: str) -> dict[str, list[tuple]]:
     
 def get_trackpoints(id : str, track_point_collumn: str) -> list | str:
     """
-    Retrieve values from a specific column of track_point rows
+    Retrieve values from a specific collumn of track_point rows
     associated with a given track ID.
 
     Args:
-        id (str): The id of the track.
-        track_point_collumn (str): The column name to retrieve from
+        id (str): The ID of the track.
+        track_point_collumn (str): The collumn name to retrieve from
             the track_point table.
 
     Returns:
-        list[tuple]: A list containing all the rows of the collumn you wanted
-        str: An error message if there is a typo
+        list[tuple]: A list of tuples containing the requested collumn
+            values for all matching track_point rows. \n
+        str: An error message if the collumn name is invalid.
     """
-
     legal_arguments = ["id", "track_id", "lat", "lon", "ele", "timestamp", "course", "speed",
                        "geoidheight", "src", "sat", "hdop", "vdop", "pdop"]
     
