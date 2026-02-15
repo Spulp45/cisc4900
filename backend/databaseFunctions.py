@@ -120,3 +120,22 @@ def delete_track_by_hash(track_hash: str):
         conn.commit()
         return True
         
+def avg_speed (track_hash: str):
+    with sqlite3.connect("test.db") as conn:
+        cur = conn.cursor()
+
+        cur.execute("""SELECT AVG (speed) 
+                    FROM track_point
+                    WHERE track_id = (SElECT id FROM track WHERE track_hash = ?)
+                    """, (track_hash,))
+        
+        row = cur.fetchone()
+
+        if row and row[0] is not None:
+            return row[0]
+        else:
+            return 0.0
+
+
+
+
