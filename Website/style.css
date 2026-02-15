@@ -1,0 +1,2 @@
+/* Ensure the map div has a height or it will stay at 0px */
+#map { height:400px; }

@@ -122,12 +122,13 @@ def delete_track_by_hash(track_hash: str):
 
         
 def avg_speed (track_hash: str):
-    with sqlite3.connect("test.db") as conn:
+    with sqlite3.connect("backend/test.db") as conn:
         cur = conn.cursor()
 
         cur.execute("""SELECT AVG (speed) 
                     FROM track_point
                     WHERE track_id = (SElECT id FROM track WHERE track_hash = ?)
+                    AND speed > 0.0
                     """, (track_hash,))
         
         row = cur.fetchone()
