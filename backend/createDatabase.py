@@ -1,6 +1,6 @@
 import sqlite3
 
-conn = sqlite3.connect('test.db')
+conn = sqlite3.connect('backend/test.db')
 cur = conn.cursor()
 
 # Enable foreign key support

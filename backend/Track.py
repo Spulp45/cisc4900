@@ -47,7 +47,7 @@ class Track:
         ele (float): Elevation in meters.
         time (datetime): Timestamp of the trkpt.
         course (float): Course over ground in degrees.
-        speed (float): Current speed.
+        speed (float): Current speed in m/s.
         geoidheight (float): Height of geoid above WGS84.
         src (str): Source of GPS data.
         hdop (float): Horizontal dilution of precision.

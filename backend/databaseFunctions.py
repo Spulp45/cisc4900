@@ -10,7 +10,7 @@ def insert_track(track : Track):
     Raises:
         Database exception if the track already exists (TODO)
     """
-    with sqlite3.connect("test.db") as conn:
+    with sqlite3.connect("backend/test.db") as conn:
         cur = conn.cursor()
         cur.execute(
         "INSERT INTO track (name, track_hash) VALUES (?, ?)",
@@ -70,7 +70,7 @@ def delete_track_by_id(id: str):
     Returns:
         True if deleted sucessfully 
     """
-    with sqlite3.connect("test.db") as conn:
+    with sqlite3.connect("backend/test.db") as conn:
         cur = conn.cursor()
         cur.execute(
             "DELETE FROM track WHERE id = ?",
@@ -95,7 +95,7 @@ def delete_track_by_hash(track_hash: str):
         True if deleted sucessfully 
     
     """
-    with sqlite3.connect("test.db") as conn:
+    with sqlite3.connect("backend/test.db") as conn:
         cur = conn.cursor()
 
         # Get track id
@@ -119,6 +119,7 @@ def delete_track_by_hash(track_hash: str):
         )
         conn.commit()
         return True
+
         
 def avg_speed (track_hash: str):
     with sqlite3.connect("test.db") as conn:
@@ -136,6 +137,90 @@ def avg_speed (track_hash: str):
         else:
             return 0.0
 
+
+
+    
+def get_all_tracks() -> list[tuple]:
+    """
+    Retrieve all rows from the track table.
+
+    Returns:
+        list[tuple]: A list of tuples in the following order:
+            (id, name, track_hash)
+    """
+    with sqlite3.connect("backend/test.db") as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM track")
+        rows = cur.fetchall()
+        return rows
+
+def get_all_track_points() -> list[tuple]:
+    """
+    Retrieve all rows from the track_point table.
+
+    Returns:
+        list[tuple]: A list of tuples in the following order:
+            (id, track_id, lat, lon, ele, timestamp, course, speed, geoidheight, src, sat, hdop, vdop, pdop)
+    """
+    with sqlite3.connect("backend/test.db") as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT * from track_point")
+        rows = cur.fetchall()
+        return rows
+
+def get_track_with_track_points_by_id(id: str) -> dict[str, list[tuple]]:
+    """
+    Get a track with all related track_points by using an id
+    
+    Args:
+        id(str): The id of the track
+
+    Returns:
+        dict[str, list[tuple]]: A dictionary containing:
+            - "track": Tuples in the order of: (id, name, track_hash)
+            - "track_points": Tuples in the order of:
+            (id, track_id, lat, lon, ele, timestamp, course, speed, geoidheight, src, sat, hdop, vdop, pdop)
+    """
+    with sqlite3.connect("backend/test.db") as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT * from track WHERE id = ?",(id))
+        track_rows = cur.fetchall()
+
+        cur.execute("SELECT * from track_point WHERE track_id = ? ",(id))
+        track_point_rows = cur.fetchall()
+        
+        return {'track': track_rows, 'track_points' : track_point_rows}
+    
+def get_trackpoints(id : str, track_point_collumn: str) -> list | str:
+    """
+    Retrieve values from a specific collumn of track_point rows
+    associated with a given track ID.
+
+    Args:
+        id (str): The ID of the track.
+        track_point_collumn (str): The collumn name to retrieve from
+            the track_point table.
+
+    Returns:
+        list[tuple]: A list of tuples containing the requested collumn
+            values for all matching track_point rows. \n
+        str: An error message if the collumn name is invalid.
+    """
+    legal_arguments = ["id", "track_id", "lat", "lon", "ele", "timestamp", "course", "speed",
+                       "geoidheight", "src", "sat", "hdop", "vdop", "pdop"]
+    
+    match track_point_collumn:
+        case track_point_collumn if track_point_collumn in legal_arguments:
+            with sqlite3.connect("backend/test.db") as conn:
+                cur = conn.cursor()
+                cur.execute(
+    f"SELECT {track_point_collumn} FROM track_point WHERE track_id = ?",
+    (id,)
+                )
+                rows = cur.fetchall()
+                return rows
+        case _:
+            return "Invalid Collumn name for track_point"
 
 
 
