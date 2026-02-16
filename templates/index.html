@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>cisc4900</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+    // This creates a global variable for map.js to use
+    var pathData = {{ map_points | tojson }};
+</script>
+    <script src="{{ url_for('static', filename='map.js') }}"></script>
+
+    <div class = "stats-display">
+        <h2>STATS</h2>
+        <table>
+            <tr>
+                <th>Static</th>
+                <th>Value</th>
+            </tr>
+            <tr>
+                <th>Average Moving Speed</th>
+                <th>{{ avg_speed }} m/s</th>
+            </tr>
+            <tr>
+                <td>Total Distance</td>
+                <td>{{total_distance}} meters</td>
+            </tr>
+            <tr>
+                <td>Total Duration</td>
+                <td>{{duration}}</td>
+            </tr>
+        </table>
+    </div>
+
+</body>
+</html>
