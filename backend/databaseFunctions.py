@@ -215,9 +215,8 @@ def get_trackpoints(id : str, track_point_collumn: str) -> list | str:
             with sqlite3.connect("backend/test.db") as conn:
                 cur = conn.cursor()
                 cur.execute(
-    f"SELECT {track_point_collumn} FROM track_point WHERE track_id = ?",
-    (id,)
-                )
+                f"SELECT {track_point_collumn} FROM track_point WHERE track_id = ?",
+                (id,))
                 rows = cur.fetchall()
                 return rows
         case _:
