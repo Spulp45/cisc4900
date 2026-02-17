@@ -122,13 +122,21 @@ def delete_track_by_hash(track_hash: str):
         return True
 
         
-def avg_speed (track_hash: str):
+def avg_speed(track_hash: str) -> float:
+    """
+    Get average speed from a track
+
+    Args:
+        track_hash (str): The hash value of the track
+    Returns:
+        float: Represents the average speed
+    """
     with sqlite3.connect("backend/test.db") as conn:
         cur = conn.cursor()
 
         cur.execute("""SELECT AVG (speed) 
                     FROM track_point
-                    WHERE track_id = (SElECT id FROM track WHERE track_hash = ?)
+                    WHERE track_id = (SELECT id FROM track WHERE track_hash = ?)
                     AND speed > 0.0
                     """, (track_hash,))
         
@@ -143,6 +151,7 @@ def duration (id: str):
     
     timestamps = get_trackpoints(id,"timestamp")
 
+
     dt_objects = [datetime.fromisoformat(ts[0]) for ts in timestamps]
     
     duration = max(dt_objects) - min(dt_objects)
@@ -151,7 +160,7 @@ def duration (id: str):
 
     return total_seconds
 
-
+ 
     
 def get_all_tracks() -> list[tuple]:
     """
@@ -196,10 +205,10 @@ def get_track_with_track_points_by_id(id: str) -> dict[str, list[tuple]]:
     """
     with sqlite3.connect("backend/test.db") as conn:
         cur = conn.cursor()
-        cur.execute("SELECT * from track WHERE id = ?",(id))
+        cur.execute("SELECT * from track WHERE id = ?",(id,))
         track_rows = cur.fetchall()
 
-        cur.execute("SELECT * from track_point WHERE track_id = ? ",(id))
+        cur.execute("SELECT * from track_point WHERE track_id = ? ",(id,))
         track_point_rows = cur.fetchall()
         
         return {'track': track_rows, 'track_points' : track_point_rows}
@@ -227,13 +236,26 @@ def get_trackpoints(id : str, track_point_collumn: str) -> list | str:
             with sqlite3.connect("backend/test.db") as conn:
                 cur = conn.cursor()
                 cur.execute(
-    f"SELECT {track_point_collumn} FROM track_point WHERE track_id = ?",
-    (id,)
-                )
+                f"SELECT {track_point_collumn} FROM track_point WHERE track_id = ?",
+                (id,))
                 rows = cur.fetchall()
                 return rows
         case _:
             return "Invalid Collumn name for track_point"
+
+def get_track_by_name(name: str) -> list:
+    """
+    Gets a list of all tracks with the same name
+    Args:
+        name (str): provide a name to search
+    Returns:
+        list: Of all tracks matching the name
+    """
+    with sqlite3.connect("backend/test.db") as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT id from track where name = ?", (name,),)
+        rows = cur.fetchall()
+        return rows
 
 
 
