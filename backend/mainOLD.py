@@ -23,3 +23,4 @@ hash =  track3.track_hash()
 #     print("Speed: ", current, "m/s")
 
 print("speed: " + str(databaseFunctions.avg_speed(hash)))
+

@@ -2,6 +2,7 @@ import gpxpy
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from backend.Track import Track
+import os
 """
 GPX parser function.
 
@@ -30,22 +31,21 @@ def getGPX(filename: str) -> Track:
             If the specified file does not exist
     """
 
-
     try:
         with open(filename, "r", encoding="utf-8") as f:
             gpx = gpxpy.parse(f)
-            
     except FileNotFoundError:
         print(f"File '{filename}' was not found.")
         return []
+    
     # GPX namespace definition
     ns = {"gpx": "http://www.topografix.com/GPX/1/0"}
 
+    filename_only = os.path.basename(filename)
+    #Initialize Track object using the filename as its name
+    track = Track(filename_only)
     tree = ET.parse(filename)
     root = tree.getroot()
-
-    # Initialize Track object using the filename as its name
-    track = Track(filename)
     
     # Read each data and child of the gpx file
     for trkpt in root.findall(".//gpx:trkpt", ns):
