@@ -229,7 +229,13 @@ def get_trackpoints(id : str, track_point_collumn: str) -> list | str:
             return "Invalid Collumn name for track_point"
 
 def get_track_by_name(name: str) -> list:
-
+    """
+    Gets a list of all tracks with the same name
+    Args:
+        name (str): provide a name to search
+    Returns:
+        list: Of all tracks matching the name
+    """
     with sqlite3.connect("backend/test.db") as conn:
         cur = conn.cursor()
         cur.execute("SELECT id from track where name = ?", (name,),)
