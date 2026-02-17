@@ -38,6 +38,15 @@
             </tr>
         </table>
     </div>
+    <div class = "input-gpx-form">
+        <form action="/upload" method="post" enctype="multipart/form-data" id="upload-form">
+             <label for="file-upload" class="drop-zone">
+             <span>Click or Drag GPX file here</span>
+            <input id="file-upload" name="file" type="file" accept=".gpx">
+            </label>
+            <button type="submit">Upload</button>
+        </form>
+    </div>
 
 </body>
 </html>

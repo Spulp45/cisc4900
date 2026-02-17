@@ -1,5 +1,6 @@
 import sqlite3 
 from backend.Track import Track
+from datetime import datetime
 
 def insert_track(track : Track):
     """
@@ -137,7 +138,18 @@ def avg_speed (track_hash: str):
             return row[0]
         else:
             return 0.0
+        
+def duration (id: str):
+    
+    timestamps = get_trackpoints(id,"timestamp")
 
+    dt_objects = [datetime.fromisoformat(ts[0]) for ts in timestamps]
+    
+    duration = max(dt_objects) - min(dt_objects)
+
+    total_seconds = int(duration.total_seconds())
+
+    return total_seconds
 
 
     
