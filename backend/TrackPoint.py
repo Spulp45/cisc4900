@@ -1,47 +1,47 @@
-from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
-@dataclass(frozen=True) # Prevent accidental modification of the GPS data
-class trackPoint:
-  """
-    Represents a single GPS track point.
 
-    Attributes:
-        lat (float):
-            Latitude in decimal degrees.
-        lon (float):
-            Longitude in decimal degrees.
-        ele (Optional[float]):
-            Elevation in meters.
-        time (Optional[datetime]):
-            Timestamp of the track point.
-        course (Optional[float]):
-            Course over ground in degrees.
-        speed (Optional[float]):
-            Speed at this point.
-        geoidheight (Optional[float]):
-            Height of geoid above WGS84.
-        src (Optional[str]):
-            Source of the GPS data.
-        sat (Optional[int]):
-            Number of satellites used.
-        hdop (Optional[float]):
-            Horizontal dilution of precision.
-        vdop (Optional[float]):
-            Vertical dilution of precision.
-        pdop (Optional[float]):
-            Position dilution of precision.
+class TrackPoint:
     """
-lat: float
-lon: float
-ele: Optional[float] 
-time: Optional[datetime] 
-course: Optional[float] 
-speed: Optional[float] 
-geoidheight: Optional[float] 
-src: Optional[str] 
-sat: Optional[int] 
-hdop: Optional[float] 
-vdop: Optional[float] 
-pdop: Optional[float]
+    Represents a single GPS track point.
+    """
+
+    def __init__(self, lat: float, lon: float):
+        # Required Data
+        self.lat = lat
+        self.lon = lon
+
+        # Optional Data
+        self.ele: Optional[float] = None
+        self.time: Optional[datetime] = None
+        self.course: Optional[float] = None
+        self.speed: Optional[float] = None
+        self.geoidheight: Optional[float] = None
+        self.src: Optional[str] = None
+        self.sat: Optional[int] = None
+        self.hdop: Optional[float] = None
+        self.vdop: Optional[float] = None
+        self.pdop: Optional[float] = None
+
+    def addChild(self, tag: str, data):
+        if tag == "ele":
+            self.ele = float(data)
+        elif tag == "time":
+            self.time = datetime.fromisoformat(data)
+        elif tag == "course":
+            self.course = float(data)
+        elif tag == "speed":
+            self.speed = float(data)
+        elif tag == "geoidheight":
+            self.geoidheight = float(data)
+        elif tag == "src":
+            self.src = str(data)
+        elif tag == "sat":
+            self.sat = int(data)
+        elif tag == "hdop":
+            self.hdop = float(data)
+        elif tag == "vdop":
+            self.vdop = float(data)
+        elif tag == "pdop":
+            self.pdop = float(data)

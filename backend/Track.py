@@ -1,5 +1,5 @@
 import hashlib
-
+import datetime
     
 class Track:
     """
@@ -35,8 +35,9 @@ class Track:
         self.counter = 0
 
 
-    def add_point(self, lat, lon, ele, time, course, speed,
-                  geoidheight, src, sat, hdop, vdop, pdop):
+    def add_point(self, lat: float, lon: float, ele:float , time: datetime, course: float, 
+                  speed: float, geoidheight: float, src: str, sat: int, hdop: float,
+                   vdop: float, pdop: float):
         
         """
     Adds a trackpoint to the track object
@@ -82,3 +83,29 @@ class Track:
         points_str = "|".join(f"{lat},{lon},{ele},{time}" for lat, lon, ele, time in zip(self.lat, self.lon, self.ele, self.time))
         return hashlib.sha256(points_str.encode()).hexdigest()
     
+    def integrityCheck(self) -> bool:
+        """
+        Checks if all arrays in the track are parallel.
+
+        Returns:
+            bool: True if everything is fine, false otherwise
+
+        
+        """
+
+        lists = [
+        self.lat, self.lon, self.ele, self.time,
+        self.course, self.speed, self.geoidheight,
+        self.src, self.sat, self.hdop, self.vdop, self.pdop
+    ]
+        lengths = {len(lst) for lst in lists}
+
+        if self.counter != lengths.pop():
+            return False
+        
+        return True
+
+
+        
+
+       

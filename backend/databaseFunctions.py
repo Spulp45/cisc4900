@@ -2,63 +2,74 @@ import sqlite3
 from backend.Track import Track
 from datetime import datetime
 
-def insert_track(track : Track):
+def insert_track(track : Track) -> str | sqlite3.IntegrityError :
     """
-    Inserts a track to the database
+    First checks if a track is already present,
+    if not it adds to the database
 
     Args:
         track (Track): Takes in track object
+    Returns:
+        (str): If integrity check for track failed
     Raises:
-        Database exception if the track already exists (TODO)
+        sqlite3.IntegrityError: If the track already exists in database
+        
     """
-    with sqlite3.connect("backend/test.db") as conn:
-        cur = conn.cursor()
-        cur.execute(
-        "INSERT INTO track (name, track_hash) VALUES (?, ?)",
-        (track.name, track.track_hash()))
-        track_id = cur.lastrowid
+    if(not track.integrityCheck()):
+        return "Failed to insert, data integrity for track failed"
+    
+    try:
+        with sqlite3.connect("backend/test.db") as conn:
+            cur = conn.cursor()
+            cur.execute(
+            "INSERT INTO track (name, track_hash) VALUES (?, ?)",
+            (track.name, track.track_hash()))
+            track_id = cur.lastrowid
 
-        data = [
-        (
-            track_id,
-            lat,
-            lon,
-            ele,
-            time.isoformat() if time else None,
-            course,
-            speed,
-            geoidheight,
-            src,
-            sat,
-            hdop,
-            vdop,
-            pdop
-        )
-        for lat, lon, ele, time, course, speed,
-            geoidheight, src, sat, hdop, vdop, pdop
-        in zip(
-            track.lat,
-            track.lon,
-            track.ele,
-            track.time,
-            track.course,
-            track.speed,
-            track.geoidheight,
-            track.src,
-            track.sat,
-            track.hdop,
-            track.vdop,
-            track.pdop
-        )
-    ]
-        cur.executemany("""
-        INSERT INTO track_point (
-            track_id, lat, lon, ele, timestamp, course,
-            speed, geoidheight, src, sat,
-            hdop, vdop, pdop
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, data)
+            data = [
+            (
+                track_id,
+                lat,
+                lon,
+                ele,
+                time.isoformat() if time else None,
+                course,
+                speed,
+                geoidheight,
+                src,
+                sat,
+                hdop,
+                vdop,
+                pdop
+            )
+            for lat, lon, ele, time, course, speed,
+                geoidheight, src, sat, hdop, vdop, pdop
+            in zip(
+                track.lat,
+                track.lon,
+                track.ele,
+                track.time,
+                track.course,
+                track.speed,
+                track.geoidheight,
+                track.src,
+                track.sat,
+                track.hdop,
+                track.vdop,
+                track.pdop
+            )
+        ]
+            cur.executemany("""
+            INSERT INTO track_point (
+                track_id, lat, lon, ele, timestamp, course,
+                speed, geoidheight, src, sat,
+                hdop, vdop, pdop
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, data)
+    
+    except sqlite3.IntegrityError:
+        print(f"'{track.name}' Already exists in the database")
         
 def delete_track_by_id(id: str):
     """
