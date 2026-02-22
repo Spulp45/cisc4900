@@ -1,6 +1,7 @@
 import sqlite3 
 from backend.Track import Track
 from datetime import datetime
+from math import radians, cos, sin, asin, sqrt
 
 def insert_track(track : Track) -> str | sqlite3.IntegrityError :
     """
@@ -175,6 +176,52 @@ def duration (id: str) -> int:
 
     return total_seconds
 
+def calculate_elevation_stats(track_id):
+    ele_rows = get_trackpoints(track_id, "ele")
+    if not ele_rows or len(ele_rows) < 2:
+        return 0.0, 0.0
+
+    uphill = 0.0
+    downhill = 0.0
+    threshold = 0.75 # Ignore changes smaller than 50cm
+
+    for i in range(len(ele_rows) - 1):
+        diff = ele_rows[i+1][0] - ele_rows[i][0]
+        
+        if diff > threshold:
+            uphill += diff
+        elif diff < -threshold:
+            downhill += abs(diff)
+
+    return uphill, downhill
+
+def calculate_total_distance(track_id):
+    # 1. Get your coordinates
+    lats = get_trackpoints(track_id, "lat")
+    lons = get_trackpoints(track_id, "lon")
+    
+    if not lats or not lons:
+        return 0.0
+
+    total_dist = 0.0
+    # 2. Loop through points and calculate distance between point i and i+1
+    for i in range(len(lats) - 1):
+        lat1, lon1 = lats[i][0], lons[i][0]
+        lat2, lon2 = lats[i+1][0], lons[i+1][0]
+        
+        # Convert decimal degrees to radians 
+        lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+
+        # Haversine formula
+        dlon = lon2 - lon1 
+        dlat = lat2 - lat1 
+        a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+        c = 2 * asin(sqrt(a)) 
+        km = 6371 * c
+        meters = (6371 * c) * 1000
+        total_dist += meters
+
+    return total_dist # Now returns total distance in meters
  
     
 def get_all_tracks() -> list[tuple]:

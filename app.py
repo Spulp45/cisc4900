@@ -16,8 +16,10 @@ def trip_stats(track_id):
     #track = parser.getGPX("testGPX/20260205.gpx")
     test_id = track_id
 
+    #For Speed
     avg = databaseFunctions.avg_speed(track_id)
 
+    #For duration
     total_seconds = databaseFunctions.duration(track_id)
 
     hours = total_seconds // 3600
@@ -29,6 +31,14 @@ def trip_stats(track_id):
     else:
         dur = f"{minutes}:{seconds:02d}"
 
+    #For distance
+    meter = databaseFunctions.calculate_total_distance(track_id)
+    formatted_meters = round(meter, 2)
+
+    #For uphill and downhill
+    gain, loss = databaseFunctions.calculate_elevation_stats(track_id)
+
+    #For map points
     lats_raw = databaseFunctions.get_trackpoints(track_id, "lat")
     lons_raw = databaseFunctions.get_trackpoints(track_id, "lon")
 
@@ -36,10 +46,17 @@ def trip_stats(track_id):
     if isinstance(lats_raw, list) and isinstance(lons_raw, list):
         coords = [[lat[0], lon[0]] for lat, lon in zip(lats_raw, lons_raw)]
 
+    
+
     return render_template('index.html', 
                            avg_speed=round(avg, track_id) if avg else 0.0,
                            map_points=coords,
-                           duration = dur)
+                           duration = dur,
+                           uphill=f"{gain:.2f}",
+                           downhill=f"{loss:.2f}",
+                           total_distance = formatted_meters)
+
+                           
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
