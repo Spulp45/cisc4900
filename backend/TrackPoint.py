@@ -8,6 +8,14 @@ class TrackPoint:
     """
 
     def __init__(self, lat: float, lon: float):
+        """
+        Initialize a TrackPoint, requires latitude and longitude data.
+
+        Args:
+            lat (float): Latitude of the track point.
+            long (float): Longitude of the track point.
+
+        """
         # Required Data
         self.lat = lat
         self.lon = lon
@@ -25,6 +33,14 @@ class TrackPoint:
         self.pdop: Optional[float] = None
 
     def addChild(self, tag: str, data):
+        """
+        If present add optional data to the trackpoint based on the tag name you give.
+
+        Args:
+            tag (str): The name of the GPS data type Examples: "sat", "time", "speed").
+            data: The value that of the tag.
+
+        """
         if tag == "ele":
             self.ele = float(data)
         elif tag == "time":

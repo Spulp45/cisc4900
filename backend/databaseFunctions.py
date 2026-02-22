@@ -158,13 +158,16 @@ def avg_speed(track_hash: str) -> float:
         else:
             return 0.0
         
-def duration (id: str):
-    
-    timestamps = get_trackpoints(id,"timestamp")
+def duration (id: str) -> int:
+    """
+    Calculate the total duration of a track in seconds.
 
+    It is computed by subtracting between the earliest and latest timestamp
+    """
+    timestamps = get_trackpoints(id, "timestamp")
 
     dt_objects = [datetime.fromisoformat(ts[0]) for ts in timestamps]
-    
+
     duration = max(dt_objects) - min(dt_objects)
 
     total_seconds = int(duration.total_seconds())

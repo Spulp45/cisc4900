@@ -40,7 +40,5 @@ def startDatabase():
             ON DELETE CASCADE
     );
     """)
-
-
     conn.commit()
     conn.close()
