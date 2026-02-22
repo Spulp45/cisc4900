@@ -7,13 +7,18 @@ from backend import parser
 app = Flask(__name__) 
 
 @app.route('/')
-def test_page():
-    track = parser.getGPX("backend/20260205.gpx")
-    test_hash = track.track_hash()
+def home():
+    all_rows = databaseFunctions.get_all_tracks()
+    return render_template('home.html', tracks=all_rows)
 
-    avg = databaseFunctions.avg_speed(test_hash)
+@app.route('/trip/<int:track_id>')
+def trip_stats(track_id):
+    #track = parser.getGPX("testGPX/20260205.gpx")
+    test_id = track_id
 
-    total_seconds = databaseFunctions.duration(1)
+    avg = databaseFunctions.avg_speed(track_id)
+
+    total_seconds = databaseFunctions.duration(track_id)
 
     hours = total_seconds // 3600
     minutes = (total_seconds % 3600) // 60
@@ -24,15 +29,15 @@ def test_page():
     else:
         dur = f"{minutes}:{seconds:02d}"
 
-    lats_raw = databaseFunctions.get_trackpoints(1, "lat")
-    lons_raw = databaseFunctions.get_trackpoints(1, "lon")
+    lats_raw = databaseFunctions.get_trackpoints(track_id, "lat")
+    lons_raw = databaseFunctions.get_trackpoints(track_id, "lon")
 
     coords = []
     if isinstance(lats_raw, list) and isinstance(lons_raw, list):
         coords = [[lat[0], lon[0]] for lat, lon in zip(lats_raw, lons_raw)]
 
     return render_template('index.html', 
-                           avg_speed=round(avg, 1) if avg else 0.0,
+                           avg_speed=round(avg, track_id) if avg else 0.0,
                            map_points=coords,
                            duration = dur)
 

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Driving Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Welcome to My Driving App</h1>
+    <p>Click the button below to see the latest trip statistics.</p>
+    
+    <<h2>All Saved Tracks</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Hash</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in tracks %}
+        <tr>
+            <td>{{ row[0] }}</td> <td>{{ row[1] }}</td> <td>{{ row[2] }}</td> <td>
+                <a href="{{ url_for('trip_stats', track_id=row[0]) }}">View Stats</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</body>
+</html>

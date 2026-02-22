@@ -133,7 +133,7 @@ def delete_track_by_hash(track_hash: str):
         return True
 
         
-def avg_speed(track_hash: str) -> float:
+def avg_speed(id: str) -> float:
     """
     Get average speed from a track
 
@@ -145,11 +145,12 @@ def avg_speed(track_hash: str) -> float:
     with sqlite3.connect("backend/test.db") as conn:
         cur = conn.cursor()
 
-        cur.execute("""SELECT AVG (speed) 
-                    FROM track_point
-                    WHERE track_id = (SELECT id FROM track WHERE track_hash = ?)
-                    AND speed > 0.0
-                    """, (track_hash,))
+        cur.execute("""
+            SELECT AVG(speed) 
+            FROM track_point 
+            WHERE track_id = ? 
+            AND speed > 0.0
+            """, (id,))
         
         row = cur.fetchone()
 
