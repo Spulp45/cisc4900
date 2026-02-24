@@ -275,35 +275,34 @@ def get_track_with_track_points_by_id(id: str) -> dict[str, list[tuple]]:
         
         return {'track': track_rows, 'track_points' : track_point_rows}
     
-def get_trackpoints(id : str, track_point_collumn: str) -> list | str:
+def get_trackpoints(id : str, track_point_column: str) -> list | str:
     """
-    Retrieve values from a specific collumn of track_point rows
+    Retrieve values from a specific column of track_point rows
     associated with a given track ID.
 
     Args:
         id (str): The ID of the track.
-        track_point_collumn (str): The collumn name to retrieve from
+        track_point_column (str): The column name to retrieve from
             the track_point table.
 
     Returns:
-        list[tuple]: A list of tuples containing the requested collumn
+        list[tuple]: A list of tuples containing the requested column
             values for all matching track_point rows. \n
-        str: An error message if the collumn name is invalid.
+        str: An error message if the column name is invalid.
     """
-    legal_arguments = ["id", "track_id", "lat", "lon", "ele", "timestamp", "course", "speed",
-                       "geoidheight", "src", "sat", "hdop", "vdop", "pdop"]
-    
-    match track_point_collumn:
-        case track_point_collumn if track_point_collumn in legal_arguments:
-            with sqlite3.connect("backend/test.db") as conn:
-                cur = conn.cursor()
-                cur.execute(
-                f"SELECT {track_point_collumn} FROM track_point WHERE track_id = ?",
-                (id,))
-                rows = cur.fetchall()
-                return rows
-        case _:
-            return "Invalid Collumn name for track_point"
+    legal_arguments = [
+    "id", "track_id", "lat", "lon", "ele", "timestamp", "course",
+    "speed", "geoidheight", "src", "sat", "hdop", "vdop", "pdop"]
+
+    if track_point_column in legal_arguments:
+        with sqlite3.connect("backend/test.db") as conn:
+            cur = conn.cursor()
+            query = f"SELECT {track_point_column} FROM track_point WHERE track_id = ?"
+            cur.execute(query, (id,))
+            rows = cur.fetchall()
+            return rows
+    else:
+        return "Invalid column name for track_point"
 
 def get_track_by_name(name: str) -> list:
     """
