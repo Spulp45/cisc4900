@@ -186,12 +186,13 @@ def calculate_elevation_stats(track_id):
     threshold = 0.75 # Ignore changes smaller than 50cm
 
     for i in range(len(ele_rows) - 1):
-        diff = ele_rows[i+1][0] - ele_rows[i][0]
+        if not ele_rows[i+1][0] and not ele_rows[i][0] < 0:
+            diff = ele_rows[i+1][0] - ele_rows[i][0]
         
-        if diff > threshold:
-            uphill += diff
-        elif diff < -threshold:
-            downhill += abs(diff)
+            if diff > threshold:
+                uphill += diff
+            elif diff < -threshold:
+                downhill += abs(diff)
 
     return uphill, downhill
 
