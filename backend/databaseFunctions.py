@@ -17,16 +17,19 @@ def insert_track(track : Track) -> str | sqlite3.IntegrityError :
         
     """
     if(not track.integrityCheck()):
-        return "Failed to insert, data integrity for track failed"
+        return f"Failed to insert, data integrity for track '{track.name}' failed"
     
     try:
         with sqlite3.connect("backend/test.db") as conn:
             cur = conn.cursor()
+             
+            
+
             cur.execute(
             "INSERT INTO track (name, track_hash) VALUES (?, ?)",
-            (track.name, track.track_hash()))
+            (track.name, track.track_hash(),))
+           
             track_id = cur.lastrowid
-
             data = [
             (
                 track_id,

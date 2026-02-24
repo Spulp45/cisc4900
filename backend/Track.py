@@ -11,15 +11,46 @@ class Track:
     if not then something is going wrong
 
     """
-    def __init__(self, name):
+    def __init__(self, name: str, length_2d: float, length_3d: float, moving_data: tuple, 
+                 avg_speed: float, uphill: tuple, time_bounds: datetime, points: int):
         """
-        Creates Track object
+        Creates Track object.
         
         Args:
             name(str):
                 Name of the track
+            length_2d(float):
+                2 Dimensional length altitude and longitude only
+            length_3d(float):
+                3 Dimensional length atitude, longitude and elevation
+            moving_data(tuple):
+                Tuple that contains data in the following order:
+                (moving_time, stopped_time, moving_distance, stopped_distance, max_speed)
+            avg_speed(float):
+                Average speed of the entire track
+            uphill(tuple):
+                Tuple containing data in the following order:
+                (uphill, downhill)
+            time_bounds(datetime):
+                Tuple containing data in this order: (startTime, endTime)
+            points(int):
+                Total number of track_points
         """
         self.name = name
+        
+        # Computed Data
+        self.length_2d = length_2d
+        self.length_3d = length_3d
+        self.moving_data = moving_data
+        self.avg_speed = avg_speed
+        self.uphill = uphill
+        self.time_bounds = time_bounds
+        self.points = points
+
+        # Counts how many times something is added to Track
+        self.counter = 0
+
+        # Parallel Arrays
         self.lat = []
         self.lon =  []
         self.ele = []
@@ -32,7 +63,7 @@ class Track:
         self.hdop = []
         self.vdop = []
         self.pdop = []
-        self.counter = 0
+        
 
 
     def add_point(self, lat: float, lon: float, ele:float , time: datetime, course: float, 
@@ -40,7 +71,7 @@ class Track:
                    vdop: float, pdop: float):
         
         """
-    Adds a trackpoint to the track object
+    Adds a trackpoint to the track object and increases the counter
 
     Args:
         lat (float): Latitude in degrees.

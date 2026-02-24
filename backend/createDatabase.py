@@ -17,7 +17,19 @@ def startDatabase():
     CREATE TABLE IF NOT EXISTS track (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL UNIQUE,
-        track_hash TEXT NOT NULL UNIQUE
+        track_hash TEXT NOT NULL UNIQUE,
+        length_2d REAL,
+        length_3d REAL,
+        moving_time REAL,
+        stopped_time REAL,
+        moving_distance REAL,
+        stopped_distance REAL,
+        max_speed REAL,
+        avg_speed REAL,
+        uphill REAL,
+        downhill REAL,
+        time_bounds TEXT,
+        points INTEGER
     );
 
     CREATE TABLE IF NOT EXISTS track_point (
@@ -35,6 +47,7 @@ def startDatabase():
         hdop REAL,
         vdop REAL,
         pdop REAL,
+        
         FOREIGN KEY (track_id)
             REFERENCES track (id)
             ON DELETE CASCADE
