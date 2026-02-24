@@ -32,7 +32,7 @@ class Track:
                 Tuple containing data in the following order:
                 (uphill, downhill)
             time_bounds(datetime):
-                Tuple containing data in this order: (startTime, endTime)
+                Tuple containing data in this order: (start_time, end_time)
             points(int):
                 Total number of track_points
         """

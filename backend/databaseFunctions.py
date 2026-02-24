@@ -22,12 +22,37 @@ def insert_track(track : Track) -> str | sqlite3.IntegrityError :
     try:
         with sqlite3.connect("backend/test.db") as conn:
             cur = conn.cursor()
-             
-            
-
             cur.execute(
-            "INSERT INTO track (name, track_hash) VALUES (?, ?)",
-            (track.name, track.track_hash(),))
+            """INSERT INTO track (name, 
+                                 track_hash,
+                                 length_2d,
+                                 length_3d,
+                                 moving_time,
+                                 stopped_time,
+                                 moving_distance,
+                                 stopped_distance,
+                                 max_speed,
+                                 avg_speed,
+                                 uphill,
+                                 downhill,
+                                 start_time,
+                                 end_time,
+                                 points) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                                (track.name,
+                                 track.track_hash(),
+                                 track.length_2d,
+                                 track.length_3d,
+                                 track.moving_data.moving_time,
+                                 track.moving_data.stopped_time,
+                                 track.moving_data.moving_distance,
+                                 track.moving_data.stopped_distance,
+                                 track.moving_data.max_speed,
+                                 track.avg_speed,
+                                 track.uphill.uphill,
+                                 track.uphill.downhill,
+                                 track.time_bounds.start_time,
+                                 track.time_bounds.end_time,
+                                 track.points,))
            
             track_id = cur.lastrowid
             data = [
@@ -233,8 +258,8 @@ def get_all_tracks() -> list[tuple]:
     Retrieve all rows from the track table.
 
     Returns:
-        list[tuple]: A list of tuples in the following order:
-            (id, name, track_hash)
+        list[tuple]: A list of tuples
+            (
     """
     with sqlite3.connect("backend/test.db") as conn:
         cur = conn.cursor()

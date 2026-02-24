@@ -28,7 +28,8 @@ def startDatabase():
         avg_speed REAL,
         uphill REAL,
         downhill REAL,
-        time_bounds TEXT,
+        start_time TEXT,
+        end_time TEXT,
         points INTEGER
     );
 
