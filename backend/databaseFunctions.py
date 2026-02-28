@@ -3,6 +3,63 @@ from backend.Track import Track
 from datetime import datetime
 from math import radians, cos, sin, asin, sqrt
 
+def createDatabase():
+    """
+    Creates a SQLite3 Database, if one is already present
+    it does nothing
+    """
+    conn = sqlite3.connect('backend/test.db')
+    cur = conn.cursor()
+
+    # Enable foreign key support
+    conn.execute("PRAGMA foreign_keys = ON")
+
+    # Create tables and index
+    cur.executescript("""
+
+    CREATE TABLE IF NOT EXISTS track (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL UNIQUE,
+        track_hash TEXT NOT NULL UNIQUE,
+        length_2d REAL,
+        length_3d REAL,
+        moving_time REAL,
+        stopped_time REAL,
+        moving_distance REAL,
+        stopped_distance REAL,
+        max_speed REAL,
+        avg_speed REAL,
+        uphill REAL,
+        downhill REAL,
+        start_time TEXT,
+        end_time TEXT,
+        points INTEGER
+    );
+
+    CREATE TABLE IF NOT EXISTS track_point (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        track_id INTEGER NOT NULL,
+        lat REAL NOT NULL,
+        lon REAL NOT NULL,
+        ele REAL,
+        timestamp TEXT NOT NULL,
+        course REAL,
+        speed REAL,
+        geoidheight REAL,
+        src TEXT,
+        sat INTEGER,
+        hdop REAL,
+        vdop REAL,
+        pdop REAL,
+        
+        FOREIGN KEY (track_id)
+            REFERENCES track (id)
+            ON DELETE CASCADE
+    );
+    """)
+    conn.commit()
+    conn.close()
+
 def insert_track(track : Track) -> str | sqlite3.IntegrityError :
     """
     First checks if a track is already present,
@@ -161,98 +218,6 @@ def delete_track_by_hash(track_hash: str):
         conn.commit()
         return True
 
-        
-def avg_speed(id: str) -> float:
-    """
-    Get average speed from a track
-
-    Args:
-        track_hash (str): The hash value of the track
-    Returns:
-        float: Represents the average speed
-    """
-    with sqlite3.connect("backend/test.db") as conn:
-        cur = conn.cursor()
-
-        cur.execute("""
-            SELECT AVG(speed) 
-            FROM track_point 
-            WHERE track_id = ? 
-            AND speed > 0.0
-            """, (id,))
-        
-        row = cur.fetchone()
-
-        if row and row[0] is not None:
-            return row[0]
-        else:
-            return 0.0
-        
-def duration (id: str) -> int:
-    """
-    Calculate the total duration of a track in seconds.
-
-    It is computed by subtracting between the earliest and latest timestamp
-    """
-    timestamps = get_trackpoints(id, "timestamp")
-
-    dt_objects = [datetime.fromisoformat(ts[0]) for ts in timestamps]
-
-    duration = max(dt_objects) - min(dt_objects)
-
-    total_seconds = int(duration.total_seconds())
-
-    return total_seconds
-
-def calculate_elevation_stats(track_id):
-    ele_rows = get_trackpoints(track_id, "ele")
-    if not ele_rows or len(ele_rows) < 2:
-        return 0.0, 0.0
-
-    uphill = 0.0
-    downhill = 0.0
-    threshold = 0.75 # Ignore changes smaller than 50cm
-
-    for i in range(len(ele_rows) - 1):
-        if not ele_rows[i+1][0] and not ele_rows[i][0] < 0:
-            diff = ele_rows[i+1][0] - ele_rows[i][0]
-        
-            if diff > threshold:
-                uphill += diff
-            elif diff < -threshold:
-                downhill += abs(diff)
-
-    return uphill, downhill
-
-def calculate_total_distance(track_id):
-    # 1. Get your coordinates
-    lats = get_trackpoints(track_id, "lat")
-    lons = get_trackpoints(track_id, "lon")
-    
-    if not lats or not lons:
-        return 0.0
-
-    total_dist = 0.0
-    # 2. Loop through points and calculate distance between point i and i+1
-    for i in range(len(lats) - 1):
-        lat1, lon1 = lats[i][0], lons[i][0]
-        lat2, lon2 = lats[i+1][0], lons[i+1][0]
-        
-        # Convert decimal degrees to radians 
-        lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
-
-        # Haversine formula
-        dlon = lon2 - lon1 
-        dlat = lat2 - lat1 
-        a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
-        c = 2 * asin(sqrt(a)) 
-        km = 6371 * c
-        meters = (6371 * c) * 1000
-        total_dist += meters
-
-    return total_dist # Now returns total distance in meters
- 
-    
 def get_all_tracks() -> list[tuple]:
     """
     Retrieve all rows from the track table.
@@ -346,6 +311,4 @@ def get_track_by_name(name: str) -> list:
         cur.execute("SELECT id from track where name = ?", (name,),)
         rows = cur.fetchall()
         return rows
-
-
 

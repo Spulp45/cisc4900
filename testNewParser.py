@@ -1,9 +1,7 @@
 from backend import parser
 from backend import databaseFunctions
-from backend import createDatabase
 
-
-createDatabase.startDatabase()
+databaseFunctions.createDatabase()
 
 track1 = parser.getGPX("testGPX/20250612_Morning.gpx")
 
