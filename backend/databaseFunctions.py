@@ -1,7 +1,6 @@
 import sqlite3 
 from backend.Track import Track
-from datetime import datetime
-from math import radians, cos, sin, asin, sqrt
+from collections import namedtuple
 
 def createDatabase():
     """
@@ -53,7 +52,7 @@ def createDatabase():
         pdop REAL,
         
         FOREIGN KEY (track_id)
-            REFERENCES track (id)
+            REFERENCES track(id)
             ON DELETE CASCADE
     );
     """)
@@ -157,7 +156,7 @@ def insert_track(track : Track) -> str | sqlite3.IntegrityError :
     except sqlite3.IntegrityError:
         print(f"'{track.name}' Already exists in the database")
         
-def delete_track_by_id(id: str):
+def delete_track_by_id(id: str) -> bool:
     """
     Deletes a track by id of the track
     and CASCADE DELETE all related track points 
@@ -180,7 +179,7 @@ def delete_track_by_id(id: str):
         )
     return True
 
-def delete_track_by_hash(track_hash: str):
+def delete_track_by_hash(track_hash: str) -> bool:
     """
     Deletes a track by hash value
     and CASCADE DELETE 
@@ -218,54 +217,84 @@ def delete_track_by_hash(track_hash: str):
         conn.commit()
         return True
 
-def get_all_tracks() -> list[tuple]:
+def get_all_tracks() -> list[namedtuple]:
     """
     Retrieve all rows from the track table.
 
     Returns:
-        list[tuple]: A list of tuples
-            (
+        list[namedtuple]: The name of each tuple represents the column name in the database.
+                            Refer to the database column names to know the names of the tuples
     """
     with sqlite3.connect("backend/test.db") as conn:
         cur = conn.cursor()
         cur.execute("SELECT * FROM track")
-        rows = cur.fetchall()
-        return rows
+        # cur.description is a list of metadata for each column retrieved from the execution of the script
+        # The first element is the column name
+        column_names = [desc[0] for desc in cur.description]
 
-def get_all_track_points() -> list[tuple]:
+        TrackRow = namedtuple("TrackRow", column_names)
+
+        rows = [TrackRow(*row) for row in cur.fetchall()]
+
+        return rows
+    
+def get_all_track_points() -> list[namedtuple]:
     """
     Retrieve all rows from the track_point table.
 
     Returns:
-        list[tuple]: A list of tuples in the following order:
-            (id, track_id, lat, lon, ele, timestamp, course, speed, geoidheight, src, sat, hdop, vdop, pdop)
+        list[namedtuple]: The name of each tuple represents the column name in the database.
+                            Refer to the database column names to know the names of the tuples
     """
     with sqlite3.connect("backend/test.db") as conn:
         cur = conn.cursor()
         cur.execute("SELECT * from track_point")
-        rows = cur.fetchall()
+        # cur.description is a list of metadata for each column retrieved from the execution of the script
+        # The first element is the column name
+        column_names = [desc[0] for desc in cur.description]
+
+        TrackPointRow = namedtuple("TrackPointRow", column_names)
+
+        rows = [TrackPointRow(*row) for row in cur.fetchall()]
+
         return rows
 
-def get_track_with_track_points_by_id(id: str) -> dict[str, list[tuple]]:
+    # TODO This function below is kinda too much should we drop it?
+def get_track_with_track_points_by_id(id: str) -> dict[str, list[namedtuple]]:
     """
-    Get a track with all related track_points by using an id
-    
+    Get a track with all related track_points by using the track id
+
     Args:
-        id(str): The id of the track
+        id(str): The id of the track to get
 
     Returns:
-        dict[str, list[tuple]]: A dictionary containing:
-            - "track": Tuples in the order of: (id, name, track_hash)
-            - "track_points": Tuples in the order of:
-            (id, track_id, lat, lon, ele, timestamp, course, speed, geoidheight, src, sat, hdop, vdop, pdop)
+        dict[str, list[namedtuple]]: A dictionary containing:
+            - "track": A list of namedtuples of type TrackRow. They are in the following order:
+                (id, name, track_hash, length_2d, length_3d, moving_time, stopped_time, 
+                moving_distance, stopped_distance, max_speed, avg_speed, uphill, downhill, 
+                start_time, end_time, points)
+            - "track_point": A list of namedtuples representing all track_points associated with that track.
+                They are in the following order:
+                (id, track_id, lat, lon, ele, timestamp, course, speed, geoidheight, src, 
+                sat, hdop, vdop, pdop)
     """
     with sqlite3.connect("backend/test.db") as conn:
         cur = conn.cursor()
         cur.execute("SELECT * from track WHERE id = ?",(id,))
-        track_rows = cur.fetchall()
+        
+        track_column_names = [desc[0] for desc in cur.description]
+
+        TrackRow = namedtuple("TrackRow", track_column_names)
+
+        track_rows = [TrackRow(*row) for row in cur.fetchall()]
 
         cur.execute("SELECT * from track_point WHERE track_id = ? ",(id,))
-        track_point_rows = cur.fetchall()
+
+        track_point_column_names = [desc[0] for desc in cur.description]
+
+        TrackPointRow = namedtuple("TrackPointRows", track_point_column_names)
+
+        track_point_rows = [TrackPointRow(*row) for row in cur.fetchall()]
         
         return {'track': track_rows, 'track_points' : track_point_rows}
     
@@ -280,7 +309,7 @@ def get_trackpoints(id : str, track_point_column: str) -> list | str:
             the track_point table.
 
     Returns:
-        list[tuple]: A list of tuples containing the requested column
+        list[]: A list containing the requested column
             values for all matching track_point rows. \n
         str: An error message if the column name is invalid.
     """
@@ -295,6 +324,7 @@ def get_trackpoints(id : str, track_point_column: str) -> list | str:
             cur.execute(query, (id,))
             rows = cur.fetchall()
             return rows
+    # TODO Change this to exception maybe?
     else:
         return "Invalid column name for track_point"
 
@@ -311,4 +341,3 @@ def get_track_by_name(name: str) -> list:
         cur.execute("SELECT id from track where name = ?", (name,),)
         rows = cur.fetchall()
         return rows
-

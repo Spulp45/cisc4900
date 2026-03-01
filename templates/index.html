@@ -4,57 +4,95 @@
     <meta charset="UTF-8">
     <title>cisc4900</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Ensure the map container has height */
+        #map {
+            height: 500px;  /* adjust as needed */
+            width: 100%;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
 
+    <!-- Map container -->
     <div id="map"></div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-    // This creates a global variable for map.js to use
-    var pathData = {{ map_points | tojson }};
-</script>
-    <script src="{{ url_for('static', filename='map.js') }}"></script>
-
-    <div class = "stats-display">
+    <!-- Stats display -->
+    <div class="stats-display">
         <h2>STATS</h2>
         <table>
             <tr>
-                <th>Static</th>
+                <th>Metric</th>
                 <th>Value</th>
             </tr>
             <tr>
                 <td>Average Moving Speed</td>
-                <td>{{ avg_speed }} m/s</td>
+                <td>{{ track.avg_speed }} m/s</td>
             </tr>
             <tr>
                 <td>Total Distance</td>
-                <td>{{total_distance}} meters</td>
+                <td>{{ track.length_3d }} meters</td>
             </tr>
             <tr>
                 <td>Total Duration</td>
-                <td>{{duration}}</td>
+                <td>{{ track.end_time }} -> {{ track.start_time }}</td>
             </tr>
             <tr>
-                 <td>Total Uphill</td>
-                 <td>{{ uphill }} m</td>
+                <td>Total Uphill</td>
+                <td>{{ track.uphill }} m</td>
             </tr>
             <tr>
                 <td>Total Downhill</td>
-                <td>{{ downhill }} m</td>
+                <td>{{ track.downhill }} m</td>
+            </tr>
+            <tr>
+                <td>Track Hash</td>
+                <td>{{ track.track_hash }} m</td>
+            </tr>
+            <tr>
+                <td>Max Speed </td>
+                <td>{{ track.max_speed }} m</td>
             </tr>
         </table>
     </div>
-    <div class = "input-gpx-form">
+
+    <!-- GPX upload form -->
+    <div class="input-gpx-form">
         <form action="/upload" method="post" enctype="multipart/form-data" id="upload-form">
-             <label for="file-upload" class="drop-zone">
-             <span>Click or Drag GPX file here</span>
-            <input id="file-upload" name="file" type="file" accept=".gpx">
+            <label for="file-upload" class="drop-zone">
+                <span>Click or Drag GPX file here</span>
+                <input id="file-upload" name="file" type="file" accept=".gpx">
             </label>
             <button type="submit">Upload</button>
         </form>
     </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Convert server-side namedtuple data to JS variables
+        var pathData = {{ map_points | tojson }};
+        var trackInfo = {{ track | tojson }};
+
+        // Initialize map
+        var map = L.map('map').setView([0, 0], 2);
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Draw the track as a polyline if there is data
+        if (pathData.length > 0) {
+            var latlngs = pathData.map(p => [p.lat, p.lon]);
+            var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
+
+            // Adjust map view to fit the polyline
+            map.fitBounds(polyline.getBounds());
+        }
+    </script>
 
 </body>
 </html>

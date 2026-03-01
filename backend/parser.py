@@ -1,6 +1,5 @@
 import gpxpy
 import xml.etree.ElementTree as ET
-from datetime import datetime
 from backend.Track import Track
 import os
 from backend.TrackPoint import TrackPoint
@@ -77,8 +76,6 @@ def getGPX(filename: str) -> Track:
             elif tag == "src":
                 track_point.addChild(tag, str(text))
             
-
-
         # Add each parsed point to the track_point object
         track.add_point(track_point.lat,
                         track_point.lon, 

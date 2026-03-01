@@ -13,48 +13,23 @@ def home():
 
 @app.route('/trip/<int:track_id>')
 def trip_stats(track_id):
-    #track = parser.getGPX("testGPX/20260205.gpx")
-    test_id = track_id
-
-    #For Speed
-    avg = databaseFunctions.avg_speed(track_id)
-
-    #For duration
-    total_seconds = databaseFunctions.duration(track_id)
-
-    hours = total_seconds // 3600
-    minutes = (total_seconds % 3600) // 60
-    seconds = total_seconds % 60
-
-    if hours > 0:
-        dur = f"{hours}:{minutes:02d}:{seconds:02d}"
-    else:
-        dur = f"{minutes}:{seconds:02d}"
-
-    #For distance
-    meter = databaseFunctions.calculate_total_distance(track_id)
-    formatted_meters = round(meter, 2)
-
-    #For uphill and downhill
-    gain, loss = databaseFunctions.calculate_elevation_stats(track_id)
-
-    #For map points
-    lats_raw = databaseFunctions.get_trackpoints(track_id, "lat")
-    lons_raw = databaseFunctions.get_trackpoints(track_id, "lon")
-
-    coords = []
-    if isinstance(lats_raw, list) and isinstance(lons_raw, list):
-        coords = [[lat[0], lon[0]] for lat, lon in zip(lats_raw, lons_raw)]
-
     
+    data = databaseFunctions.get_track_with_track_points_by_id(track_id)
 
-    return render_template('index.html', 
-                           avg_speed=round(avg, track_id) if avg else 0.0,
-                           map_points=coords,
-                           duration = dur,
-                           uphill=f"{gain:.2f}",
-                           downhill=f"{loss:.2f}",
-                           total_distance = formatted_meters)
+    if not data['track']:
+        return f"No track found with ID {track_id}", 404
+    
+    track = data['track'][0] 
+    track_points = data['track_points']
+
+    track_dict = track._asdict()
+    track_points_list = [pt._asdict() for pt in track_points]
+
+    return render_template(
+        'index.html',
+        track=track_dict,
+        map_points=track_points_list
+    )
 
                            
 
@@ -79,9 +54,6 @@ def upload_file():
         except sqlite3.IntegrityError:
             # Instead of crashing, tell the user the file already exists
             return "This track has already been uploaded.", 400
-                    
-                            
-
 if __name__ == '__main__':
     app.run(debug=True)
 
