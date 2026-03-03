@@ -92,3 +92,14 @@ def getGPX(filename: str) -> Track:
     
     return track
 
+def is_valid_gpx(filepath):
+    try:
+        tree = ET.parse(filepath)
+        root = tree.getroot()
+
+        if "gpx" in root.tag.lower():
+            return True
+        return False
+    except ET.ParseError:
+        return False
+

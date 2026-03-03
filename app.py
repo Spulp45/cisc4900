@@ -1,13 +1,17 @@
 from flask import Flask, render_template,request, redirect
-import sqlite3
+from werkzeug.utils import secure_filename
 from backend import databaseFunctions
 from backend import parser
+import os
 
 
-app = Flask(__name__) 
+app = Flask(__name__)
+app.config['UPLOAD_DIRECTORY'] = 'uploads/'
+app.config['ALLOWED_EXTENSIONS'] = ['.gpx']
 
 @app.route('/')
 def home():
+    databaseFunctions.createDatabase() # Remove this later
     all_rows = databaseFunctions.get_all_tracks()
     return render_template('home.html', tracks=all_rows)
 
@@ -31,29 +35,39 @@ def trip_stats(track_id):
         map_points=track_points_list
     )
 
-                           
-
 @app.route('/upload', methods=['POST'])
-def upload_file():
+def upload():
     if 'file' not in request.files:
-        return "No file part", 400
-    
+        return redirect('/')
+
     file = request.files['file']
-    if file.filename == '':
-        return "No selected file", 400
 
-    if file:
-        # 1. Parse the GPX data directly from the uploaded file stream
-        track_obj = parser.getGPXWeb(file)
-        print(f"DEBUG: Generated Hash: {track_obj.track_hash()}")
-        print(f"DEBUG: Number of points parsed: {len(track_obj.lat)}")
+    if file.filename == "":
+        return redirect('/')
 
-        try:
-            databaseFunctions.insert_track(track_obj)
-            return redirect('/')
-        except sqlite3.IntegrityError:
-            # Instead of crashing, tell the user the file already exists
-            return "This track has already been uploaded.", 400
+    extension = os.path.splitext(file.filename)[1].lower()
+
+    if extension not in app.config['ALLOWED_EXTENSIONS']:
+        return 'The file is not .gpx format'
+
+    filename = secure_filename(file.filename)
+    filepath = os.path.join(app.config['UPLOAD_DIRECTORY'], filename)
+
+    file.save(filepath)
+
+    databaseFunctions.insert_track(parser.getGPX(filepath))
+
+    return redirect('/')
+
+@app.route('/delete/<int:track_id>', methods=['POST'])
+def delete_track(track_id):
+    success = databaseFunctions.delete_track_by_id(track_id)
+
+    if not success:
+        return f"Could not delete track {track_id}", 400
+
+    return redirect('/')
+
 if __name__ == '__main__':
     app.run(debug=True)
 

@@ -59,7 +59,7 @@ def createDatabase():
     conn.commit()
     conn.close()
 
-def insert_track(track : Track) -> str | sqlite3.IntegrityError :
+def insert_track(track : Track) -> str | bool | sqlite3.IntegrityError :
     """
     First checks if a track is already present,
     if not it adds to the database
@@ -68,6 +68,7 @@ def insert_track(track : Track) -> str | sqlite3.IntegrityError :
         track (Track): Takes in track object
     Returns:
         (str): If integrity check for track failed
+        (bool): True if insert is successful
     Raises:
         sqlite3.IntegrityError: If the track already exists in database
         
@@ -155,6 +156,7 @@ def insert_track(track : Track) -> str | sqlite3.IntegrityError :
     
     except sqlite3.IntegrityError:
         print(f"'{track.name}' Already exists in the database")
+    return True
         
 def delete_track_by_id(id: str) -> bool:
     """

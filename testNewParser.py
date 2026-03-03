@@ -17,9 +17,9 @@ tracks = databaseFunctions.get_all_tracks()
 track_points = databaseFunctions.get_all_track_points()
 
 # Print track points for track_id = 2
-for tp in track_points:
-    if tp.track_id == 2:
-        print("lat:", tp.lat, "\tlon:", tp.lon, "\tspeed:", tp.speed)
+for track_point in track_points:
+    if track_point.track_id == 2:
+        print("lat:", track_point.lat, "\tlon:", track_point.lon, "\tspeed:", track_point.speed)
 
 # Print basic info about all tracks
 for track in tracks:
@@ -43,6 +43,8 @@ for pt in track_points2:
 
 # Print basic info about the track itself
 print("Name:", track.name, "\tStart Time:", track.start_time)
+
+
 
 
 
