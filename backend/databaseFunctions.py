@@ -343,3 +343,29 @@ def get_track_by_name(name: str) -> list:
         cur.execute("SELECT id from track where name = ?", (name,),)
         rows = cur.fetchall()
         return rows
+    
+def get_sql_total_only() -> namedtuple:
+    with sqlite3.connect("backend/test.db") as conn:
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        
+        # We still need the column names to build the NamedTuple structure
+        cur.execute("SELECT * FROM track LIMIT 0") 
+        column_names = [desc[0] for desc in cur.description]
+        TrackRow = namedtuple("TrackRow", column_names)
+
+        # Get only the SUMS/MAX
+        cur.execute("""
+            SELECT 0 as id, 'TOTAL' as name, '' as track_hash, 
+                   SUM(length_2d) as length_2d, SUM(length_3d) as length_3d,
+                   SUM(moving_time) as moving_time, SUM(stopped_time) as stopped_time,
+                   SUM(moving_distance) as moving_distance, SUM(stopped_distance) as stopped_distance,
+                   MAX(max_speed) as max_speed, AVG(avg_speed) as avg_speed, 
+                   SUM(uphill) as uphill, SUM(downhill) as downhill,
+                   '' as start_time, '' as end_time, SUM(points) as points
+            FROM track
+        """)
+        
+        total_data = cur.fetchone()
+        # Return just the single NamedTuple object
+        return TrackRow(*total_data) if total_data else None

@@ -14,54 +14,51 @@
         }
     </style>
 </head>
+
+
 <body>
 
     <!-- Map container -->
     <div id="map"></div>
 
     <!-- Stats display -->
-    <div class="stats-display">
-        <h2>STATS</h2>
-        <table>
-            <tr>
-                <th>Metric</th>
-                <th>Value</th>
-            </tr>
-            <tr>
-                <td>Average Moving Speed</td>
-                <td>{{ track.avg_speed }} m/s</td>
-            </tr>
-            <tr>
-                <td>Total Distance</td>
-                <td>{{ track.length_3d }} meters</td>
-            </tr>
-            <tr>
-                <td>Start Time</td>
-                <td>{{track.start_time }}</td>
-            </tr>
-            <tr>
-                <tr>
-                <td>End Time</td>
-                <td>{{track.end_time }}</td>
-            </tr>
-            <tr>
-                <td>Total Uphill</td>
-                <td>{{ track.uphill }} m</td>
-            </tr>
-            <tr>
-                <td>Total Downhill</td>
-                <td>{{ track.downhill }} m</td>
-            </tr>
-            <tr>
-                <td>Track Hash</td>
-                <td>{{ track.track_hash }} m</td>
-            </tr>
-            <tr>
-                <td>Max Speed </td>
-                <td>{{ track.max_speed }} m</td>
-            </tr>
-        </table>
-    </div>
+<div class="stats-display">
+    <h2>STATS</h2>
+    <table>
+        <tr>
+            <th>Metric</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td>Average Moving Speed</td>
+            <td>{{ "%.2f"|format(track.avg_speed) }} m/s</td>
+        </tr>
+        <tr>
+            <td>Total Distance</td>
+            <td>{{ "%.2f"|format(track.length_3d) }} meters</td>
+        </tr>
+        <tr>
+            <td>Start Time</td>
+            <td>{{ track.start_time }}</td>
+        </tr>
+        <tr>                                    
+            <td>End Time</td>
+            <td>{{ track.end_time }}</td>
+        </tr>
+        <tr>
+            <td>Total Uphill</td>
+            <td>{{ "%.1f"|format(track.uphill) }} m</td>
+        </tr>
+        <tr>
+            <td>Total Downhill</td>
+            <td>{{ "%.1f"|format(track.downhill) }} m</td>
+        </tr>
+        <tr>
+            <td>Max Speed</td>
+            <td>{{ "%.2f"|format(track.max_speed) }} m/s</td>
+        </tr>
+    </table>
+</div>
 
     <!-- GPX upload form -->
     <div class="input-gpx-form">
@@ -77,6 +74,11 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        var carIcon = L.icon({
+        iconUrl: "{{ url_for('static', filename='car.png') }}",
+        iconSize: [40, 40], 
+        iconAnchor: [20, 20]
+});
         // Convert server-side namedtuple data to JS variables
         var pathData = {{ map_points | tojson }};
         var trackInfo = {{ track | tojson }};
@@ -97,6 +99,28 @@
             // Adjust map view to fit the polyline
             map.fitBounds(polyline.getBounds());
         }
+
+    let currentStep = 0;
+    let carMarker;
+
+    function animateCar() {
+        if (pathData.length > 0 && currentStep < pathData.length) {
+            let p = pathData[currentStep];
+            
+            // Create the car if it doesn't exist, otherwise move it
+            if (!carMarker) {
+                carMarker = L.marker([p.lat, p.lon], {icon: carIcon}).addTo(map);
+            } else {
+                carMarker.setLatLng([p.lat, p.lon]);
+            }
+
+            currentStep++;
+            setTimeout(animateCar, 100); // 100ms creates a smooth drive
+        }
+    }
+
+// Start driving!
+animateCar();
     </script>
 
 </body>

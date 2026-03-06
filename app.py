@@ -68,7 +68,21 @@ def delete_track(track_id):
 
     return redirect('/')
 
+@app.route('/allTrip')
+def all_trips():
+    # Fetch just the one total row
+    summary_row = databaseFunctions.get_sql_total_only()
+
+    if not summary_row:
+        return "No data found to calculate totals", 404
+    
+    # Send the single row to the HTML
+    return render_template('all_trips.html', track=summary_row)
+
+
+#this is for hupper the user_reloader
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)
+
 
 
