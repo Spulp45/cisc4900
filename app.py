@@ -1,88 +1,115 @@
-from flask import Flask, render_template,request, redirect
-import sqlite3
+from flask import Flask, render_template, request, redirect, session
+from werkzeug.utils import secure_filename
 from backend import databaseFunctions
 from backend import parser
+import os
+import units
 
 
-app = Flask(__name__) 
+app = Flask(__name__)
+app.secret_key = "your_secret_key_here"
+app.config['UPLOAD_DIRECTORY'] = 'uploads/'
+app.config['ALLOWED_EXTENSIONS'] = ['.gpx']
+
 
 @app.route('/')
 def home():
+    databaseFunctions.createDatabase()  # Remove this later
     all_rows = databaseFunctions.get_all_tracks()
     return render_template('home.html', tracks=all_rows)
 
 @app.route('/trip/<int:track_id>')
 def trip_stats(track_id):
-    #track = parser.getGPX("testGPX/20260205.gpx")
-    test_id = track_id
+    data = databaseFunctions.get_track_with_track_points_by_id(track_id)
 
-    #For Speed
-    avg = databaseFunctions.avg_speed(track_id)
-
-    #For duration
-    total_seconds = databaseFunctions.duration(track_id)
-
-    hours = total_seconds // 3600
-    minutes = (total_seconds % 3600) // 60
-    seconds = total_seconds % 60
-
-    if hours > 0:
-        dur = f"{hours}:{minutes:02d}:{seconds:02d}"
-    else:
-        dur = f"{minutes}:{seconds:02d}"
-
-    #For distance
-    meter = databaseFunctions.calculate_total_distance(track_id)
-    formatted_meters = round(meter, 2)
-
-    #For uphill and downhill
-    gain, loss = databaseFunctions.calculate_elevation_stats(track_id)
-
-    #For map points
-    lats_raw = databaseFunctions.get_trackpoints(track_id, "lat")
-    lons_raw = databaseFunctions.get_trackpoints(track_id, "lon")
-
-    coords = []
-    if isinstance(lats_raw, list) and isinstance(lons_raw, list):
-        coords = [[lat[0], lon[0]] for lat, lon in zip(lats_raw, lons_raw)]
-
+    if not data['track']:
+        return f"No track found with ID {track_id}", 404
     
+    track = data['track'][0] 
+    track_points = data['track_points']
 
-    return render_template('index.html', 
-                           avg_speed=round(avg, track_id) if avg else 0.0,
-                           map_points=coords,
-                           duration = dur,
-                           uphill=f"{gain:.2f}",
-                           downhill=f"{loss:.2f}",
-                           total_distance = formatted_meters)
+    track_dict = track._asdict()
+    track_points_list = [pt._asdict() for pt in track_points]
 
-                           
+    return render_template(
+        'index.html',
+        track=track_dict,
+        map_points=track_points_list
+    )
 
 @app.route('/upload', methods=['POST'])
-def upload_file():
+def upload():
     if 'file' not in request.files:
-        return "No file part", 400
-    
+        return redirect('/')
+
     file = request.files['file']
-    if file.filename == '':
-        return "No selected file", 400
 
-    if file:
-        # 1. Parse the GPX data directly from the uploaded file stream
-        track_obj = parser.getGPXWeb(file)
-        print(f"DEBUG: Generated Hash: {track_obj.track_hash()}")
-        print(f"DEBUG: Number of points parsed: {len(track_obj.lat)}")
+    if file.filename == "":
+        return redirect('/')
 
-        try:
-            databaseFunctions.insert_track(track_obj)
-            return redirect('/')
-        except sqlite3.IntegrityError:
-            # Instead of crashing, tell the user the file already exists
-            return "This track has already been uploaded.", 400
-                    
-                            
+    extension = os.path.splitext(file.filename)[1].lower()
 
+    if extension not in app.config['ALLOWED_EXTENSIONS']:
+        return 'The file is not .gpx format'
+
+    filename = secure_filename(file.filename)
+    filepath = os.path.join(app.config['UPLOAD_DIRECTORY'], filename)
+
+    file.save(filepath)
+    databaseFunctions.insert_track(parser.getGPX(filepath))
+
+    return redirect('/')
+
+@app.route('/delete/<int:track_id>', methods=['POST'])
+def delete_track(track_id):
+    success = databaseFunctions.delete_track_by_id(track_id)
+
+    if not success:
+        return f"Could not delete track {track_id}", 400
+
+    return redirect('/')
+
+@app.route('/allTrip')
+def all_trips():
+    summary_row = databaseFunctions.get_sql_total_only()
+
+    if not summary_row:
+        return "No data found to calculate totals", 404
+    
+    return render_template('all_trips.html', track=summary_row)
+
+
+# Unit toggle route
+@app.route('/set_units/<unit>')
+def set_units(unit):
+    if unit in ['metric', 'imperial']:
+        session['units'] = unit
+    return redirect(request.referrer or '/')
+
+
+# Template filters
+@app.template_filter("speed")
+def speed_filter(value):
+    unit_setting = session.get("units", "metric")
+    return units.format_speed(value, unit_setting)
+
+
+@app.template_filter("distance")
+def distance_filter(value):
+    unit_setting = session.get("units", "metric")
+    return units.format_distance(value, unit_setting)
+
+
+@app.template_filter("elevation")
+def elevation_filter(value):
+    unit_setting = session.get("units", "metric")
+    return units.format_elevation(value, unit_setting)
+
+@app.template_filter("time")
+def time_filter(value):
+    return units.format_time(value)
+
+
+# For running the app
 if __name__ == '__main__':
-    app.run(debug=True)
-
-
+    app.run(debug=True, use_reloader=False)

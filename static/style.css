@@ -26,3 +26,29 @@ tr:nth-child(even) {
 tr:hover {
     background-color: #f1f1f1;
 }
+
+/* for all trip button */
+
+.total-table {
+    margin: 20px 0; /* Adds 20px of space above and below */
+    padding: 10px;
+}
+
+/* The actual button style */
+.btn-primary {
+    display: inline-block;
+    background-color: black; /* Professional blue */
+    color: white;
+    padding: 8px 8px;
+    text-decoration: none; /* Removes the blue underline */
+    border-radius: 6px;
+    font-weight: bold;
+    font-family: sans-serif;
+    transition: background-color 0.3s ease;
+}
+
+/* Darker blue when you hover over it */
+.btn-primary:hover {
+    background-color: red;
+    cursor: pointer;
+}

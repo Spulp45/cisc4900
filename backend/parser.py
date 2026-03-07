@@ -1,6 +1,5 @@
 import gpxpy
 import xml.etree.ElementTree as ET
-from datetime import datetime
 from backend.Track import Track
 import os
 from backend.TrackPoint import TrackPoint
@@ -35,20 +34,30 @@ def getGPX(filename: str) -> Track:
 
     try:
         with open(filename, "r", encoding="utf-8") as f:
+            tree = ET.parse(filename)
             gpx = gpxpy.parse(f)
     except FileNotFoundError:
         print(f"File '{filename}' was not found.")
-        return []
-    
-    # GPX namespace definition
-    ns = {"gpx": "http://www.topografix.com/GPX/1/0"}
 
+    length_2d = gpx.length_2d()         # float
+    length_3d = gpx.length_3d()         # float
+    moving_data = gpx.get_moving_data() # tuple (moving_time, stopped_time, moving_distance, stopped_distance, max_speed)
+    avg_speed = moving_data.moving_distance / moving_data.moving_time # float    
+    uphill = gpx.get_uphill_downhill() #tuple (uphill, downhill)
+    time_bounds = gpx.get_time_bounds() # datetime (start, end)
+    points = gpx.get_points_no() # int
+
+    # Initialize the track with the filename as its name and include all
+    # computed data
     filename_only = os.path.basename(filename)
-    #Initialize Track object using the filename as its name
-    track = Track(filename_only)
-    tree = ET.parse(filename)
-    root = tree.getroot()
+    track = Track(filename_only, length_2d, length_3d, moving_data, 
+                  avg_speed, uphill, time_bounds, points, filename, filename_only)
     
+    
+
+    root = tree.getroot()    
+    # GPX namespace definition
+    ns = {"gpx": "http://www.topografix.com/GPX/1/0"}    
     # Read each data and child of the gpx file
     for trkpt in root.findall(".//gpx:trkpt", ns):
         track_point = TrackPoint(float(trkpt.attrib['lat']),
@@ -67,8 +76,6 @@ def getGPX(filename: str) -> Track:
             elif tag == "src":
                 track_point.addChild(tag, str(text))
             
-
-
         # Add each parsed point to the track_point object
         track.add_point(track_point.lat,
                         track_point.lon, 
@@ -82,83 +89,17 @@ def getGPX(filename: str) -> Track:
                         track_point.hdop,
                         track_point.vdop,
                         track_point.pdop)
-    return track
-
-def getGPXWeb(filename: str) -> Track:
-    """
-    Docstring for getGPX
-
-    Args:
-        filename (str):
-            Path to the GPX file to parse.
-
-    Returns:
-        Track:
-            A track object containing all the parsed track points
-
-    Raises:
-        ValueError:
-            If conversion fails for GPX point attributes
-        xml.etree.ElementTree:
-            If the XML structure is invalid or corrupted
-        FileNotFoundError:
-            If the specified file does not exist
-    """
-
-
-    try:
-       
-            gpx = gpxpy.parse(filename)
-
-            filename.seek(0)
-
-            tree = ET.parse(filename)
-            root = tree.getroot()
-            
-    except Exception as e:
-        print(f"Error parsing GPX file: {e}")
-        return None
-    # GPX namespace definition
-    ns = {"gpx": "http://www.topografix.com/GPX/1/0"}
-
-
-    # Initialize Track object using the filename as its name
-    track = Track(filename.filename)
     
-    # Read each data and child of the gpx file
-    for trkpt in root.findall(".//gpx:trkpt", ns):
-        data = {
-            "lat": float(trkpt.attrib["lat"]),
-            "lon": float(trkpt.attrib["lon"]),
-        }
-
-        for child in trkpt:
-            tag = child.tag.split("}")[-1]
-            text = child.text
-
-            if tag == "time":
-                data[tag] = datetime.fromisoformat(text.replace("Z", "+00:00"))
-            elif tag in {"ele", "course", "speed", "geoidheight", "hdop", "vdop", "pdop"}:
-                data[tag] = float(text)
-            elif tag == "sat":
-                data[tag] = int(text)
-            else:
-                data[tag] = text
-        
-        # Add each parsed point to the track object
-        track.add_point(
-                lat=data.get("lat"),
-                lon=data.get("lon"),
-                ele=data.get("ele"),
-                time=data.get("time"),
-                course=data.get("course"),
-                speed=data.get("speed"),
-                geoidheight=data.get("geoidheight"),
-                src=data.get("src"),
-                sat=data.get("sat"),
-                hdop=data.get("hdop"),
-                vdop=data.get("vdop"),
-                pdop=data.get("pdop"), 
-                )
-
     return track
+
+def is_valid_gpx(filepath):
+    try:
+        tree = ET.parse(filepath)
+        root = tree.getroot()
+
+        if "gpx" in root.tag.lower():
+            return True
+        return False
+    except ET.ParseError:
+        return False
+

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>All Stats</title>
+</head>
+<body>
+    <div class="Total-stats-display">
+    <h2>TOTAL STATS</h2>
+    <table>
+        <tr>
+            <th>Metric</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td>Average Moving Speed</td>
+            <td>{{ "%.2f"|format(track.avg_speed) }} m/s</td>
+        </tr>
+        <tr>
+            <td>Total Distance</td>
+            <td>{{ "%.2f"|format(track.length_3d) }} meters</td>
+        </tr>
+        <tr>
+            <td>Total Uphill</td>
+            <td>{{ "%.1f"|format(track.uphill) }} m</td>
+        </tr>
+        <tr>
+            <td>Total Downhill</td>
+            <td>{{ "%.1f"|format(track.downhill) }} m</td>
+        </tr>
+        <tr>
+            <td>Max Speed</td>
+            <td>{{ "%.2f"|format(track.max_speed) }} m/s</td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

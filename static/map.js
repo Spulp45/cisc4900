@@ -8,7 +8,7 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // NEW: Plotting the line
 if (typeof pathData !== 'undefined' && pathData.length > 0) {
     var polyline = L.polyline(pathData, {
-        color: 'red',
+        color: 'aqua',
         weight: 4,
         opacity: 0.7
     }).addTo(map);
