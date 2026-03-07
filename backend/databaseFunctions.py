@@ -1,4 +1,5 @@
-import sqlite3 
+import sqlite3
+import os
 from backend.Track import Track
 from collections import namedtuple
 
@@ -32,7 +33,9 @@ def createDatabase():
         downhill REAL,
         start_time TEXT,
         end_time TEXT,
-        points INTEGER
+        points INTEGER,
+        filepath TEXT NOT NULL,
+        filename TEXT NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS track_point (
@@ -94,7 +97,8 @@ def insert_track(track : Track) -> str | bool | sqlite3.IntegrityError :
                                  downhill,
                                  start_time,
                                  end_time,
-                                 points) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                                 points, filepath,
+                                 filename) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                                 (track.name,
                                  track.track_hash(),
                                  track.length_2d,
@@ -109,7 +113,9 @@ def insert_track(track : Track) -> str | bool | sqlite3.IntegrityError :
                                  track.uphill.downhill,
                                  track.time_bounds.start_time,
                                  track.time_bounds.end_time,
-                                 track.points,))
+                                 track.points,
+                                 track.filepath,
+                                 track.filename,))
            
             track_id = cur.lastrowid
             data = [
@@ -169,55 +175,30 @@ def delete_track_by_id(id: str) -> bool:
     Returns:
         True if deleted sucessfully 
     """
-    with sqlite3.connect("backend/test.db") as conn:
-        cur = conn.cursor()
-        cur.execute(
-            "DELETE FROM track WHERE id = ?",
-            (id,)
-        )
-        cur.execute(
-            "DELETE FROM track_point WHERE track_id = ?",
-            (id,)
-        )
-    return True
-
-def delete_track_by_hash(track_hash: str) -> bool:
-    """
-    Deletes a track by hash value
-    and CASCADE DELETE 
-    all related track points 
-    from the track_point table
+    try:
+        int_id = int(id)  # convert id to int
+    except ValueError:
+        return False
     
-    Args:
-        track_hash (str): hash value
-    Returns:
-        True if deleted sucessfully 
-    
-    """
     with sqlite3.connect("backend/test.db") as conn:
         cur = conn.cursor()
 
-        # Get track id
-        cur.execute("SELECT id FROM track WHERE track_hash = ?", (track_hash,))
+        cur.execute("SELECT filepath FROM track WHERE id = ?", (int_id,))
         row = cur.fetchone()
 
-        if row is None:
-            return False
+        if not row:
+            return False  # track does not exist
 
-        track_id = row[0]
+        filepath = row[0]
+        print(filepath)
 
-       
-        cur.execute(
-            "DELETE FROM track_point WHERE track_id = ?",
-            (track_id,)
-        )
-        # delete track
-        cur.execute(
-            "DELETE FROM track WHERE id = ?",
-            (track_id,)
-        )
-        conn.commit()
-        return True
+        if filepath and os.path.exists(filepath):
+            os.remove(filepath)
+
+        cur.execute("DELETE FROM track_point WHERE track_id = ?", (int_id,))
+        cur.execute("DELETE FROM track WHERE id = ?", (int_id,))
+
+    return True
 
 def get_all_tracks() -> list[namedtuple]:
     """
@@ -348,13 +329,12 @@ def get_sql_total_only() -> namedtuple:
     with sqlite3.connect("backend/test.db") as conn:
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
-        
-        # We still need the column names to build the NamedTuple structure
-        cur.execute("SELECT * FROM track LIMIT 0") 
+
+        # Build NamedTuple structure
+        cur.execute("SELECT * FROM track LIMIT 0")
         column_names = [desc[0] for desc in cur.description]
         TrackRow = namedtuple("TrackRow", column_names)
 
-        # Get only the SUMS/MAX
         cur.execute("""
             SELECT 0 as id, 'TOTAL' as name, '' as track_hash, 
                    SUM(length_2d) as length_2d, SUM(length_3d) as length_3d,
@@ -362,10 +342,15 @@ def get_sql_total_only() -> namedtuple:
                    SUM(moving_distance) as moving_distance, SUM(stopped_distance) as stopped_distance,
                    MAX(max_speed) as max_speed, AVG(avg_speed) as avg_speed, 
                    SUM(uphill) as uphill, SUM(downhill) as downhill,
-                   '' as start_time, '' as end_time, SUM(points) as points
+                   '' as start_time, '' as end_time, SUM(points) as points,
+                    filepath, filename
             FROM track
         """)
-        
+
         total_data = cur.fetchone()
-        # Return just the single NamedTuple object
-        return TrackRow(*total_data) if total_data else None
+
+        # Detect empty table
+        if total_data["points"] is None:
+            return None
+
+        return TrackRow(*total_data)

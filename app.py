@@ -1,23 +1,25 @@
-from flask import Flask, render_template,request, redirect
+from flask import Flask, render_template, request, redirect, session
 from werkzeug.utils import secure_filename
 from backend import databaseFunctions
 from backend import parser
 import os
+import units
 
 
 app = Flask(__name__)
+app.secret_key = "your_secret_key_here"
 app.config['UPLOAD_DIRECTORY'] = 'uploads/'
 app.config['ALLOWED_EXTENSIONS'] = ['.gpx']
 
+
 @app.route('/')
 def home():
-    databaseFunctions.createDatabase() # Remove this later
+    databaseFunctions.createDatabase()  # Remove this later
     all_rows = databaseFunctions.get_all_tracks()
     return render_template('home.html', tracks=all_rows)
 
 @app.route('/trip/<int:track_id>')
 def trip_stats(track_id):
-    
     data = databaseFunctions.get_track_with_track_points_by_id(track_id)
 
     if not data['track']:
@@ -54,7 +56,6 @@ def upload():
     filepath = os.path.join(app.config['UPLOAD_DIRECTORY'], filename)
 
     file.save(filepath)
-
     databaseFunctions.insert_track(parser.getGPX(filepath))
 
     return redirect('/')
@@ -70,19 +71,45 @@ def delete_track(track_id):
 
 @app.route('/allTrip')
 def all_trips():
-    # Fetch just the one total row
     summary_row = databaseFunctions.get_sql_total_only()
 
     if not summary_row:
         return "No data found to calculate totals", 404
     
-    # Send the single row to the HTML
     return render_template('all_trips.html', track=summary_row)
 
 
-#this is for hupper the user_reloader
+# Unit toggle route
+@app.route('/set_units/<unit>')
+def set_units(unit):
+    if unit in ['metric', 'imperial']:
+        session['units'] = unit
+    return redirect(request.referrer or '/')
+
+
+# Template filters
+@app.template_filter("speed")
+def speed_filter(value):
+    unit_setting = session.get("units", "metric")
+    return units.format_speed(value, unit_setting)
+
+
+@app.template_filter("distance")
+def distance_filter(value):
+    unit_setting = session.get("units", "metric")
+    return units.format_distance(value, unit_setting)
+
+
+@app.template_filter("elevation")
+def elevation_filter(value):
+    unit_setting = session.get("units", "metric")
+    return units.format_elevation(value, unit_setting)
+
+@app.template_filter("time")
+def time_filter(value):
+    return units.format_time(value)
+
+
+# For running the app
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False)
-
-
-

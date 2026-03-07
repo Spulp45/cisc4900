@@ -12,7 +12,7 @@ class Track:
 
     """
     def __init__(self, name: str, length_2d: float, length_3d: float, moving_data: tuple, 
-                 avg_speed: float, uphill: tuple, time_bounds: datetime, points: int):
+                 avg_speed: float, uphill: tuple, time_bounds: datetime, points: int, filepath: str, filename: str):
         """
         Creates Track object.
         
@@ -35,8 +35,14 @@ class Track:
                 Tuple containing data in this order: (start_time, end_time)
             points(int):
                 Total number of track_points
+            filepath(str): 
+                The location of where the file is stored
+            filename(str):
+                Name of the file
         """
         self.name = name
+        self.filepath = filepath
+        self.filename = filename
         
         # Computed Data
         self.length_2d = length_2d

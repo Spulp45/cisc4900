@@ -51,7 +51,7 @@ def getGPX(filename: str) -> Track:
     # computed data
     filename_only = os.path.basename(filename)
     track = Track(filename_only, length_2d, length_3d, moving_data, 
-                  avg_speed, uphill, time_bounds, points)
+                  avg_speed, uphill, time_bounds, points, filename, filename_only)
     
     
 

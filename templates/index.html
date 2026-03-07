@@ -21,42 +21,104 @@
     <!-- Map container -->
     <div id="map"></div>
 
-    <!-- Stats display -->
+<!-- Stats display -->
 <div class="stats-display">
     <h2>STATS</h2>
+
+    <!-- Unit toggle links -->
+    <div class="unit-toggle">
+        <span>Units:</span>
+        <a href="/set_units/metric">Metric</a> |
+        <a href="/set_units/imperial">Imperial</a>
+    </div>
+    
     <table>
         <tr>
             <th>Metric</th>
             <th>Value</th>
         </tr>
+
         <tr>
             <td>Average Moving Speed</td>
-            <td>{{ "%.2f"|format(track.avg_speed) }} m/s</td>
+            <td>{{ track.avg_speed | speed }}</td>
         </tr>
+
         <tr>
-            <td>Total Distance</td>
-            <td>{{ "%.2f"|format(track.length_3d) }} meters</td>
+            <td>Total Distance 2D</td>
+            <td>{{ track.length_2d | distance }}</td>
         </tr>
+
+        <tr>
+            <td>Total Distance 3D</td>
+            <td>{{ track.length_3d | distance }}</td>
+        </tr>
+
+        <tr>
+            <td>Moving Time hh:mm:ss</td>
+            <td>{{ track.moving_time | time }} </td>
+        </tr>
+
+        <tr>
+            <td>Stopped Time hh:mm:ss</td>
+            <td>{{ track.stopped_time | time }}</td>
+        </tr>
+
+        <tr>
+            <td>Moving Distance</td>
+            <td>{{ track.moving_distance | distance }}</td>
+        </tr>
+
+        <tr>
+            <td>Stopped Distance</td>
+            <td>{{ track.stopped_distance | distance }}</td>
+        </tr>
+
+        <tr>
+            <td>Max Speed</td>
+            <td>{{ track.max_speed | speed }}</td>
+        </tr>
+
+        <tr>
+            <td>Average Speed </td>
+            <td>{{ track.avg_speed | speed }}</td>
+        </tr>
+
+        <tr>
+            <td>Uphill</td>
+            <td>{{ track.uphill | elevation }}</td>
+        </tr>
+
+        <tr>
+            <td>Downhill</td>
+            <td>{{ track.downhill | elevation }}</td>
+        </tr>
+
         <tr>
             <td>Start Time</td>
             <td>{{ track.start_time }}</td>
         </tr>
-        <tr>                                    
+
+        <tr>
             <td>End Time</td>
             <td>{{ track.end_time }}</td>
         </tr>
+
         <tr>
-            <td>Total Uphill</td>
-            <td>{{ "%.1f"|format(track.uphill) }} m</td>
+            <td>Number of GPS Points</td>
+            <td>{{ track.points }}</td>
         </tr>
+
         <tr>
-            <td>Total Downhill</td>
-            <td>{{ "%.1f"|format(track.downhill) }} m</td>
+            <td>Filename</td>
+            <td>{{ track.filename }}</td>
         </tr>
+
         <tr>
-            <td>Max Speed</td>
-            <td>{{ "%.2f"|format(track.max_speed) }} m/s</td>
+            <td>Filepath</td>
+            <td>{{ track.filepath }}</td>
         </tr>
+
+
     </table>
 </div>
 
@@ -94,7 +156,7 @@
         // Draw the track as a polyline if there is data
         if (pathData.length > 0) {
             var latlngs = pathData.map(p => [p.lat, p.lon]);
-            var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
+            var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(map);
 
             // Adjust map view to fit the polyline
             map.fitBounds(polyline.getBounds());

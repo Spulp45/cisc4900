@@ -37,11 +37,11 @@
             <td>{{ row.name }}</td>
             <td>{{ row.track_hash }}</td>
             <td>
-                <a href="{{ url_for('trip_stats', track_id=row[0]) }}">
+                <a href="{{ url_for('trip_stats', track_id=row.id) }}">
                     <button type="submit">View Stats</button>
                 </a>
 
-                <form action="{{ url_for('delete_track', track_id=row[0]) }}"
+                <form action="{{ url_for('delete_track', track_id=row.id) }}"
                       method="post"
                       style="display:inline;">
                     <button type="submit">Delete</button>
