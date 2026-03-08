@@ -1,9 +1,8 @@
+from backend import parser
 from backend import databaseFunctions
 
 
+daPoint = parser.getGPX("testGPX/1.0/20250926.gpx")
 
-test = databaseFunctions.calculate_elevation_stats(1)
-test2 = databaseFunctions.calculate_elevation_stats(4)
 
-print(test)
-print(test2)
+print(daPoint.speed)

@@ -56,8 +56,14 @@ def upload():
     filepath = os.path.join(app.config['UPLOAD_DIRECTORY'], filename)
 
     file.save(filepath)
-    databaseFunctions.insert_track(parser.getGPX(filepath))
 
+    #DISABLE FOR DEBUG
+    #try:
+    track = parser.getGPX(filepath)
+    databaseFunctions.insert_track(track)
+    #except Exception:
+     #   return f"Error processing the file: {filename}, "
+    
     return redirect('/')
 
 @app.route('/delete/<int:track_id>', methods=['POST'])

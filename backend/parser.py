@@ -34,10 +34,15 @@ def getGPX(filename: str) -> Track:
 
     try:
         with open(filename, "r", encoding="utf-8") as f:
-            tree = ET.parse(filename)
             gpx = gpxpy.parse(f)
+
+    except gpxpy.gpx.GPXXMLSyntaxException:
+        print(f"File '{filename}' is not well-formed")
+        return
+
     except FileNotFoundError:
         print(f"File '{filename}' was not found.")
+        return
 
     length_2d = gpx.length_2d()         # float
     length_3d = gpx.length_3d()         # float
@@ -54,30 +59,65 @@ def getGPX(filename: str) -> Track:
                   avg_speed, uphill, time_bounds, points, filename, filename_only)
     
     
-
-    root = tree.getroot()    
-    # GPX namespace definition
-    ns = {"gpx": "http://www.topografix.com/GPX/1/0"}    
     # Read each data and child of the gpx file
-    for trkpt in root.findall(".//gpx:trkpt", ns):
-        track_point = TrackPoint(float(trkpt.attrib['lat']),
-                                 float(trkpt.attrib['lon']))
-        
-        for child in trkpt:
-            tag = child.tag.split("}")[-1]
-            text = child.text
+    for trk in gpx.tracks:
+        for segment in trk.segments:
+            for p in segment.points:
 
-            if tag == "time":
-                track_point.addChild(tag, text)
-            elif tag in {"ele", "course", "speed", "geoidheight", "hdop", "vdop", "pdop"}:
-                track_point.addChild(tag, float(text))
-            elif tag == "sat":
-                track_point.addChild(tag, int(text))
-            elif tag == "src":
-                track_point.addChild(tag, str(text))
-            
-        # Add each parsed point to the track_point object
-        track.add_point(track_point.lat,
+                track_point = TrackPoint(p.latitude, p.longitude)
+
+                if p.elevation:
+                    track_point.addChild("ele", p.elevation)
+                
+                if p.time:
+                    track_point.addChild("time", p.time)
+                
+                course = p.course if p.course else None
+                speed = p.speed if p.speed else None
+
+                if(course is None or speed is None) and p.extensions:
+                    for ext in p.extensions:
+                        for child in ext:
+                            tag = child.tag.lower()
+                            if "speed" in tag and speed is None:
+                                try:
+                                    speed = float(child.text)
+                                except (TypeError, ValueError):
+                                    pass
+                            if "course" in tag and course is None:
+                                try:
+                                    course = float(child.text)
+                                except (TypeError, ValueError):
+                                    pass
+                
+                track_point.addChild("course", course)
+                track_point.addChild("speed", speed)
+
+                if p.course:
+                    track_point.addChild("course", p.course) 
+                if p.speed:
+                    track_point.addChild("speed", p.speed)
+                
+                if p.geoid_height:
+                    track_point.addChild("geoidheight", p.geoid_height)
+                
+                if p.source:
+                    track_point.addChild("src", p.source)
+                
+                if p.satellites:
+                    track_point.addChild("sat", p.satellites)
+                
+                if p.horizontal_dilution:
+                    track_point.addChild("hdop", p.horizontal_dilution)
+                
+                if p.vertical_dilution:
+                    track_point.addChild("vdop", p.vertical_dilution)
+                
+                if p.position_dilution:
+                    track_point.addChild("pdop",p.position_dilution)
+                
+                # Add each parsed point to the track_point object
+                track.add_point(track_point.lat,
                         track_point.lon, 
                         track_point.ele,
                         track_point.time, 
@@ -89,7 +129,7 @@ def getGPX(filename: str) -> Track:
                         track_point.hdop,
                         track_point.vdop,
                         track_point.pdop)
-    
+                
     return track
 
 def is_valid_gpx(filepath):

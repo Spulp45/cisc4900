@@ -32,7 +32,7 @@ class TrackPoint:
         self.vdop: Optional[float] = None
         self.pdop: Optional[float] = None
 
-    def addChild(self, tag: str, data):
+    def addChild(self, tag: str, data: float | datetime | str | int | None):
         """
         If present add optional data to the trackpoint based on the tag name you give.
 
@@ -44,11 +44,11 @@ class TrackPoint:
         if tag == "ele":
             self.ele = float(data)
         elif tag == "time":
-            self.time = datetime.fromisoformat(data)
+            self.time = data
         elif tag == "course":
-            self.course = float(data)
+            self.course = data
         elif tag == "speed":
-            self.speed = float(data)
+            self.speed = data
         elif tag == "geoidheight":
             self.geoidheight = float(data)
         elif tag == "src":
