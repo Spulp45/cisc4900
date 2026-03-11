@@ -12,7 +12,7 @@ class Track:
 
     """
     def __init__(self, name: str, length_2d: float, length_3d: float, moving_data: tuple, 
-                 avg_speed: float, uphill: tuple, time_bounds: datetime, points: int, filepath: str, filename: str):
+                 avg_speed: float, uphill: tuple, time_bounds: datetime, points: int, filepath: str, filename: str, gpxVersion: str):
         """
         Creates Track object.
         
@@ -39,6 +39,8 @@ class Track:
                 The location of where the file is stored
             filename(str):
                 Name of the file
+            gpxVersion(str):
+                Version of the GPX file
         """
         self.name = name
         self.filepath = filepath
@@ -52,6 +54,7 @@ class Track:
         self.uphill = uphill
         self.time_bounds = time_bounds
         self.points = points
+        self.gpxVersion = gpxVersion
 
         # Counts how many times something is added to Track
         self.counter = 0

@@ -26,7 +26,7 @@
         <tr>
             <th>ID</th>
             <th>Name</th>
-            <th>Hash</th>
+            <th>Start Time</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -35,7 +35,7 @@
         <tr>
             <td>{{ row.id }}</td>
             <td>{{ row.name }}</td>
-            <td>{{ row.track_hash }}</td>
+            <td>{{ row.start_time }}</td>
             <td>
                 <a href="{{ url_for('trip_stats', track_id=row.id) }}">
                     <button type="submit">View Stats</button>

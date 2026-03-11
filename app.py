@@ -54,17 +54,27 @@ def upload():
 
     filename = secure_filename(file.filename)
     filepath = os.path.join(app.config['UPLOAD_DIRECTORY'], filename)
-
     file.save(filepath)
 
-    #DISABLE FOR DEBUG
-    #try:
     track = parser.getGPX(filepath)
-    databaseFunctions.insert_track(track)
-    #except Exception:
-     #   return f"Error processing the file: {filename}, "
+    if track == parser.FILE_CORRUPTED:
+        if filepath and os.path.exists(filepath):
+            os.remove(filepath)
+            return f"Error processing the file \'{filename}\', file is likely corrupted"
+
+    if track == parser.FILE_NOT_FOUND:
+        return f"Error {filepath} was not found."        
     
+    result = databaseFunctions.insert_track(track)
+        
+    if result == databaseFunctions.DUPLICATE_ERROR:
+           return f"The file \'{track.filename}\' already exists on the database"
+    elif result == databaseFunctions.INTEGRITY_ERROR:
+            return f"Track integrity check failed"
+        
     return redirect('/')
+
+parser.getGPX
 
 @app.route('/delete/<int:track_id>', methods=['POST'])
 def delete_track(track_id):
@@ -77,12 +87,12 @@ def delete_track(track_id):
 
 @app.route('/allTrip')
 def all_trips():
-    summary_row = databaseFunctions.get_sql_total_only()
+    totals = databaseFunctions.get_totals()
 
-    if not summary_row:
+    if not totals:
         return "No data found to calculate totals", 404
     
-    return render_template('all_trips.html', track=summary_row)
+    return render_template('all_trips.html', track=totals)
 
 
 # Unit toggle route

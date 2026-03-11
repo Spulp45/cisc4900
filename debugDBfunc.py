@@ -1,8 +1,12 @@
-from backend import parser
 from backend import databaseFunctions
 
 
-daPoint = parser.getGPX("testGPX/1.0/20250926.gpx")
+#totals = databaseFunctions.get_totals()
 
+#for key, value in totals.items():
+ #   print(key, value)
 
-print(daPoint.speed)
+totals2 = databaseFunctions.get_totalsOTHER()
+
+print(totals2)
+

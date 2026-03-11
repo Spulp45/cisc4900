@@ -4,6 +4,10 @@ from backend.Track import Track
 import os
 from backend.TrackPoint import TrackPoint
 
+FILE_CORRUPTED = 2
+FILE_NOT_FOUND = 3
+
+
 """
 GPX parser function.
 
@@ -11,25 +15,26 @@ This module parses a GPX file and converts each entry into a
 track point object and then bundles it up into a Track object.
 """
 
-def getGPX(filename: str) -> Track:
+def getGPX(filename: str) -> Track | int:
     """
-    Docstring for getGPX
+    parse the GPX file by providing its name and get a Track object back
 
     Args:
         filename (str):
             Path to the GPX file to parse.
 
     Returns:
-        Track:
-            A track object containing all the parsed track points
+        Track | int:
+            A track object containing all the parsed track points,
+            or an error code if something went wrong.
 
     Raises:
         ValueError:
-            If conversion fails for GPX point attributes
+            If conversion fails for GPX point attributes.
         xml.etree.ElementTree:
-            If the XML structure is invalid or corrupted
+            If the XML structure is invalid or corrupted.
         FileNotFoundError:
-            If the specified file does not exist
+            If the specified file does not exist.
     """
 
     try:
@@ -38,11 +43,11 @@ def getGPX(filename: str) -> Track:
 
     except gpxpy.gpx.GPXXMLSyntaxException:
         print(f"File '{filename}' is not well-formed")
-        return
+        return FILE_CORRUPTED
 
     except FileNotFoundError:
         print(f"File '{filename}' was not found.")
-        return
+        return FILE_NOT_FOUND
 
     length_2d = gpx.length_2d()         # float
     length_3d = gpx.length_3d()         # float
@@ -51,12 +56,13 @@ def getGPX(filename: str) -> Track:
     uphill = gpx.get_uphill_downhill() #tuple (uphill, downhill)
     time_bounds = gpx.get_time_bounds() # datetime (start, end)
     points = gpx.get_points_no() # int
+    gpxVersion = gpx.version # str
 
     # Initialize the track with the filename as its name and include all
     # computed data
     filename_only = os.path.basename(filename)
     track = Track(filename_only, length_2d, length_3d, moving_data, 
-                  avg_speed, uphill, time_bounds, points, filename, filename_only)
+                  avg_speed, uphill, time_bounds, points, filename, filename_only, gpxVersion)
     
     
     # Read each data and child of the gpx file

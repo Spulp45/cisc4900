@@ -3,6 +3,12 @@ import os
 from backend.Track import Track
 from collections import namedtuple
 
+# Error Codes #
+SUCCESS = 0
+DUPLICATE_ERROR = 1
+INTEGRITY_ERROR = 2
+
+
 def createDatabase():
     """
     Creates a SQLite3 Database, if one is already present
@@ -35,7 +41,8 @@ def createDatabase():
         end_time TEXT,
         points INTEGER,
         filepath TEXT NOT NULL,
-        filename TEXT NOT NULL
+        filename TEXT NOT NULL,
+        gpx_version TEXT
     );
 
     CREATE TABLE IF NOT EXISTS track_point (
@@ -62,7 +69,7 @@ def createDatabase():
     conn.commit()
     conn.close()
 
-def insert_track(track : Track) -> str | bool | sqlite3.IntegrityError :
+def insert_track(track : Track) -> int:
     """
     First checks if a track is already present,
     if not it adds to the database
@@ -70,14 +77,15 @@ def insert_track(track : Track) -> str | bool | sqlite3.IntegrityError :
     Args:
         track (Track): Takes in track object
     Returns:
-        (str): If integrity check for track failed
-        (bool): True if insert is successful
+        (int):  0: Success
+                1: Duplicate exists in database
+                2: Track Integrity Check Failed
     Raises:
         sqlite3.IntegrityError: If the track already exists in database
         
     """
     if(not track.integrityCheck()):
-        return f"Failed to insert, data integrity for track '{track.name}' failed"
+        return INTEGRITY_ERROR
     
     try:
         with sqlite3.connect("backend/test.db") as conn:
@@ -97,8 +105,11 @@ def insert_track(track : Track) -> str | bool | sqlite3.IntegrityError :
                                  downhill,
                                  start_time,
                                  end_time,
-                                 points, filepath,
-                                 filename) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                                 points,
+                                 filepath,
+                                 filename,
+                                 gpx_version) 
+                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                                 (track.name,
                                  track.track_hash(),
                                  track.length_2d,
@@ -115,7 +126,8 @@ def insert_track(track : Track) -> str | bool | sqlite3.IntegrityError :
                                  track.time_bounds.end_time,
                                  track.points,
                                  track.filepath,
-                                 track.filename,))
+                                 track.filename,
+                                 track.gpxVersion,))
            
             track_id = cur.lastrowid
             data = [
@@ -161,8 +173,9 @@ def insert_track(track : Track) -> str | bool | sqlite3.IntegrityError :
             """, data)
     
     except sqlite3.IntegrityError:
-        print(f"'{track.name}' Already exists in the database")
-    return True
+        return DUPLICATE_ERROR
+    
+    return SUCCESS
         
 def delete_track_by_id(id: str) -> bool:
     """
@@ -190,7 +203,6 @@ def delete_track_by_id(id: str) -> bool:
             return False  # track does not exist
 
         filepath = row[0]
-        print(filepath)
 
         if filepath and os.path.exists(filepath):
             os.remove(filepath)
@@ -325,32 +337,78 @@ def get_track_by_name(name: str) -> list:
         rows = cur.fetchall()
         return rows
     
-def get_sql_total_only() -> namedtuple:
+def get_totals_OTHER() -> dict:
+    """
+    Retreive all data that can be summed up as a total
+    
+    Returns:
+        dict: Each entry in the dict represents the total for each category
+    """
+    
     with sqlite3.connect("backend/test.db") as conn:
-        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        cur.execute("SELECT * from track")
+
+        column_names = [desc[0] for desc in cur.description]
+
+        TrackPointRow = namedtuple("TrackpointRow",column_names)
+
+        rows = [TrackPointRow(*row) for row in cur.fetchall()]
+
+        totals = {
+            "length_2d":        0,
+            "length_3d":        0,
+            "moving_time":      0,
+            "stopped_time":     0,
+            "moving_distance":  0,
+            "stopped_distance": 0,
+            "uphill":           0,
+            "downhill":         0,
+            "points":           0,
+        }
+
+        for row in rows:
+            totals["length_2d"] += row.length_2d
+            totals["length_3d"] += row.length_3d
+            totals["moving_time"] += row.moving_time
+            totals["stopped_time"] += row.stopped_time
+            totals["moving_distance"] += row.moving_distance
+            totals["stopped_distance"] += row.stopped_distance
+            totals["uphill"] += row.uphill
+            totals["downhill"] += row.downhill
+            totals["points"] += row.points
+    return totals
+
+
+def get_totals() -> list[namedtuple]:
+    """
+    Retreive all data that can be summed up as a total
+    
+    Returns:
+        list[namedtuple]: Each name represents a column name
+    """
+    with sqlite3.connect("backend/test.db") as conn:
         cur = conn.cursor()
 
-        # Build NamedTuple structure
-        cur.execute("SELECT * FROM track LIMIT 0")
-        column_names = [desc[0] for desc in cur.description]
-        TrackRow = namedtuple("TrackRow", column_names)
-
         cur.execute("""
-            SELECT 0 as id, 'TOTAL' as name, '' as track_hash, 
-                   SUM(length_2d) as length_2d, SUM(length_3d) as length_3d,
-                   SUM(moving_time) as moving_time, SUM(stopped_time) as stopped_time,
-                   SUM(moving_distance) as moving_distance, SUM(stopped_distance) as stopped_distance,
-                   MAX(max_speed) as max_speed, AVG(avg_speed) as avg_speed, 
-                   SUM(uphill) as uphill, SUM(downhill) as downhill,
-                   '' as start_time, '' as end_time, SUM(points) as points,
-                    filepath, filename
-            FROM track
-        """)
+                    SELECT 
+                    TOTAL(length_2d)        AS length_2d,
+                    TOTAL(length_3d)        AS length_3d,
+                    TOTAL(moving_time)      AS moving_time,
+                    TOTAL(stopped_time)     AS stopped_time,
+                    TOTAL(moving_distance)  AS moving_distance,
+                    TOTAL(stopped_distance) AS stopped_distance,
+                    TOTAL(uphill)           AS uphill,
+                    TOTAL(downhill)         AS downhill,
+                    TOTAL(points)           AS points
+                    FROM track
+                    """)
 
-        total_data = cur.fetchone()
+        column_names = ['length_2d', 'length_3d', 'moving_time', 'stopped_time',
+                        'moving_distance', 'stopped_distance', 'uphill', 'downhill', 'points']
 
-        # Detect empty table
-        if total_data["points"] is None:
-            return None
+        TrackTotals = namedtuple("TrackTotals", column_names)
 
-        return TrackRow(*total_data)
+        rows = [TrackTotals(*row) for row in cur.fetchall()]
+
+        return rows
