@@ -57,7 +57,9 @@ def upload():
     file.save(filepath)
 
     track = parser.getGPX(filepath)
+    
     if track == parser.FILE_CORRUPTED:
+            # Try to Delete Corrupted File
         if filepath and os.path.exists(filepath):
             os.remove(filepath)
             return f"Error processing the file \'{filename}\', file is likely corrupted"
@@ -74,7 +76,6 @@ def upload():
         
     return redirect('/')
 
-parser.getGPX
 
 @app.route('/delete/<int:track_id>', methods=['POST'])
 def delete_track(track_id):
