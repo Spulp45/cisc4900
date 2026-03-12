@@ -7,14 +7,22 @@ from collections import namedtuple
 SUCCESS = 0
 DUPLICATE_ERROR = 1
 INTEGRITY_ERROR = 2
+DATABASE_EXISTS = 3
 
+# Directories #
+DatabasePath = 'backend/test.db'
 
-def createDatabase():
+def createDatabase() -> int:
     """
-    Creates a SQLite3 Database, if one is already present
-    it does nothing
+    Creates a SQLite3 Database, if one is already present returns 3
+    Returns:
+        (int): 0 for SUCCESS, 3 for Database already exists
+        
     """
-    conn = sqlite3.connect('backend/test.db')
+    if os.path.exists(DatabasePath):
+        return DATABASE_EXISTS
+    
+    conn = sqlite3.connect(DatabasePath)
     cur = conn.cursor()
 
     # Enable foreign key support
@@ -69,6 +77,8 @@ def createDatabase():
     conn.commit()
     conn.close()
 
+    return SUCCESS
+
 def insert_track(track : Track) -> int:
     """
     First checks if a track is already present,
@@ -88,7 +98,7 @@ def insert_track(track : Track) -> int:
         return INTEGRITY_ERROR
     
     try:
-        with sqlite3.connect("backend/test.db") as conn:
+        with sqlite3.connect(DatabasePath) as conn:
             cur = conn.cursor()
             cur.execute(
             """INSERT INTO track (name, 
@@ -193,7 +203,7 @@ def delete_track_by_id(id: str) -> bool:
     except ValueError:
         return False
     
-    with sqlite3.connect("backend/test.db") as conn:
+    with sqlite3.connect(DatabasePath) as conn:
         cur = conn.cursor()
 
         cur.execute("SELECT filepath FROM track WHERE id = ?", (int_id,))
@@ -220,7 +230,7 @@ def get_all_tracks() -> list[namedtuple]:
         list[namedtuple]: The name of each tuple represents the column name in the database.
                             Refer to the database column names to know the names of the tuples
     """
-    with sqlite3.connect("backend/test.db") as conn:
+    with sqlite3.connect(DatabasePath) as conn:
         cur = conn.cursor()
         cur.execute("SELECT * FROM track")
         # cur.description is a list of metadata for each column retrieved from the execution of the script
@@ -241,7 +251,7 @@ def get_all_track_points() -> list[namedtuple]:
         list[namedtuple]: The name of each tuple represents the column name in the database.
                             Refer to the database column names to know the names of the tuples
     """
-    with sqlite3.connect("backend/test.db") as conn:
+    with sqlite3.connect(DatabasePath) as conn:
         cur = conn.cursor()
         cur.execute("SELECT * from track_point")
         # cur.description is a list of metadata for each column retrieved from the execution of the script
@@ -273,7 +283,7 @@ def get_track_with_track_points_by_id(id: str) -> dict[str, list[namedtuple]]:
                 (id, track_id, lat, lon, ele, timestamp, course, speed, geoidheight, src, 
                 sat, hdop, vdop, pdop)
     """
-    with sqlite3.connect("backend/test.db") as conn:
+    with sqlite3.connect(DatabasePath) as conn:
         cur = conn.cursor()
         cur.execute("SELECT * from track WHERE id = ?",(id,))
         
@@ -313,7 +323,7 @@ def get_trackpoints(id : str, track_point_column: str) -> list | str:
     "speed", "geoidheight", "src", "sat", "hdop", "vdop", "pdop"]
 
     if track_point_column in legal_arguments:
-        with sqlite3.connect("backend/test.db") as conn:
+        with sqlite3.connect(DatabasePath) as conn:
             cur = conn.cursor()
             query = f"SELECT {track_point_column} FROM track_point WHERE track_id = ?"
             cur.execute(query, (id,))
@@ -331,7 +341,7 @@ def get_track_by_name(name: str) -> list:
     Returns:
         list: Of all tracks matching the name
     """
-    with sqlite3.connect("backend/test.db") as conn:
+    with sqlite3.connect(DatabasePath) as conn:
         cur = conn.cursor()
         cur.execute("SELECT id from track where name = ?", (name,),)
         rows = cur.fetchall()
@@ -345,7 +355,7 @@ def get_totals_OTHER() -> dict:
         dict: Each entry in the dict represents the total for each category
     """
     
-    with sqlite3.connect("backend/test.db") as conn:
+    with sqlite3.connect(DatabasePath) as conn:
         cur = conn.cursor()
         cur.execute("SELECT * from track")
 
@@ -387,7 +397,7 @@ def get_totals() -> list[namedtuple]:
     Returns:
         list[namedtuple]: Each name represents a column name
     """
-    with sqlite3.connect("backend/test.db") as conn:
+    with sqlite3.connect(DatabasePath) as conn:
         cur = conn.cursor()
 
         cur.execute("""
@@ -400,12 +410,17 @@ def get_totals() -> list[namedtuple]:
                     TOTAL(stopped_distance) AS stopped_distance,
                     TOTAL(uphill)           AS uphill,
                     TOTAL(downhill)         AS downhill,
-                    TOTAL(points)           AS points
+                    TOTAL(points)           AS points,
+                    MAX(max_speed)          AS max_speed,
+                    AVG(avg_speed)          AS overall_avg_speed,
+                    SUM(CASE WHEN gpx_version = '1.0' THEN 1 ELSE 0 END) AS gpx_1_0_count,
+                    SUM(CASE WHEN gpx_version = '1.1' THEN 1 ELSE 0 END) AS gpx_1_1_count
                     FROM track
                     """)
 
         column_names = ['length_2d', 'length_3d', 'moving_time', 'stopped_time',
-                        'moving_distance', 'stopped_distance', 'uphill', 'downhill', 'points']
+                        'moving_distance', 'stopped_distance', 'uphill', 'downhill',
+                        'points', 'max_speed', 'overall_avg_speed','gpx_1_0_count', 'gpx_1_1_count']
 
         TrackTotals = namedtuple("TrackTotals", column_names)
 

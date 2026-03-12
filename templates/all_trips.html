@@ -1,40 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>All Stats</title>
-</head>
-<body>
-    <div class="Total-stats-display">
-    <h2>TOTAL STATS</h2>
-    <table>
-        <tr>
-            <th>Metric</th>
-            <th>Value</th>
-        </tr>
-        <tr>
-            <td>Average Moving Speed</td>
-            <td>{{  }} m/s</td>
-        </tr>
-        <tr>
-            <td>Total Distance</td>
-            <td>{{  }} meters</td>
-        </tr>
-        <tr>
-            <td>Total Uphill</td>
-            <td>{{  }} m</td>
-        </tr>
-        <tr>
-            <td>Total Downhill</td>
-            <td>{{  }} m</td>
-        </tr>
-        <tr>
-            <td>Max Speed</td>
-            <td>{{  }} m/s</td>
-        </tr>
-    </table>
+<div class="All-Stats">
+
+    <head>
+        <title>My Driving Tracker</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+
+    <h2>Total Statistics</h2>
+
+    <div class="unit-toggle">
+        <span>Units:</span>
+        <a href="/set_units/metric">Metric</a> |
+        <a href="/set_units/imperial">Imperial</a>
+    </div>
+
+    <hr>
+
+    {% for track in totals %}
+
+    <!-- Distance Stats -->
+    <div class="stats-group">
+        <h3>Distances</h3>
+        <table class="vertical-table">
+            <tr><th>Distance (2D)</th><td>{{ track.length_2d | distance }}</td></tr>
+            <tr><th>Distance (3D)</th><td>{{ track.length_3d | distance }}</td></tr>
+            <tr><th>Moving Distance</th><td>{{ track.moving_distance | distance }}</td></tr>
+            <tr><th>Stopped Distance</th><td>{{ track.stopped_distance | distance }}</td></tr>
+            <tr><th>Uphill</th><td>{{ track.uphill | distance }}</td></tr>
+            <tr><th>Downhill</th><td>{{ track.downhill | distance }}</td></tr>
+        </table>
+    </div>
+
+    <!-- Time Stats -->
+    <div class="stats-group">
+        <h3>Time</h3>
+        <table class="vertical-table">
+            <tr><th>Moving Time</th><td>{{ track.moving_time | time }}</td></tr>
+            <tr><th>Stopped Time</th><td>{{ track.stopped_time | time}}</td></tr>
+        </table>
+    </div>
+
+    <!-- Speed Stats -->
+    <div class="stats-group">
+        <h3>Speed</h3>
+        <table class="vertical-table">
+            <tr><th>Max Speed</th><td>{{ track.max_speed | speed }}</td></tr>
+            <tr><th>Average Speed Overall</th><td>{{ track.overall_avg_speed | speed }}</td></tr>
+        </table>
+    </div>
+
+    <!-- Misc Stats -->
+    <div class="stats-group">
+        <h3>Misc</h3>
+        <table class="vertical-table">
+            <tr><th>GPS Track Points</th><td>{{ track.points | int }}</td></tr>
+            <tr><th>GPX 1.0 Files</th><td>{{ track.gpx_1_0_count | int }}</td></tr>
+            <tr><th>GPX 1.1 Files</th><td>{{ track.gpx_1_1_count | int }}</td></tr>
+            
+        </table>
+    </div>
+
+    {% endfor %}
+
 </div>
-</body>
-</html>
+

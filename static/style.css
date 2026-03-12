@@ -52,3 +52,31 @@ tr:hover {
     background-color: red;
     cursor: pointer;
 }
+.stats-group {
+    margin-bottom: 30px; /* Space between groups */
+}
+
+.stats-group h3 {
+    color: #333;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 5px;
+}
+
+.vertical-table {
+    width: 100%;
+    margin-top: 10px;
+    border-collapse: collapse;
+}
+
+.vertical-table th {
+    background-color: #f8f9fa;
+    width: 30%; /* Fixed width for labels */
+    padding: 10px;
+    border: 1px solid #dee2e6;
+}
+
+.vertical-table td {
+    padding: 10px;
+    border: 1px solid #dee2e6;
+    text-align: center;
+}

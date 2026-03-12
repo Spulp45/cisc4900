@@ -55,6 +55,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Ignore config with secrets
+config.py
+
 # C extensions
 *.so
 

@@ -6,15 +6,16 @@ import os
 import units
 
 
+random_data = os.urandom(32)
+
 app = Flask(__name__)
-app.secret_key = "your_secret_key_here"
+app.secret_key = random_data
 app.config['UPLOAD_DIRECTORY'] = 'uploads/'
 app.config['ALLOWED_EXTENSIONS'] = ['.gpx']
 
 
 @app.route('/')
 def home():
-    databaseFunctions.createDatabase()  # Remove this later
     all_rows = databaseFunctions.get_all_tracks()
     return render_template('home.html', tracks=all_rows)
 
@@ -93,7 +94,8 @@ def all_trips():
     if not totals:
         return "No data found to calculate totals", 404
     
-    return render_template('all_trips.html', track=totals)
+    
+    return render_template('all_trips.html', totals=totals)
 
 
 # Unit toggle route
