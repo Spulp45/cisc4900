@@ -1,0 +1,7 @@
+{
+    "DATABASE_PATH": "backend/test.db",
+    "UPLOAD_DIRECTORY": "uploads/",
+    "ALLOWED_EXTENSIONS": [
+        ".gpx"
+    ]
+}

@@ -2,6 +2,9 @@ import sqlite3
 import os
 from backend.Track import Track
 from collections import namedtuple
+import json
+
+
 
 # Error Codes #
 SUCCESS = 0
@@ -10,7 +13,7 @@ INTEGRITY_ERROR = 2
 DATABASE_EXISTS = 3
 
 # Directories #
-DatabasePath = 'backend/test.db'
+DatabasePath = json.load(open("config.json"))["DATABASE_PATH"]
 
 def createDatabase() -> int:
     """

@@ -1,13 +1,28 @@
+import generate_secret
 from backend import databaseFunctions
-from app import app
 
-result = databaseFunctions.createDatabase()
+## First Time Tests
+generateKeyResult = generate_secret.generate()
 
-if(result == databaseFunctions.DATABASE_EXISTS):
+if generateKeyResult == generate_secret.SUCCESS:
+    print("Successfully Created Random Key")
+elif generateKeyResult == generate_secret.KEY_EXISTS:
+    print("Key already exists. Skipping this step...")
+
+
+databaseResult = databaseFunctions.createDatabase()
+if databaseResult == databaseFunctions.DATABASE_EXISTS:
     print("Database already exists, skipping create database..")
-    pass
-if(result == 0):
+elif databaseResult == databaseFunctions.SUCCESS:
     print("Database creation success!")
+else:
+    print("Failed to create database, unknown error. Exiting Program")
+    exit()
+
+
+# Import flask only after checking if everything is ok
+
+from app import app 
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

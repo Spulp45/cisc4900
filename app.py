@@ -4,14 +4,14 @@ from backend import databaseFunctions
 from backend import parser
 import os
 import units
+import json
 
 
-random_data = os.urandom(32)
 
 app = Flask(__name__)
-app.secret_key = random_data
-app.config['UPLOAD_DIRECTORY'] = 'uploads/'
-app.config['ALLOWED_EXTENSIONS'] = ['.gpx']
+app.secret_key = json.load(open("secret.json"))["SECRET_KEY"]
+app.config['UPLOAD_DIRECTORY'] = json.load(open("config.json"))["UPLOAD_DIRECTORY"]
+app.config['ALLOWED_EXTENSIONS'] = json.load(open("config.json"))["ALLOWED_EXTENSIONS"]
 
 
 @app.route('/')

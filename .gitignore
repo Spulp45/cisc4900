@@ -56,7 +56,7 @@ __pycache__/
 *$py.class
 
 # Ignore config with secrets
-config.py
+secret.json
 
 # C extensions
 *.so
