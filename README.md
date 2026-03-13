@@ -8,12 +8,12 @@ A Python app that read and parses GPX files, stores data in a databse and displa
 
 ## Features
 
-- Simple Web UI
-- Plot the GPS data in a map
-- Store original GPX files
-- Calculate Statistics (distance, average speed, etc..)
-- Store GPS data in a database
-- Supports GPX 1.0 and 1.1 Files 
+- Simple Web UI.
+- Plot the GPS data in a map.
+- Store original GPX files.
+- Calculate Statistics (distance, average speed, etc..).
+- Store GPS data in a database.
+- Supports GPX 1.0 and 1.1 Files.
 
 
 ## Run Locally
@@ -21,13 +21,13 @@ A Python app that read and parses GPX files, stores data in a databse and displa
 Clone the project
 
 ```bash
-  git clone https://github.com/Spulp45/cisc4900.git
+git clone https://github.com/Spulp45/cisc4900.git
 ```
 
 Go to the project directory
 
 ```bash
-  cd cisc4900
+cd cisc4900
 ```
 
 ## (Mac/Linux)
@@ -35,24 +35,24 @@ Go to the project directory
 Create Python Virtual Environment 
 
 ```bash
-  python -m venv .venv
+python -m venv .venv
 ```
 Activate Virtual Environment 
 
 ```bash
-  source .venv/bin/activate
+source .venv/bin/activate
 ```
 
 Install Required Libraries
 
 ```bash
-  pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 Run the app with 
 
 ```bash
-  python ./main.py
+python ./main.py
 ```
 
 Now you should see this in the terminal:
@@ -67,24 +67,24 @@ That is where the Web UI is located. Open it to interact with the app.
 Create Python Virtual Environment 
 
 ```bash
-  python -m venv .venv
+python -m venv .venv
 ```
 Activate Virtual Environment 
 
 ```bash
-  source .venv\Scripts\activate
+source .venv\Scripts\activate
 ```
 
 Install Required Libraries
 
 ```bash
-  pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 Run the app with 
 
 ```bash
-  python .\main.py
+python .\main.py
 ```
 
 Now you should see this in the terminal:
