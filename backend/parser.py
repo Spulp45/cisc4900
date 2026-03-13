@@ -52,7 +52,7 @@ def getGPX(filename: str) -> Track | int:
     length_2d = gpx.length_2d()         # float
     length_3d = gpx.length_3d()         # float
     moving_data = gpx.get_moving_data() # tuple (moving_time, stopped_time, moving_distance, stopped_distance, max_speed)
-    avg_speed = moving_data.moving_distance / moving_data.moving_time # float    
+    avg_speed = moving_data.moving_distance / moving_data.moving_time # float
     uphill = gpx.get_uphill_downhill() #tuple (uphill, downhill)
     time_bounds = gpx.get_time_bounds() # datetime (start, end)
     points = gpx.get_points_no() # int
@@ -89,11 +89,13 @@ def getGPX(filename: str) -> Track | int:
                                 try:
                                     speed = float(child.text)
                                 except (TypeError, ValueError):
+                                    print("TypeError or ValueError Exception in getting speed from extensions")
                                     pass
                             if "course" in tag and course is None:
                                 try:
                                     course = float(child.text)
                                 except (TypeError, ValueError):
+                                    print("TypeError or ValueError Exception in getting course from extensions")
                                     pass
                 
                 track_point.addChild("course", course)

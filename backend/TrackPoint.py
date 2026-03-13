@@ -46,9 +46,9 @@ class TrackPoint:
         elif tag == "time":
             self.time = data
         elif tag == "course":
-            self.course = data
+            self.course = data # May be of NoneType
         elif tag == "speed":
-            self.speed = data
+            self.speed = data # May be of NoneType
         elif tag == "geoidheight":
             self.geoidheight = float(data)
         elif tag == "src":
