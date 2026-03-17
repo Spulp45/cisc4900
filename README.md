@@ -1,7 +1,7 @@
 [![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
 # Driving Stats
 
-A Python app that read and parses GPX files, stores data in a databse and display statistics for the given data.
+A Python app that reads and parses GPX files, stores data in a database, and displays statistics for the given data.
 
 
 
@@ -9,9 +9,9 @@ A Python app that read and parses GPX files, stores data in a databse and displa
 ## Features
 
 - Simple Web UI.
-- Plot the GPS data in a map.
+- Plot the GPS data on a map.
 - Store original GPX files.
-- Calculate Statistics (distance, average speed, etc..).
+- Calculate Statistics (distance, average speed, etc).
 - Store GPS data in a database.
 - Supports GPX 1.0 and 1.1 Files.
 
@@ -100,9 +100,9 @@ That is where the Web UI is located. Open it to interact with the app.
 Instructions on how to run are on Run Locally Section
 
 1) Open the Web UI. 
-2) You should see a Upload GPX File Section and an empty table.
-**Note:** We have provided you with some test files located in the demoGPX folder, you can use these to test the upload and display features of the app.
-3) Upload a GPX file, click on the Browse... button and select a GPX file. After making your selection click the Upload Button.
+2) You should see an Upload GPX File Section and an empty table.
+**Note:** We have provided you with some test files located in the demoGPX folder. You can use these to test the upload and display features of the app.
+3) Upload a GPX file, click on the Browse... button, and select a GPX file. After making your selection, click the Upload Button.
 4) Click on the View Stats to display all the data processed from that GPX file.
 
 ## Screenshots
