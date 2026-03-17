@@ -13,7 +13,7 @@ LEAFLET_FILES = {
     "images/marker-icon.png": f"https://unpkg.com/leaflet@{LEAFLET_VERSION}/dist/images/marker-icon.png",
     "images/marker-icon-2x.png": f"https://unpkg.com/leaflet@{LEAFLET_VERSION}/dist/images/marker-icon-2x.png",
     "images/marker-shadow.png": f"https://unpkg.com/leaflet@{LEAFLET_VERSION}/dist/images/marker-shadow.png",
-    "images/layers.png": f"https://unpkg.com/leaflet@{LEAFLET_VERSION}/dist/images/layers.png"
+    "images/layers-2x.png": f"https://unpkg.com/leaflet@{LEAFLET_VERSION}/dist/images/layers.png"
 }
 
 def download_leaflet():
