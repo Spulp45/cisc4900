@@ -1,0 +1,7 @@
+"this is a components page for anything we might reuse "
+
+{% macro back_button(label="Back") %}
+    <a href="{{ url_for('home') }}" class="btn-back">
+        {{ label }}
+    </a>
+{% endmacro %}

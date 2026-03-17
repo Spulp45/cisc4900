@@ -1,5 +1,6 @@
-<div class="All-Stats">
+{% import 'macros.html' as func %}
 
+<div class="All-Stats">
     <head>
         <title>My Driving Tracker</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
@@ -10,7 +11,7 @@
     <div class="unit-toggle">
         <span>Units:</span>
         <a href="/set_units/metric">Metric</a> |
-        <a href="/set_units/imperial">Imperial</a>
+        <a href="/set_units/imperial">Imperial</a> 
     </div>
 
     <hr>
@@ -60,6 +61,6 @@
     </div>
 
     {% endfor %}
-
+    {{ func.back_button(label="← Back") }}
 </div>
 

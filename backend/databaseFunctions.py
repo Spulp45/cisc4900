@@ -430,3 +430,5 @@ def get_totals() -> list[namedtuple]:
         rows = [TrackTotals(*row) for row in cur.fetchall()]
 
         return rows
+    
+    
