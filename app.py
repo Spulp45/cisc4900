@@ -33,7 +33,7 @@ def trip_stats(track_id):
     track_points_list = [pt._asdict() for pt in track_points]
 
     return render_template(
-        'index.html',
+        'trips.html',
         track=track_dict,
         map_points=track_points_list
     )

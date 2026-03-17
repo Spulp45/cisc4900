@@ -1,5 +1,6 @@
 import generate_secret
 from backend import databaseFunctions
+import leafletInstall
 
 ## First Time Tests
 generateKeyResult = generate_secret.generate()
@@ -19,10 +20,15 @@ else:
     print("Failed to create database, unknown error. Exiting Program")
     exit()
 
+leafletResult = leafletInstall.download_leaflet()
 
+if leafletResult == leafletInstall.SUCCESS:
+    print("Leaflet downloaded successfully")
+else:
+    print("Leaflet was not downloaded correctly")
 # Import flask only after checking if everything is ok
 
 from app import app 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(host="0.0.0.0", debug=True)

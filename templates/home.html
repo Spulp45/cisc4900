@@ -1,61 +1,66 @@
-<!DOCTYPE html>
-<html>
-<head>
+{% import 'macros.html' as func %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Driving Tracker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Welcome to My Driving App</h1>
 
-    <h1>Welcome to My Driving App</h1>
-
-    <!-- GPX Upload Form -->
-    <div class="upload-section">
+      <!-- GPX Upload Form -->
+      <div class="upload-section">
         <h2>Upload a GPX File</h2>
         <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
-            <input type="file" name="file" accept=".gpx" required>
-            <button type="submit">Upload</button>
+          <input type="file" name="file" accept=".gpx" required />
+          <button type="submit">Upload</button>
         </form>
-    </div>
+      </div>
 
-    <hr>
+      <hr />
 
-    <!-- Saved Tracks Table -->
-    <h2>All Saved Tracks</h2>
-<table border="1">
-    <thead>
-        <tr>
+      <!-- Saved Tracks Table -->
+      <h2>All Saved Tracks</h2>
+      <table>
+        <thead>
+          <tr>
             <th>ID</th>
             <th>Name</th>
             <th>Start Time</th>
             <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for row in tracks %}
-        <tr>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in tracks %}
+          <tr>
             <td>{{ row.id }}</td>
             <td>{{ row.name }}</td>
             <td>{{ row.start_time }}</td>
             <td>
+              <div class="action-buttons">
                 <a href="{{ url_for('trip_stats', track_id=row.id) }}">
-                    <button type="submit">View Stats</button>
+                  <button type="button">View Stats</button>
                 </a>
 
-                <form action="{{ url_for('delete_track', track_id=row.id) }}"
-                      method="post"
-                      style="display:inline;">
-                    <button type="submit">Delete</button>
+                <form action="{{ url_for('delete_track', track_id=row.id) }}" method="post" style="display:inline;">
+                  <button type="submit">Delete</button>
                 </form>
+              </div>
             </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
 
-<!-- Total table -->
-<div class = "total-table">
-    <a href="{{ url_for('all_trips') }}" class="btn-primary">View All Trip</a>
-</div>
+      <hr />
 
-</body>
+      <!-- Total Table -->
+      <div class="total-table">
+        {{ func.total_table(label="Total Table") }}
+      </div>
+    </div>
+  </body>
 </html>

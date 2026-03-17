@@ -1,0 +1,153 @@
+{% import 'macros.html' as func %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Trip</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='leaflet/leaflet.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <style>
+      /* Map container styling */
+      #map {
+        width: 80%;
+        max-width: 1000px;
+        height: 500px;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Map container -->
+    <div id="map"></div>
+     <hr>
+    <!-- Stats display -->
+    <div class="stats-display">
+      <h2>STATS</h2>
+      <div class="unit-toggle">
+        <span>Units:</span>
+        <a href="/set_units/metric" class="unit-btn">Metric</a>
+        <a href="/set_units/imperial" class="unit-btn">Imperial</a>
+      </div>
+    </div>
+
+    <table>
+      <tr>
+        <th>Data</th>
+        <th>Value</th>
+      </tr>
+
+      <tr class="tooltip-row" title="Average speed while the user was moving.">
+        <td>Average Moving Speed</td>
+        <td>{{ track.avg_speed | speed }}</td>
+      </tr>
+
+      <tr
+        class="tooltip-row"
+        title="Horizontal distance covered, ignoring elevation."
+      >
+        <td>Total Distance 2D</td>
+        <td>{{ track.length_2d | distance }}</td>
+      </tr>
+
+      <tr class="tooltip-row" title="Distance including elevation.">
+        <td>Total Distance 3D</td>
+        <td>{{ track.length_3d | distance }}</td>
+      </tr>
+
+      <tr class="tooltip-row" title="Total time spent moving.">
+        <td>Moving Time hh:mm:ss</td>
+        <td>{{ track.moving_time | time }}</td>
+      </tr>
+
+      <tr class="tooltip-row" title="Total time spent not moving.">
+        <td>Stopped Time hh:mm:ss</td>
+        <td>{{ track.stopped_time | time }}</td>
+      </tr>
+
+      <tr class="tooltip-row" title="Distance traveled while moving.">
+        <td>Moving Distance</td>
+        <td>{{ track.moving_distance | distance }}</td>
+      </tr>
+
+      <tr
+        class="tooltip-row"
+        title="Distance traveled while stopped."
+      >
+        <td>Stopped Distance</td>
+        <td>{{ track.stopped_distance | distance }}</td>
+      </tr>
+
+      <tr class="tooltip-row" title="Highest speed recorded on the track.">
+        <td>Max Speed</td>
+        <td>{{ track.max_speed | speed }}</td>
+      </tr>
+
+      <tr class="tooltip-row" title="Overall average speed including stops.">
+        <td>Average Speed</td>
+        <td>{{ track.avg_speed | speed }}</td>
+      </tr>
+
+      <tr class="tooltip-row" title="Total elevation gained.">
+        <td>Uphill</td>
+        <td>{{ track.uphill | elevation }}</td>
+      </tr>
+
+      <tr class="tooltip-row" title="Total elevation lost.">
+        <td>Downhill</td>
+        <td>{{ track.downhill | elevation }}</td>
+      </tr>
+
+      <tr class="tooltip-row" title="Timestamp when the track started.">
+        <td>Start Time</td>
+        <td>{{ track.start_time }}</td>
+      </tr>
+
+      <tr class="tooltip-row" title="Timestamp when the track ended.">
+        <td>End Time</td>
+        <td>{{ track.end_time }}</td>
+      </tr>
+
+      <tr class="tooltip-row" title="Total GPS points recorded in this track.">
+        <td>Number of GPS Points</td>
+        <td>{{ track.points }}</td>
+      </tr>
+
+      <tr class="tooltip-row" title="Name of the uploaded GPX file.">
+        <td>Filename</td>
+        <td>{{ track.filename }}</td>
+      </tr>
+
+      <tr class="tooltip-row" title="Server path where the GPX file is stored.">
+        <td>Filepath</td>
+        <td>{{ track.filepath }}</td>
+      </tr>
+
+      <tr class="tooltip-row" title="Version of the GPX format used.">
+        <td>GPX Version</td>
+        <td>{{ track.gpx_version }}</td>
+      </tr>
+    </table>
+
+    <hr>
+    <!-- Leaflet JS -->
+    <script src="{{ url_for('static', filename='leaflet/leaflet.js') }}"></script>
+
+    <!-- Pass server-side data to JS -->
+    <script>
+      const pathData = {{ map_points | tojson }};
+      const trackInfo = {{ track | tojson }};
+    </script>
+
+    <!-- Include map logic -->
+    <script src="{{ url_for('static', filename='/map.js') }}"></script>
+
+       {{ func.back_button(label="← Back") }}
+  </body>
+</html>

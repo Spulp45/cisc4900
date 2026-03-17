@@ -1,7 +1,9 @@
-"this is a components page for anything we might reuse "
+"this is a components page for anything we might reuse " {% macro
+back_button(label="Back") %}
+<a href="{{ url_for('home') }}" class="btn-primary">← Back</a>
+{% endmacro %}
 
-{% macro back_button(label="Back") %}
-    <a href="{{ url_for('home') }}" class="btn-back">
-        {{ label }}
-    </a>
+{%macro
+    total_table(label="total_table") %}
+<a href="{{ url_for('all_trips') }}" class="btn-primary">Total Table</a>
 {% endmacro %}
