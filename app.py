@@ -23,19 +23,10 @@ def home():
 def trip_stats(track_id):
     data = databaseFunctions.get_track_with_track_points_by_id(track_id)
 
-    if not data['track']:
-        return f"No track found with ID {track_id}", 404
-    
-    track = data['track'][0] 
-    track_points = data['track_points']
-
-    track_dict = track._asdict()
-    track_points_list = [pt._asdict() for pt in track_points]
-
     return render_template(
         'trips.html',
-        track=track_dict,
-        map_points=track_points_list
+        track=data['track'][0],
+        map_points=data['track_points']
     )
 
 @app.route('/upload', methods=['POST'])

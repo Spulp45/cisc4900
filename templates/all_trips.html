@@ -3,7 +3,10 @@
 <div class="container All-Stats">
   <head>
     <title>My Driving Tracker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
   </head>
 
   <h2>Total Statistics</h2>
@@ -16,35 +19,33 @@
 
   <hr />
 
-  {% for track in totals %}
-
   <!-- Distance Stats -->
   <div class="stats-group card">
     <h3>Distances</h3>
     <table class="vertical-table">
       <tr>
         <th>Distance (2D)</th>
-        <td>{{ track.length_2d | distance }}</td>
+        <td>{{ totals.length_2d | distance }}</td>
       </tr>
       <tr>
         <th>Distance (3D)</th>
-        <td>{{ track.length_3d | distance }}</td>
+        <td>{{ totals.length_3d | distance }}</td>
       </tr>
       <tr>
         <th>Moving Distance</th>
-        <td>{{ track.moving_distance | distance }}</td>
+        <td>{{ totals.moving_distance | distance }}</td>
       </tr>
       <tr>
         <th>Stopped Distance</th>
-        <td>{{ track.stopped_distance | distance }}</td>
+        <td>{{ totals.stopped_distance | distance }}</td>
       </tr>
       <tr>
         <th>Uphill</th>
-        <td>{{ track.uphill | distance }}</td>
+        <td>{{ totals.uphill | distance }}</td>
       </tr>
       <tr>
         <th>Downhill</th>
-        <td>{{ track.downhill | distance }}</td>
+        <td>{{ totals.downhill | distance }}</td>
       </tr>
     </table>
   </div>
@@ -55,11 +56,11 @@
     <table class="vertical-table">
       <tr>
         <th>Moving Time</th>
-        <td>{{ track.moving_time | time }}</td>
+        <td>{{ totals.moving_time | time }}</td>
       </tr>
       <tr>
         <th>Stopped Time</th>
-        <td>{{ track.stopped_time | time}}</td>
+        <td>{{ totals.stopped_time | time }}</td>
       </tr>
     </table>
   </div>
@@ -70,11 +71,11 @@
     <table class="vertical-table">
       <tr>
         <th>Max Speed</th>
-        <td>{{ track.max_speed | speed }}</td>
+        <td>{{ totals.max_speed | speed }}</td>
       </tr>
       <tr>
         <th>Average Speed Overall</th>
-        <td>{{ track.overall_avg_speed | speed }}</td>
+        <td>{{ totals.overall_avg_speed | speed }}</td>
       </tr>
     </table>
   </div>
@@ -85,20 +86,18 @@
     <table class="vertical-table">
       <tr>
         <th>GPS Track Points</th>
-        <td>{{ track.points | int }}</td>
+        <td>{{ totals.points | int }}</td>
       </tr>
       <tr>
         <th>GPX 1.0 Files</th>
-        <td>{{ track.gpx_1_0_count | int }}</td>
+        <td>{{ totals.gpx_1_0_count | int }}</td>
       </tr>
       <tr>
         <th>GPX 1.1 Files</th>
-        <td>{{ track.gpx_1_1_count | int }}</td>
+        <td>{{ totals.gpx_1_1_count | int }}</td>
       </tr>
     </table>
   </div>
-
-  {% endfor %} 
 
   {{ func.back_button(label="← Back") }}
 </div>
