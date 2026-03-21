@@ -27,7 +27,15 @@ function renderTrackPanel(point) {
   const userUnits = sessionStorage.getItem("units") || "metric";
 
   panel.innerHTML = `
+
     <h3>Track Point</h3>
+
+    <div class="unit-toggle">
+    <span>Units:</span>
+    <button type="button" class="unit-btn" data-unit="metric">Metric</button>
+    <button type="button" class="unit-btn" data-unit="imperial">Imperial</button>
+  </div>
+  
     ${point.lat != null ? `<p><b>Latitude:</b> ${point.lat}</p>` : ""}
     ${point.lon != null ? `<p><b>Longitude:</b> ${point.lon}</p>` : ""}
     ${point.speed != null ? `<p><b>Speed:</b> ${formatValue(point.speed, "speed", userUnits)}</p>` : ""}
@@ -40,7 +48,7 @@ function renderTrackPanel(point) {
     ${point.hdop != null ? `<p><b>HDOP:</b> ${point.hdop}</p>` : ""}
     ${point.vdop != null ? `<p><b>VDOP:</b> ${point.vdop}</p>` : ""}
     ${point.pdop != null ? `<p><b>PDOP:</b> ${point.pdop}</p>` : ""}
-  `;
+  `; 
 }
 
 // --- MAP INITIALIZATION ---
@@ -67,7 +75,7 @@ function initMap(pathData, trackInfo) {
   // 4. Draw track polyline
   if (pathData.length > 0) {
   const latlngs = pathData.map((p) => [p.lat, p.lon]);
-  const polyline = L.polyline(latlngs, { color: "orange", weight: 7, opacity: 3 }).addTo(trackLayer);
+  const polyline = L.polyline(latlngs, { color: "orange", weight: 7, opacity: 1 }).addTo(trackLayer);
 
   // Start and end markers
   L.marker([pathData[0].lat, pathData[0].lon]).addTo(uiLayer).bindPopup("Start");
@@ -103,13 +111,22 @@ function initMap(pathData, trackInfo) {
   L.control.layers(baseLayers).addTo(map);
 
   // 6. Unit toggle buttons
-  document.querySelectorAll(".unit-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const newUnit = btn.dataset.unit; // "metric" or "imperial"
-      sessionStorage.setItem("units", newUnit);
-      renderTrackPanel(lastClickedPoint); // update panel 
-    });
-  });
+  document.getElementById("track-details").addEventListener("click", (e) => {
+  if (e.target.classList.contains("unit-btn")) {
+    const newUnit = e.target.dataset.unit;
+    sessionStorage.setItem("units", newUnit);
+    renderTrackPanel(lastClickedPoint);
+  }
+});
+  btn.addEventListener("click", (e) => {
+  const newUnit = e.currentTarget.dataset.unit;
+
+  // update frontend
+  sessionStorage.setItem("units", newUnit);
+
+  // update backend + reload page
+  window.location.href = `/set_units/${newUnit}`;
+});
 }
 
 // --- INIT CALL ---

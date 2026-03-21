@@ -47,15 +47,20 @@
 <!-- Stats display -->
 <div class="stats-display">
   <h2>STATS</h2>
-  <div>
-    <span>Units:</span>
-    <button class="btn-primary unit-btn" data-unit="metric">Metric</button>
-    <button class="btn-primary unit-btn" data-unit="imperial">Imperial</button>
-  </div>
+
 </div>
 
   <!-- Stats table -->
   <table>
+    <div class="unit-toggle">
+  <span>Units:</span>
+  <a href="/set_units/metric">
+    <button type="button" class="btn-primary">Metric</button>
+  </a>
+  <a href="/set_units/imperial">
+    <button type="button" class="btn-primary">Imperial</button>
+  </a>
+</div>
     <tr><th>Data</th><th>Value</th></tr>
 
     <tr class="tooltip-row" title="Average speed while the user was moving.">
