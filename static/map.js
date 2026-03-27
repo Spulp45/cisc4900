@@ -1,46 +1,59 @@
-// --- GLOBAL VARIABLES ---
-let lastClickedPoint = null; // Store the last clicked track point
+let lastClickedPoint = null;
 
-// Helper function to format values based on units
+
+// Retrieve current unit setting
+function getUnits() {
+  return sessionStorage.getItem("units") || "metric";
+}
+// Store selected unit setting
+function setUnits(unit) {
+  sessionStorage.setItem("units", unit);
+}
+// Format values base on type and unit setting
 function formatValue(value, type, units) {
   if (value == null) return "";
+  if (units === "raw") return value;
 
   switch (type) {
-    case "speed": // value in m/s
+    case "speed":
       return units === "imperial"
         ? `${(value * 2.23694).toFixed(2)} mph`
         : `${(value * 3.6).toFixed(2)} km/h`;
-    case "elevation": // value in meters
+    case "distance":
+      return units === "imperial"
+        ? `${(value * 0.000621371).toFixed(2)} mi`
+        : `${(value / 1000).toFixed(2)} km`;
+    case "elevation":
       return units === "imperial"
         ? `${(value * 3.28084).toFixed(2)} ft`
         : `${value.toFixed(2)} m`;
+    case "time":
+      const h = Math.floor(value / 3600);
+      const m = Math.floor((value % 3600) / 60);
+      const s = Math.floor(value % 60);
+      return `${h}:${m.toString().padStart(2, "0")}:${s
+        .toString()
+        .padStart(2, "0")}`;
     default:
       return value;
   }
 }
 
-// Function to render the track info panel
+// Display info for a single track_point
 function renderTrackPanel(point) {
   if (!point) return;
 
   const panel = document.getElementById("track-details");
-  const userUnits = sessionStorage.getItem("units") || "metric";
+  const userUnits = getUnits();
 
   panel.innerHTML = `
-
     <h3>Track Point</h3>
 
-    <div class="unit-toggle">
-    <span>Units:</span>
-    <button type="button" class="unit-btn" data-unit="metric">Metric</button>
-    <button type="button" class="unit-btn" data-unit="imperial">Imperial</button>
-  </div>
-  
     ${point.lat != null ? `<p><b>Latitude:</b> ${point.lat}</p>` : ""}
     ${point.lon != null ? `<p><b>Longitude:</b> ${point.lon}</p>` : ""}
     ${point.speed != null ? `<p><b>Speed:</b> ${formatValue(point.speed, "speed", userUnits)}</p>` : ""}
     ${point.ele != null ? `<p><b>Elevation:</b> ${formatValue(point.ele, "elevation", userUnits)}</p>` : ""}
-    ${point.time != null ? `<p><b>Time:</b> ${point.time}</p>` : ""}
+    ${point.timestamp != null ? `<p><b>Time:</b> ${point.timestamp}</p>` : ""}
     ${point.course != null ? `<p><b>Course:</b> ${point.course}</p>` : ""}
     ${point.geoidheight != null ? `<p><b>Geoid Height:</b> ${point.geoidheight}</p>` : ""}
     ${point.src != null ? `<p><b>Source:</b> ${point.src}</p>` : ""}
@@ -48,86 +61,114 @@ function renderTrackPanel(point) {
     ${point.hdop != null ? `<p><b>HDOP:</b> ${point.hdop}</p>` : ""}
     ${point.vdop != null ? `<p><b>VDOP:</b> ${point.vdop}</p>` : ""}
     ${point.pdop != null ? `<p><b>PDOP:</b> ${point.pdop}</p>` : ""}
-  `; 
+  `;
+}
+// Display overall info for the track
+function renderStatsTable(track, units) {
+  const table = document.getElementById("stats-table");
+
+  table.innerHTML = `
+    <div class="unit-toggle">
+      <span>Units:</span>
+      <button type="button" class="unit-btn" data-unit="metric">Metric</button>
+      <button type="button" class="unit-btn" data-unit="imperial">Imperial</button>
+      <button type="button" class="unit-btn" data-unit="raw">Raw</button>
+    </div>
+    <tr><th>Data</th><th>Value</th></tr>
+    <tr><td>Average Moving Speed</td><td>${formatValue(track.avg_speed, "speed", units)}</td></tr>
+    <tr><td>Total Distance 2D</td><td>${formatValue(track.length_2d, "distance", units)}</td></tr>
+    <tr><td>Total Distance 3D</td><td>${formatValue(track.length_3d, "distance", units)}</td></tr>
+    <tr><td>Moving Time</td><td>${formatValue(track.moving_time, "time", units)}</td></tr>
+    <tr><td>Stopped Time</td><td>${formatValue(track.stopped_time, "time", units)}</td></tr>
+    <tr><td>Moving Distance</td><td>${formatValue(track.moving_distance, "distance", units)}</td></tr>
+    <tr><td>Stopped Distance</td><td>${formatValue(track.stopped_distance, "distance", units)}</td></tr>
+    <tr><td>Max Speed</td><td>${formatValue(track.max_speed, "speed", units)}</td></tr>
+    <tr><td>Average Speed</td><td>${formatValue(track.avg_speed, "speed", units)}</td></tr>
+    <tr><td>Uphill</td><td>${formatValue(track.uphill, "elevation", units)}</td></tr>
+    <tr><td>Downhill</td><td>${formatValue(track.downhill, "elevation", units)}</td></tr>
+    <tr><td>Start Time</td><td>${track.start_time}</td></tr>
+    <tr><td>End Time</td><td>${track.end_time}</td></tr>
+    <tr><td>Points</td><td>${track.points}</td></tr>
+    <tr><td>Filename</td><td>${track.filename}</td></tr>
+    <tr><td>Filepath</td><td>${track.filepath}</td></tr>
+    <tr><td>GPX Version</td><td>${track.gpx_version}</td></tr>
+  `;
 }
 
-// --- MAP INITIALIZATION ---
-function initMap(pathData, trackInfo) {
-  // 1. Base layers
-  const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap contributors",
-  });
+// Handle clicks 
+document.addEventListener("click", (e) => {
+  if (e.target.classList.contains("unit-btn")) {
+    const unit = e.target.dataset.unit;
+    setUnits(unit);
+    renderStatsTable(track, unit);
+    if (lastClickedPoint) renderTrackPanel(lastClickedPoint);
+  }
+});
+
+// Initialize Map
+function initMap(track_points, track) {
+  const osm = L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    { attribution: "&copy; OpenStreetMap contributors" },
+  );
   const esriSat = L.tileLayer(
     "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    { attribution: "Tiles &copy; Esri" }
+    { attribution: "Tiles &copy; Esri" },
   );
-  const dark = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-    attribution: "&copy; OpenStreetMap &copy; Carto",
-  });
+  const dark = L.tileLayer(
+    "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    { attribution: "&copy; OpenStreetMap &copy; Carto" },
+  );
 
-  // 2. Create map
   const map = L.map("map", { center: [0, 0], zoom: 1, layers: [osm] });
-
-  // 3. Layer groups
   const trackLayer = L.layerGroup().addTo(map);
   const uiLayer = L.layerGroup().addTo(map);
 
-  // 4. Draw track polyline
-  if (pathData.length > 0) {
-  const latlngs = pathData.map((p) => [p.lat, p.lon]);
-  const polyline = L.polyline(latlngs, { color: "orange", weight: 7, opacity: 1 }).addTo(trackLayer);
-
-  // Start and end markers
-  L.marker([pathData[0].lat, pathData[0].lon]).addTo(uiLayer).bindPopup("Start");
-  L.marker([pathData[pathData.length - 1].lat, pathData[pathData.length - 1].lon])
-    .addTo(uiLayer)
-    .bindPopup("End");
-
-  // Clickable markers with hover effect on radius
-  pathData.forEach((point) => {
-    const marker = L.circleMarker([point.lat, point.lon], {
-      radius: 3,
-      color: "orange",
-      weight: 1,
-      fillOpacity: 1,
+  if (track_points.length > 0) {
+    const latlngs = track_points.map((p) => [p.lat, p.lon]);
+    const polyline = L.polyline(latlngs, {
+      color: "#008e00",
+      weight: 7,
+      opacity: 1,
     }).addTo(trackLayer);
 
-    // Hover effect: increase radius
-    marker.on("mouseover", () => marker.setStyle({ radius: 10, color: 'yellow'}));
-    marker.on("mouseout", () => marker.setStyle({ radius: 3, color: 'orange'}));
+    L.marker([track_points[0].lat, track_points[0].lon])
+      .addTo(uiLayer)
+      .bindPopup("Start");
+    L.marker([
+      track_points[track_points.length - 1].lat,
+      track_points[track_points.length - 1].lon,
+    ])
+      .addTo(uiLayer)
+      .bindPopup("End");
 
-    // Click event for track panel
-    marker.on("click", () => {
-      lastClickedPoint = point;       // save clicked point
-      renderTrackPanel(point);        // render panel
+    track_points.forEach((point) => {
+      const marker = L.circleMarker([point.lat, point.lon], {
+        radius: 3,
+        color: "#1f3145",
+        weight: 1,
+        fillOpacity: 0.7,
+      }).addTo(trackLayer);
+      marker.on("mouseover", () =>
+        marker.setStyle({ radius: 10, color: "yellow" }),
+      );
+      marker.on("mouseout", () =>
+        marker.setStyle({ radius: 3, color: "#1f3145" }),
+      );
+      marker.on("click", () => {
+        lastClickedPoint = point;
+        renderTrackPanel(point);
+      });
     });
-  });
 
-  map.fitBounds(polyline.getBounds());
-}
+    map.fitBounds(polyline.getBounds());
+  }
 
-  // 5. Layer control
   const baseLayers = { OSM: osm, Satellite: esriSat, Dark: dark };
   L.control.layers(baseLayers).addTo(map);
-
-  // 6. Unit toggle buttons
-  document.getElementById("track-details").addEventListener("click", (e) => {
-  if (e.target.classList.contains("unit-btn")) {
-    const newUnit = e.target.dataset.unit;
-    sessionStorage.setItem("units", newUnit);
-    renderTrackPanel(lastClickedPoint);
-  }
-});
-  btn.addEventListener("click", (e) => {
-  const newUnit = e.currentTarget.dataset.unit;
-
-  // update frontend
-  sessionStorage.setItem("units", newUnit);
-
-  // update backend + reload page
-  window.location.href = `/set_units/${newUnit}`;
-});
 }
 
-// --- INIT CALL ---
-initMap(pathData, trackInfo);
+// Start the map and render table
+initMap(track_points, track);
+const units = getUnits();
+renderStatsTable(track, units);

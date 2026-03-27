@@ -27,7 +27,7 @@ def trip_stats(track_id):
     return render_template(
         'trips.html',
         track=data['track'][0],
-        map_points=data['track_points']
+        track_points=data['track_points']
     )
 
 @app.route('/upload', methods=['POST'])
@@ -51,7 +51,6 @@ def upload():
     temp_filename = f"temp_{uuid.uuid4().hex}.{extension}"
     temp_filepath = os.path.join(app.config['UPLOAD_DIRECTORY'], temp_filename)
     original_filepath = os.path.join(app.config['UPLOAD_DIRECTORY'], file.filename)
-    print("OG PATH:", original_filepath)
     try:
         # Save temp file
         file.save(temp_filepath)

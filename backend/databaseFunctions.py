@@ -37,7 +37,7 @@ def createDatabase() -> int:
 
     CREATE TABLE IF NOT EXISTS track (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL UNIQUE,
+        name TEXT NOT NULL,
         track_hash TEXT NOT NULL UNIQUE,
         length_2d REAL,
         length_3d REAL,
