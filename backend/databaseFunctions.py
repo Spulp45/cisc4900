@@ -10,9 +10,11 @@ SUCCESS = 0
 DUPLICATE_ERROR = 1
 INTEGRITY_ERROR = 2
 DATABASE_EXISTS = 3
+DELETE_FILE_ERROR = 4
 
 # Directories #
 DatabasePath = json.load(open("config.json"))["DATABASE_PATH"]
+UploadDirectory = json.load(open("config.json"))["UPLOAD_DIRECTORY"]
 
 def createDatabase() -> int:
     """
@@ -98,7 +100,8 @@ def insert_track(track : Track) -> int:
     """
     if(not track.integrityCheck()):
         return INTEGRITY_ERROR
-    
+    track_hash = track.track_hash()
+    hashedFilePath = os.path.join(UploadDirectory, track_hash) + ".gpx" #TODO Might Break in the Future
     try:
         with sqlite3.connect(DatabasePath) as conn:
             cur = conn.cursor()
@@ -137,7 +140,7 @@ def insert_track(track : Track) -> int:
                                  track.time_bounds.start_time,
                                  track.time_bounds.end_time,
                                  track.points,
-                                 track.filepath,
+                                 hashedFilePath,
                                  track.filename,
                                  track.gpxVersion,))
            
@@ -189,7 +192,7 @@ def insert_track(track : Track) -> int:
     
     return SUCCESS
         
-def delete_track_by_id(id: str) -> bool:
+def delete_track_by_id(id: str) -> bool | int:
     """
     Deletes a track by id of the track
     and CASCADE DELETE all related track points 
@@ -198,7 +201,8 @@ def delete_track_by_id(id: str) -> bool:
     Args:
         id (str): id of the track
     Returns:
-        True if deleted sucessfully 
+        bool: True if deleted sucessfully
+        int: A error code if something bad happened
     """
     try:
         int_id = int(id)  # convert id to int
@@ -208,20 +212,26 @@ def delete_track_by_id(id: str) -> bool:
     with sqlite3.connect(DatabasePath) as conn:
         cur = conn.cursor()
 
-        cur.execute("SELECT filepath FROM track WHERE id = ?", (int_id,))
+        cur.execute("SELECT filepath, track_hash FROM track WHERE id = ?", (int_id,))
         row = cur.fetchone()
 
         if not row:
             return False  # track does not exist
 
-        filepath = row[0]
-
-        if filepath and os.path.exists(filepath):
-            os.remove(filepath)
+        filepath, track_hash = row
+        pathOnly = filepath.rsplit('/', 1)[0]
+        hashFilePath = os.path.join(pathOnly, track_hash) + ".gpx" #TODO Might Break in the Future
 
         cur.execute("DELETE FROM track_point WHERE track_id = ?", (int_id,))
         cur.execute("DELETE FROM track WHERE id = ?", (int_id,))
-
+        
+        print(hashFilePath)
+    try: 
+        if filepath and os.path.exists(hashFilePath):
+            os.remove(hashFilePath)
+    except:
+        return DELETE_FILE_ERROR
+        
     return True
 
 def get_all_tracks() -> list[dict]:

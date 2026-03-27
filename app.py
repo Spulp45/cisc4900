@@ -5,6 +5,7 @@ from backend import parser
 import os
 import units
 import json
+import uuid
 
 
 
@@ -39,42 +40,75 @@ def upload():
     if file.filename == "":
         return redirect('/')
 
-    extension = os.path.splitext(file.filename)[1].lower()
+    extension = os.path.splitext(file.filename)[1].lower().lstrip('.')
 
     if extension not in app.config['ALLOWED_EXTENSIONS']:
-        return 'The file is not .gpx format'
+        return "The file is not a valid GPX file"
 
-    filename = secure_filename(file.filename)
-    filepath = os.path.join(app.config['UPLOAD_DIRECTORY'], filename)
-    file.save(filepath)
+    original_filename = secure_filename(file.filename)
 
-    track = parser.getGPX(filepath)
-    
-    if track == parser.FILE_CORRUPTED:
-            # Try to Delete Corrupted File
-        if filepath and os.path.exists(filepath):
-            os.remove(filepath)
-            return f"Error processing the file \'{filename}\', file is likely corrupted"
+    # Create temp file
+    temp_filename = f"temp_{uuid.uuid4().hex}.{extension}"
+    temp_filepath = os.path.join(app.config['UPLOAD_DIRECTORY'], temp_filename)
+    original_filepath = os.path.join(app.config['UPLOAD_DIRECTORY'], file.filename)
+    print("OG PATH:", original_filepath)
+    try:
+        # Save temp file
+        file.save(temp_filepath)
 
-    if track == parser.FILE_NOT_FOUND:
-        return f"Error {filepath} was not found."        
-    
-    result = databaseFunctions.insert_track(track)
-        
-    if result == databaseFunctions.DUPLICATE_ERROR:
-           return f"The file \'{track.filename}\' already exists on the database"
-    elif result == databaseFunctions.INTEGRITY_ERROR:
-            return f"Track integrity check failed"
-        
+        # Parse file
+        track = parser.getGPX(temp_filepath, original_filename, original_filepath)
+
+        if track == parser.FILE_CORRUPTED:
+            os.remove(temp_filepath)
+            return f"Error processing '{original_filename}', file is likely corrupted"
+
+        if track == parser.FILE_NOT_FOUND:
+            os.remove(temp_filepath)
+            return f"Error: {temp_filepath} was not found"
+
+        # Compute hash
+        track_hash = track.track_hash()
+
+        new_filename = f"{track_hash}.{extension}"
+        new_filepath = os.path.join(app.config['UPLOAD_DIRECTORY'], new_filename)
+
+        # If file already exists, remove temp and skip rename
+        if os.path.exists(new_filepath):
+            os.remove(temp_filepath)
+            return f"The file '{original_filename}' already exists"
+
+        # Rename temp file to final name
+        os.replace(temp_filepath, new_filepath)
+
+        # Insert into DB
+        result = databaseFunctions.insert_track(track)
+
+        if result == databaseFunctions.DUPLICATE_ERROR:
+            os.remove(new_filepath)
+            return f"The file '{original_filename}' already exists in the database"
+
+        elif result == databaseFunctions.INTEGRITY_ERROR:
+            os.remove(new_filepath)
+            return f"Track integrity check failed for '{original_filename}'"
+
+    except Exception as e:
+        # Cleanup temp file
+        if os.path.exists(temp_filepath):
+            os.remove(temp_filepath)
+        return f"Error saving the file: {e}"
+
     return redirect('/')
 
 
 @app.route('/delete/<int:track_id>', methods=['POST'])
 def delete_track(track_id):
-    success = databaseFunctions.delete_track_by_id(track_id)
+    result = databaseFunctions.delete_track_by_id(track_id)
 
-    if not success:
+    if not result:
         return f"Could not delete track {track_id}", 400
+    if result == databaseFunctions.DELETE_FILE_ERROR:
+        return f"Could not delete file associated with track with id: {track_id}"
 
     return redirect('/')
 
