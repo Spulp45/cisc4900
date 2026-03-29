@@ -17,10 +17,6 @@ app.config['ALLOWED_EXTENSIONS'] = json.load(open("config.json"))["ALLOWED_EXTEN
 
 
 
-@app.route('/login')
-def login():
-    # This looks for a file named login.html inside a 'templates' folder
-    return render_template('login.html')
 
 
 
