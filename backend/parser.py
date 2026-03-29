@@ -7,46 +7,44 @@ from backend.TrackPoint import TrackPoint
 FILE_CORRUPTED = 2
 FILE_NOT_FOUND = 3
 
-
 """
 GPX parser function.
 
 This module parses a GPX file and converts each entry into a
 track point object and then bundles it up into a Track object.
 """
-
-def getGPX(filename: str) -> Track | int:
+def getGPX(filepath: str, original_filename: str, original_filepath: str) -> Track | int:
     """
-    parse the GPX file by providing its name and get a Track object back
-
     Args:
-        filename (str):
-            Path to the GPX file to parse.
-
+        filepath (str):
+            Path to the GPX file to parse
+        original_filename (str):
+            The original filename of the uploaded GPX file
+        original_filepath (str):
+            The original file path before file is relocated
     Returns:
         Track | int:
-            A track object containing all the parsed track points,
-            or an error code if something went wrong.
-
+            A Track object containing all parsed track points if successful,
+            or integer error code if something went wrong.
     Raises:
-        ValueError:
-            If conversion fails for GPX point attributes.
-        xml.etree.ElementTree:
-            If the XML structure is invalid or corrupted.
         FileNotFoundError:
             If the specified file does not exist.
+        ValueError:
+            If conversion of GPX point attribute fails
+        xml.etree.ElementTree.ParseError:
+            If the XML structure is invalid or corrupted
     """
 
     try:
-        with open(filename, "r", encoding="utf-8") as f:
+        with open(filepath, "r", encoding="utf-8") as f:
             gpx = gpxpy.parse(f)
 
     except gpxpy.gpx.GPXXMLSyntaxException:
-        print(f"File '{filename}' is not well-formed")
+        print(f"File '{filepath}' is not well-formed")
         return FILE_CORRUPTED
 
     except FileNotFoundError:
-        print(f"File '{filename}' was not found.")
+        print(f"File '{filepath}' was not found.")
         return FILE_NOT_FOUND
 
     length_2d = gpx.length_2d()         # float
@@ -60,9 +58,8 @@ def getGPX(filename: str) -> Track | int:
 
     # Initialize the track with the filename as its name and include all
     # computed data
-    filename_only = os.path.basename(filename)
-    track = Track(filename_only, length_2d, length_3d, moving_data, 
-                  avg_speed, uphill, time_bounds, points, filename, filename_only, gpxVersion)
+    track = Track(original_filename, length_2d, length_3d, moving_data, 
+                  avg_speed, uphill, time_bounds, points, original_filepath ,original_filename, gpxVersion)
     
     
     # Read each data and child of the gpx file
