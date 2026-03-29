@@ -11,6 +11,10 @@
     <div class="container">
       <h1>Welcome to My Driving App</h1>
 
+        <div class = "NovBar"> 
+          {{ func.home_page_button("all_trips", link = url_for('all_trips')) }}
+        </div>
+
       <!-- GPX Upload Form -->
       <div class="upload-section">
         <h2>Upload a GPX File</h2>

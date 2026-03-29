@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - GPX Project</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styleForWeb/login.css') }}">
+</head>
+<body>
+
+    <div class="top-photo">
+        <img src="{{ url_for('static', filename='Images/login/cloud.jpg') }}" alt="Cloud Logo">
+    </div>
+
+    <img src="{{ url_for('static', filename='Images/login/road.jpg') }}" id="bg-img" alt="Road Background">
+
+    <div class="login-container">
+
+        <h2>Welcome Back</h2>
+        <form>
+            <label>Username:</label>
+            <input type="text" name="username" placeholder="Enter Username">
+            
+            <br><br>
+            
+            <label>Password:</label>
+            <input type="password" name="password" placeholder="Enter Password">
+            
+            <br><br>
+            
+            <button type="button">Login</button>
+        </form>
+    </div>
+
+</body>
+</html>

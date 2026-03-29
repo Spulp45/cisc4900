@@ -14,6 +14,13 @@ app.config['UPLOAD_DIRECTORY'] = json.load(open("config.json"))["UPLOAD_DIRECTOR
 app.config['ALLOWED_EXTENSIONS'] = json.load(open("config.json"))["ALLOWED_EXTENSIONS"]
 
 
+@app.route('/login')
+def login():
+    # This looks for a file named login.html inside a 'templates' folder
+    return render_template('login.html')
+
+
+
 @app.route('/')
 def home():
     all_rows = databaseFunctions.get_all_tracks()
