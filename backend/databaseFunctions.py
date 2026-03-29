@@ -2,6 +2,7 @@ import sqlite3
 import os
 from backend.Track import Track
 import json
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 
@@ -55,6 +56,12 @@ def createDatabase() -> int:
         filepath TEXT NOT NULL,
         filename TEXT NOT NULL,
         gpx_version TEXT
+    );
+                      
+    CREATE TABLE IF NOT EXISTS user (
+        id  INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS track_point (
@@ -225,7 +232,6 @@ def delete_track_by_id(id: str) -> bool | int:
         cur.execute("DELETE FROM track_point WHERE track_id = ?", (int_id,))
         cur.execute("DELETE FROM track WHERE id = ?", (int_id,))
         
-        print(hashFilePath)
     try: 
         if filepath and os.path.exists(hashFilePath):
             os.remove(hashFilePath)
@@ -344,3 +350,34 @@ def get_totals() -> dict:
         row = cur.fetchone()
 
         return dict(zip(columns, row)) if row else {}
+
+
+def create_user(username, password):
+    try:
+        with sqlite3.connect(DatabasePath) as conn:
+            cur = conn.cursor()
+
+            password_hash = generate_password_hash(password)
+
+            cur.execute("""
+                INSERT INTO user (username, password_hash)
+                VALUES (?, ?)""", (username, password_hash))
+
+        return True # username & hash password added
+
+    except sqlite3.IntegrityError:
+        return False  # username already exists
+    
+def verify_user(username, password):
+    with sqlite3.connect(DatabasePath) as conn:
+        cur = conn.cursor()
+
+        cur.execute("""
+            SELECT id, password_hash FROM user WHERE username = ?
+            """, (username,))
+        user = cur.fetchone()
+
+    if user and check_password_hash(user[1], password):
+        return user[0] # return user_id
+
+    return False
