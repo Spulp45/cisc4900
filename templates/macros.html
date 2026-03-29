@@ -12,7 +12,7 @@
 {% macro home_page_button(text, link='#', type='button', class='racing-btn') %}
     <a href="{{ link }}" style="text-decoration: none;">
         <button type="{{ type }}" class="{{ class }}">
-            {{ text }}
+            <span>{{ text }}</span>
         </button>
     </a>
 {% endmacro %}
