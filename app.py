@@ -25,6 +25,10 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+#Temp redirect
+@app.route('/')
+def tempRedirect():
+    return redirect('/login')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -66,15 +70,16 @@ def logout():
 @app.route('/home')
 @login_required
 def home():
-    all_rows = databaseFunctions.get_all_tracks()
-    return render_template('home.html', tracks=all_rows)
+    print("CURRENTUSER: ",session.get('user_id'))
+    all_rows = databaseFunctions.get_tracks(session.get('user_id'))
+    return render_template('home.html', tracks=all_rows, username=session.get('username'))
 
 
 @app.route('/trip/<int:track_id>')
 @login_required
 def trip_stats(track_id):
 
-    data = databaseFunctions.get_track_with_track_points_by_id(track_id)
+    data = databaseFunctions.get_gps_points(track_id,session.get('user_id'))
 
     return render_template(
         'trips.html',
@@ -134,8 +139,8 @@ def upload():
             # Rename temp file to final name
             os.replace(temp_filepath, new_filepath)
 
-            # Insert into DB
-            result = databaseFunctions.insert_track(track)
+            # Insert into DB also pass user_id
+            result = databaseFunctions.insert_track(track, session.get('user_id'))
 
             if result == databaseFunctions.DUPLICATE_ERROR:
                 os.remove(new_filepath)
@@ -158,9 +163,9 @@ def upload():
 @login_required
 def delete_track(track_id):
 
-    result = databaseFunctions.delete_track_by_id(track_id)
+    result = databaseFunctions.delete_track_by_id(track_id, session.get('user_id'))
 
-    if not result:
+    if result == databaseFunctions.DELETE_ERROR:
         return f"Could not delete track {track_id}", 400
     if result == databaseFunctions.DELETE_FILE_ERROR:
         return f"Could not delete file associated with track with id: {track_id}"
@@ -170,7 +175,6 @@ def delete_track(track_id):
 @app.route('/allTrip')
 @login_required
 def all_trips():
-
     totals = databaseFunctions.get_totals()
 
     if not totals:
@@ -178,37 +182,6 @@ def all_trips():
     
     
     return render_template('all_trips.html', totals=totals)
-
-
-# Unit toggle route
-@app.route('/set_units/<unit>')
-def set_units(unit):
-    if unit in ['metric', 'imperial']:
-        session['units'] = unit
-    return redirect(request.referrer or '/')
-
-
-# Template filters
-@app.template_filter("speed")
-def speed_filter(value):
-    unit_setting = session.get("units", "metric")
-    return units.format_speed(value, unit_setting)
-
-
-@app.template_filter("distance")
-def distance_filter(value):
-    unit_setting = session.get("units", "metric")
-    return units.format_distance(value, unit_setting)
-
-
-@app.template_filter("elevation")
-def elevation_filter(value):
-    unit_setting = session.get("units", "metric")
-    return units.format_elevation(value, unit_setting)
-
-@app.template_filter("time")
-def time_filter(value):
-    return units.format_time(value)
 
 
 # For running the app
