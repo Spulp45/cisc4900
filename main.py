@@ -9,6 +9,9 @@ if generateKeyResult == generate_secret.SUCCESS:
     print("Successfully Created Random Key")
 elif generateKeyResult == generate_secret.KEY_EXISTS:
     print("Key already exists. Skipping this step...")
+else:
+    print("Failed to create key! exiting program")
+    exit()
 
 
 databaseResult = databaseFunctions.createDatabase()
@@ -26,6 +29,7 @@ if leafletResult == leafletInstall.SUCCESS:
     print("Leaflet downloaded successfully")
 else:
     print("Leaflet was not downloaded correctly")
+    exit()
 # Import flask only after checking if everything is ok
 
 from app import app 

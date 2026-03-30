@@ -34,8 +34,7 @@ def createDatabase() -> int:
     # Enable foreign key support
     conn.execute("PRAGMA foreign_keys = ON")
 
-    # Create tables and index
-    cur.executescript("""
+    createDB="""
 
     CREATE TABLE IF NOT EXISTS track (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,7 +93,19 @@ def createDatabase() -> int:
                       
         PRIMARY KEY(user_id, track_id)
     );
-    """)
+
+    CREATE INDEX idx_track_point_track_id 
+    ON track_point(track_id);
+
+    CREATE INDEX idx_user_tracks_track_id 
+    ON user_tracks(track_id);
+
+    CREATE INDEX idx_track_point_timestamp 
+    ON track_point(timestamp);
+    """
+
+    # Create tables and index
+    cur.executescript(createDB)
     conn.commit()
     conn.close()
 
