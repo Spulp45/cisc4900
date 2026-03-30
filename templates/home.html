@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Driving Tracker</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styleForWeb/home.css') }}" />
   </head>
   <body>
     <div class="container">
@@ -14,10 +15,13 @@
 
         <div class = "NovBar"> 
           {{ func.home_page_button("all_trips", link = url_for('all_trips')) }}
+          {{ func.home_page_button("compare", link = url_for('all_trips')) }}
+          {{ func.home_page_button("whatever", link = url_for('all_trips')) }}
+          {{ func.home_page_button("whatever2", link = url_for('all_trips')) }}
         </div>
 
      <form action="{{ url_for('logout') }}" method="get" style="display:inline;">
-    <button type="submit">Logout</button>
+    
 </form>
 </form>
 
@@ -70,11 +74,8 @@
       </table>
 
       <hr />
-
-      <!-- Total Table -->
-      <div class="total-table">
-        {{ func.total_table(label="Total Table") }}
-      </div>
     </div>
+
+    <button type="submit">Logout</button>
   </body>
 </html>

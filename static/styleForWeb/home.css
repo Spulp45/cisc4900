@@ -1,0 +1,130 @@
+/* Main Page Setup */
+body {
+    background: #111; /* fallback color */
+    color: #eee;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+    max-width: 100%;
+    margin: 50px auto;
+    padding: 30px;
+    background: rgba(30, 30, 30, 0.8); /* Dark glass effect */
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 1px solid #444;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+}
+
+/* Header & Navigation */
+h1 {
+    font-family: 'Orbitron', sans-serif;
+    color: #f1c40f; /* Road Line Yellow */
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+}
+
+.NovBar { 
+    display: flex;
+    width: 100%;
+    gap: 0px;
+    margin-bottom: 40px;
+}
+
+.NovBar a {
+    flex: 1; /* Makes road buttons fill the line */
+    display: flex;
+}
+
+/* Upload Section */
+.upload-section {
+    background: #222;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 6px solid #f1c40f; /* Yellow lane marker */
+    margin: 30px 0;
+}
+
+.upload-section h2 {
+    font-size: 1.2rem;
+    margin-top: 0;
+}
+
+.upload-section input[type="file"] {
+    background: #333;
+    padding: 10px;
+    border-radius: 4px;
+    color: #fff;
+    border: 1px solid #555;
+    margin-right: 10px;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th {
+    text-align: left;
+    padding: 15px;
+    background: #333;
+    color: #f1c40f;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+td {
+    padding: 15px;
+    border-bottom: 1px solid #444;
+}
+
+tr:hover {
+    background: rgba(241, 196, 15, 0.05); /* Subtle yellow tint on hover */
+}
+
+/* Action Buttons inside Table */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.action-buttons button {
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    border: none;
+    transition: 0.3s;
+}
+
+/* Delete Button Specifics */
+form[action*="delete"] button {
+    background: #c0392b;
+    color: white;
+}
+
+form[action*="delete"] button:hover {
+    background: #e74c3c;
+}
+
+/* Logout Button */
+.logout-btn {
+    display: block;
+    margin: 40px auto 0;
+    background: none;
+    border: 2px solid #555;
+    color: #888;
+    padding: 10px 25px;
+    cursor: pointer;
+    border-radius: 20px;
+}
+
+.logout-btn:hover {
+    color: white;
+    border-color: #fff;
+}

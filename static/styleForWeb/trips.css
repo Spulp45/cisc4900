@@ -1,0 +1,115 @@
+body {
+    background: #111;
+    color: #eee;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+/* 2. Map + Panel Container (The GPS Unit) */
+#map-container {
+    display: flex;
+    height: 65vh; /* Using 70% of the screen height */
+    width: 50vw;  /* Changed to 90vw to give you that wide 'parity' look */
+    max-width: 1600px;
+    margin: 20px auto;
+    gap: 15px;
+    background: #222;
+    padding: 10px;
+    border-radius: 12px;
+}
+
+#map {
+    flex: 4;      /* Map takes 80% of the container width */
+    height: 100%;
+    width: 100%;
+    border-radius: 8px;
+}
+
+/* 4. Side Panel (The "On-Board Computer") */
+#track-details {
+    flex: 1;      /* Side panel takes 20% of the container width */
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    border-left: 4px solid #f1c40f;
+    border-radius: 0 8px 8px 0; /* Rounds the right side of the panel */
+}
+
+/* Style the specific labels so they pop */
+#track-details p {
+    color: #f1c40f; /* Make the data labels (like "Speed:") yellow */
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+/* Style the actual values (the numbers) */
+#track-details span {
+    color: #ffffff; /* Make the actual coordinates/numbers white */
+    font-family: 'Courier New', monospace; /* Looks more like a GPS readout */
+}
+
+#track-details h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    color: #f1c40f;
+    text-transform: uppercase;
+    margin-top: 0;
+}
+
+/* 5. Stats Section */
+.stats-display {
+    max-width: 1200px;
+    margin: 0 auto 20px auto;
+    background: rgba(40, 40, 40, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    border-bottom: 4px solid #f1c40f;
+}
+
+.stats-display h2 {
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 2px;
+    color: #fff;
+    margin-top: 0;
+}
+
+/* 6. Stats Table (Leaderboard Style) */
+#stats-table {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    border-collapse: collapse;
+    background: #222;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#stats-table th {
+    background: #333;
+    color: #f1c40f;
+    padding: 15px;
+    text-align: left;
+    font-family: 'Orbitron', sans-serif;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+#stats-table td {
+    padding: 15px;
+    border-bottom: 1px solid #444;
+}
+
+/* 7. Scrollbar Styling (Make it look techy) */
+#track-details::-webkit-scrollbar {
+    width: 8px;
+}
+#track-details::-webkit-scrollbar-track {
+    background: #111;
+}
+#track-details::-webkit-scrollbar-thumb {
+    background: #f1c40f;
+    border-radius: 10px;
+}

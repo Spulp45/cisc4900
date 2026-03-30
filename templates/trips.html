@@ -6,31 +6,7 @@
   <title>Trip</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='leaflet/leaflet.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-  <style>
-    /* Map + panel container */
-    #map-container {
-      display: flex;
-      height: 500px;
-      max-width: 1000px;
-      margin: 0 auto 20px auto;
-      gap: 10px;
-    }
-
-    /* Map styling */
-    #map {
-      flex: 2;
-      height: 100%;
-    }
-
-    /* Side panel for track point details */
-    #track-details {
-      flex: 1;
-      padding: 10px;
-      border-left: 1px solid #ccc;
-      overflow-y: auto;
-      background: #f9f9f9;
-    }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styleForWeb/trips.css') }}" />
 </head>
 
 <body>
