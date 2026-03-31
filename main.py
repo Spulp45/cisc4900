@@ -1,7 +1,7 @@
 import generate_secret
 from backend import databaseFunctions
 import leafletInstall
-from app import app 
+
 ## First Time Tests
 generateKeyResult = generate_secret.generate()
 
@@ -31,5 +31,6 @@ else:
     exit()
 
 #Start Flask
+from app import app 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
