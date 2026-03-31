@@ -72,7 +72,7 @@ python -m venv .venv
 Activate Virtual Environment 
 
 ```bash
-source .venv\Scripts\activate
+.venv\Scripts\activate.bat
 ```
 
 Install Required Libraries
