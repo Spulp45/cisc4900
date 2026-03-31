@@ -100,10 +100,11 @@ That is where the Web UI is located. Open it to interact with the app.
 Instructions on how to run are on Run Locally Section
 
 1) Open the Web UI. 
-2) You should see an Upload GPX File Section and an empty table.
+2) You should see the login screen, choose register if you have not created an username and password yet.
+3) After logging in you should see the Main Menu with a table with uploaded tracks and the upload box.
 **Note:** We have provided you with some test files located in the demoGPX folder. You can use these to test the upload and display features of the app.
-3) Upload a GPX file, click on the Browse... button, and select a GPX file. After making your selection, click the Upload Button.
-4) Click on the View Stats to display all the data processed from that GPX file.
+4) Upload a GPX file, click on the Browse... button, and select a GPX file. After making your selection, click the Upload Button.
+5) Click on the View Stats to display all the data processed from that GPX file.
 
 ## Screenshots
 
@@ -117,3 +118,10 @@ Instructions on how to run are on Run Locally Section
 ## Total Statistics Table
 
 ![App Screenshot](screenshots/totaltable.png)
+
+## Libraries Used
+
+* Leaflet.js https://leafletjs.com/
+* Flask https://flask.palletsprojects.com/
+* gpxpy https://github.com/tkrajina/gpxpy
+* PLACEHOLDER
