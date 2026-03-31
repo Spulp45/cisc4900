@@ -1,17 +1,14 @@
 import generate_secret
 from backend import databaseFunctions
 import leafletInstall
-
+from app import app 
 ## First Time Tests
 generateKeyResult = generate_secret.generate()
 
 if generateKeyResult == generate_secret.SUCCESS:
     print("Successfully Created Random Key")
-elif generateKeyResult == generate_secret.KEY_EXISTS:
+if generateKeyResult == generate_secret.KEY_EXISTS:
     print("Key already exists. Skipping this step...")
-else:
-    print("Failed to create key! exiting program")
-    exit()
 
 
 databaseResult = databaseFunctions.createDatabase()
@@ -25,14 +22,14 @@ else:
 
 leafletResult = leafletInstall.download_leaflet()
 
-if leafletResult == leafletInstall.SUCCESS:
-    print("Leaflet downloaded successfully")
+if leafletResult == leafletInstall.LEAFLET_EXISTS:
+    print("Leaflet files ready")
+elif leafletResult == leafletInstall.SUCCESS:
+    print("Leaflet download complete")
 else:
     print("Leaflet was not downloaded correctly")
     exit()
-# Import flask only after checking if everything is ok
 
-from app import app 
-
+#Start Flask
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

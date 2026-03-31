@@ -3,6 +3,7 @@ import requests
 
 SUCCESS = 0
 ERROR = 1
+LEAFLET_EXISTS = 2
 LEAFLET_VERSION = "1.9.4"
 STATIC_LEAFLET_DIR = "static/leaflet"
 
@@ -19,6 +20,7 @@ LEAFLET_FILES = {
 def download_leaflet():
     os.makedirs(STATIC_LEAFLET_DIR, exist_ok=True)
     os.makedirs(os.path.join(STATIC_LEAFLET_DIR, "images"), exist_ok=True)
+    downloadCount = 0
 
     for filename, url in LEAFLET_FILES.items():
         local_path = os.path.join(STATIC_LEAFLET_DIR, filename)
@@ -27,10 +29,15 @@ def download_leaflet():
             continue
         print(f"Downloading {filename}...")
         r = requests.get(url)
+        downloadCount = downloadCount + 1
         r.raise_for_status()
 
         os.makedirs(os.path.dirname(local_path), exist_ok=True)
         with open(local_path, "wb") as f:
             f.write(r.content)
-    print("Leaflet download completed")
-    return SUCCESS
+    if(downloadCount != 0 ):
+        print(f"Downloaded {downloadCount} Files")
+        print("Leaflet download completed")
+        return SUCCESS
+    else:
+        return LEAFLET_EXISTS
