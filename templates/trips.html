@@ -23,14 +23,20 @@
 <!-- Stats display -->
 <div class="stats-display">
   <h2>STATS</h2>
-
 </div>
 
   <!-- Stats table -->
   <table id="stats-table"></table>
 
+   <canvas id="chartjs"></canvas>
+
+
   <!-- Leaflet JS -->
   <script src="{{ url_for('static', filename='leaflet/leaflet.js') }}"></script>
+
+  <!-- Chart JS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 
   <!-- Pass server-side data to JS -->
   <script>
@@ -40,6 +46,9 @@
 
   <!-- Include map logic -->
   <script src="{{ url_for('static', filename='/map.js') }}"></script>
+
+  <!-- Include Chart.js logic -->
+  <script src="{{ url_for('static', filename='/chart.js') }}"></script>
 
   <!-- Back button -->
   {{ func.back_button(label="← Back") }}
