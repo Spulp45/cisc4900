@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, url_for
+from flask import Flask, render_template, request, redirect, session, url_for, jsonify
 from werkzeug.utils import secure_filename
 from backend import databaseFunctions
 from backend import parser
@@ -173,6 +173,18 @@ def delete_track(track_id):
         return f"Could not delete file associated with track with id: {track_id}"
 
     return redirect('/home')
+
+@app.route('/update_description/<int:track_id>', methods=['POST'])
+@login_required
+def update_description(track_id):
+    data = request.get_json()
+
+    new_description = data.get('description')
+
+    databaseFunctions.update_description(track_id, session.get('user_id'), new_description)
+
+    return jsonify({"success": True})
+
 
 @app.route('/allTrip')
 @login_required

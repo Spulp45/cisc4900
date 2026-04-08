@@ -28,7 +28,7 @@ const myChart = new Chart(canvas, {
     datasets: [{
       label: 'Speed',
       data: dataPoints,
-      borderColor: 'lime',
+      borderColor: 'red',
       borderWidth: 2,
       pointRadius: 0,
       tension: 0.3
@@ -59,7 +59,7 @@ const myChart = new Chart(canvas, {
         ticks: {
           callback: function(value) {
             const date = new Date(value);
-            return date.toLocaleTimeString();
+            return date.toLocaleTimeString()
           }
         }
       },

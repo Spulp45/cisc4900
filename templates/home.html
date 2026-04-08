@@ -12,18 +12,16 @@
     <div class="container">
       <h1>Welcome {{username }} </h1>
 
+      <div class="NovBar"> 
+        {{ func.home_page_button("all_trips", link = url_for('all_trips')) }}
+        {{ func.home_page_button("compare", link = url_for('all_trips')) }}
+        {{ func.home_page_button("whatever", link = url_for('all_trips')) }}
+        {{ func.home_page_button("whatever2", link = url_for('all_trips')) }}
+      </div>
 
-        <div class = "NovBar"> 
-          {{ func.home_page_button("all_trips", link = url_for('all_trips')) }}
-          {{ func.home_page_button("compare", link = url_for('all_trips')) }}
-          {{ func.home_page_button("whatever", link = url_for('all_trips')) }}
-          {{ func.home_page_button("whatever2", link = url_for('all_trips')) }}
-        </div>
-
-     <form action="{{ url_for('logout') }}" method="get" style="display:inline;">
-    
-</form>
-</form>
+      <form action="{{ url_for('logout') }}" method="get" style="display:inline;">
+      </form>
+      </form>
 
       <!-- GPX Upload Form -->
       <div class="upload-section">
@@ -37,9 +35,10 @@
       <hr />
 
       {% if tracks %}
-    {% else %}
-    <p>No tracks uploaded yet. Start by uploading a GPX file above!</p>
-{% endif %}
+      {% else %}
+        <p>No tracks uploaded yet. Start by uploading a GPX file above!</p>
+      {% endif %}
+
       <!-- Saved Tracks Table -->
       <h2>All Saved Tracks</h2>
       <table>
@@ -47,7 +46,7 @@
           <tr>
             <th>ID</th>
             <th>Name</th>
-            <th>Start Time</th>
+            <th>Description</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -56,9 +55,38 @@
           <tr>
             <td>{{ row.id }}</td>
             <td>{{ row.name }}</td>
-            <td>{{ row.start_time }}</td>
+
+            <!-- Description -->
+            <td>
+              <span id="desc-text-{{ row.id }}">
+                {{ row.description if row.description else "No description" }}
+              </span>
+
+              <input 
+                type="text" 
+                id="desc-input-{{ row.id }}" 
+                value="{{ row.description or '' }}" 
+                style="display:none;"
+              >
+            </td>
+
+            <!-- Actions -->
             <td>
               <div class="action-buttons">
+
+                        <button type="button"
+                id="edit-btn-{{ row.id }}"
+                onclick="enableEdit({{ row.id }})">
+          Edit
+        </button>
+
+                <button type="button"
+                        onclick="saveEdit({{ row.id }})"
+                        id="save-btn-{{ row.id }}"
+                        style="display:none;">
+                  Save
+                </button>
+
                 <a href="{{ url_for('trip_stats', track_id=row.id) }}">
                   <button type="button">View Stats</button>
                 </a>
@@ -69,6 +97,7 @@
                       onsubmit="return confirm('Are you sure you want to delete this track?');">
                   <button type="submit">Delete</button>
                 </form>
+
               </div>
             </td>
           </tr>
@@ -76,10 +105,49 @@
         </tbody>
       </table>
 
-      <hr />
+      <hr/>
     </div>
-    <form action="{{ url_for('logout') }}" method="post">
-  <button type="submit">Logout</button>
-  </form>
+
+    <form class="action-buttons" action="{{ url_for('logout') }}" method="post">
+      <button type="submit">Logout</button>
+    </form>
   </body>
+
+  <script>
+    function enableEdit(id) {
+      document.getElementById(`desc-text-${id}`).style.display = 'none';
+      document.getElementById(`desc-input-${id}`).style.display = 'inline';
+      document.getElementById(`save-btn-${id}`).style.display = 'inline';
+
+      document.getElementById(`edit-btn-${id}`).style.display = 'none';
+
+    }
+
+    function saveEdit(id) {
+      const input = document.getElementById(`desc-input-${id}`);
+      const newDescription = input.value;
+
+      fetch(`/update_description/${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ description: newDescription })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById(`desc-text-${id}`).innerText =
+            newDescription.trim() ? newDescription : "No description";
+          document.getElementById(`desc-text-${id}`).style.display = 'inline';
+          document.getElementById(`desc-input-${id}`).style.display = 'none';
+          document.getElementById(`save-btn-${id}`).style.display = 'none';
+
+          document.getElementById(`edit-btn-${id}`).style.display = 'inline';
+        } else {
+          alert("Update failed");
+        }
+      });
+    }
+  </script>
 </html>

@@ -55,7 +55,8 @@ def createDatabase() -> int:
         points INTEGER,
         filepath TEXT NOT NULL,
         filename TEXT NOT NULL,
-        gpx_version TEXT
+        gpx_version TEXT,
+        description TEXT
     );
 
     CREATE TABLE IF NOT EXISTS track_point (
@@ -429,6 +430,26 @@ def get_totals(user_id: str) -> dict:
         columns = [col[0] for col in cur.description]
         return dict(zip(columns, row))
 
+
+def update_description(track_id: int, user_id: int, new_description):
+    with sqlite3.connect(DatabasePath) as conn:
+        cur = conn.cursor()
+
+        cur.execute("""
+            SELECT 1 FROM user_tracks
+            WHERE track_id = ? AND user_id = ?
+        """, (track_id, user_id))
+
+        if cur.fetchone() is None:
+            return False  
+        cur.execute("""
+            UPDATE track
+            SET description = ?
+            WHERE id = ?
+        """, (new_description, track_id))
+
+        conn.commit()
+        return True
 
 def create_user(username, password):
     try:

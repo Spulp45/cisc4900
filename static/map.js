@@ -52,7 +52,7 @@ function renderTrackPanel(point) {
     ${point.lon != null ? `<p><b>Longitude:</b> ${point.lon}</p>` : ""}
     ${point.speed != null ? `<p><b>Speed:</b> ${formatValue(point.speed, "speed", userUnits)}</p>` : ""}
     ${point.ele != null ? `<p><b>Elevation:</b> ${formatValue(point.ele, "elevation", userUnits)}</p>` : ""}
-    ${point.timestamp != null ? `<p><b>Time:</b> ${point.timestamp}</p>` : ""}
+    ${point.timestamp != null ? `<p><b>Time:</b> ${new Date(point.timestamp).toLocaleString()}</p>` : ""}
     ${point.course != null ? `<p><b>Course:</b> ${point.course}</p>` : ""}
     ${point.geoidheight != null ? `<p><b>Geoid Height:</b> ${point.geoidheight}</p>` : ""}
     ${point.src != null ? `<p><b>Source:</b> ${point.src}</p>` : ""}
@@ -74,6 +74,9 @@ function renderStatsTable(track, units) {
       <button type="button" class="unit-btn" data-unit="raw">Raw</button>
     </div>
     <tr><th>Data</th><th>Value</th></tr>
+    <tr><td>Filename</td><td>${track.filename}</td></tr>
+    <tr><td>Filepath</td><td>${track.filepath}</td></tr>
+    <tr><td>Description</td><td>${track.description}</td></tr>
     <tr><td>Average Moving Speed</td><td>${formatValue(track.avg_speed, "speed", units)}</td></tr>
     <tr><td>Total Distance 2D</td><td>${formatValue(track.length_2d, "distance", units)}</td></tr>
     <tr><td>Total Distance 3D</td><td>${formatValue(track.length_3d, "distance", units)}</td></tr>
@@ -85,11 +88,9 @@ function renderStatsTable(track, units) {
     <tr><td>Average Speed</td><td>${formatValue(track.avg_speed, "speed", units)}</td></tr>
     <tr><td>Uphill</td><td>${formatValue(track.uphill, "elevation", units)}</td></tr>
     <tr><td>Downhill</td><td>${formatValue(track.downhill, "elevation", units)}</td></tr>
-    <tr><td>Start Time</td><td>${track.start_time}</td></tr>
-    <tr><td>End Time</td><td>${track.end_time}</td></tr>
+    <tr><td>Start Time</td><td>${new Date(track.start_time).toLocaleString()}</td></tr>
+    <tr><td>End Time</td><td>${new Date(track.start_time).toLocaleString()}</td></tr>
     <tr><td>Points</td><td>${track.points}</td></tr>
-    <tr><td>Filename</td><td>${track.filename}</td></tr>
-    <tr><td>Filepath</td><td>${track.filepath}</td></tr>
     <tr><td>GPX Version</td><td>${track.gpx_version}</td></tr>
   `;
 }
