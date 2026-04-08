@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Trip</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='leaflet/leaflet.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='js/leaflet/leaflet.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='styleForWeb/trips.css') }}" />
 </head>
@@ -24,18 +24,16 @@
 <div class="stats-display">
   <h2>STATS</h2>
 </div>
-
   <!-- Stats table -->
   <table id="stats-table"></table>
 
-   <canvas id="chartjs"></canvas>
+  <canvas id="tripsChart"></canvas>
 
 
   <!-- Leaflet JS -->
-  <script src="{{ url_for('static', filename='leaflet/leaflet.js') }}"></script>
-
+  <script src="{{ url_for('static', filename='js/leaflet/leaflet.js') }}"></script>
   <!-- Chart JS -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{{ url_for('static', filename='js/chartjs/dist/chart.umd.min.js') }}"></script>
 
 
   <!-- Pass server-side data to JS -->
@@ -48,7 +46,7 @@
   <script src="{{ url_for('static', filename='/map.js') }}"></script>
 
   <!-- Include Chart.js logic -->
-  <script src="{{ url_for('static', filename='/chart.js') }}"></script>
+  <script src="{{ url_for('static', filename='/tripsChart.js') }}"></script>
 
   <!-- Back button -->
   {{ func.back_button(label="← Back") }}

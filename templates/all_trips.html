@@ -12,9 +12,10 @@
   <h2>Total Statistics</h2>
 
   <div class="unit-toggle">
-    <span>Units:</span>
-    <a href="/set_units/metric" class="unit-btn">Metric</a>
-    <a href="/set_units/imperial" class="unit-btn">Imperial</a>
+ <span>Units:</span>
+<a href="/set_units/metric" class="unit-btn">Metric</a>
+<a href="/set_units/imperial" class="unit-btn">Imperial</a>
+<a href="/set_units/raw" class="unit-btn">Raw</a>
   </div>
 
   <hr />
@@ -41,11 +42,11 @@
       </tr>
       <tr>
         <th>Uphill</th>
-        <td>{{ totals.uphill | distance }}</td>
+        <td>{{ totals.uphill | elevation }}</td>
       </tr>
       <tr>
         <th>Downhill</th>
-        <td>{{ totals.downhill | distance }}</td>
+        <td>{{ totals.downhill | elevation }}</td>
       </tr>
     </table>
   </div>
