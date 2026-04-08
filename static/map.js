@@ -1,6 +1,5 @@
 let lastClickedPoint = null;
 
-
 // Retrieve current unit setting
 function getUnits() {
   return sessionStorage.getItem("units") || "metric";
@@ -95,7 +94,7 @@ function renderStatsTable(track, units) {
   `;
 }
 
-// Handle clicks 
+// Handle clicks
 document.addEventListener("click", (e) => {
   if (e.target.classList.contains("unit-btn")) {
     const unit = e.target.dataset.unit;
@@ -106,66 +105,114 @@ document.addEventListener("click", (e) => {
 });
 
 // Initialize Map
-function initMap(track_points, track) {
+function initMap(track_points) {
   const osm = L.tileLayer(
     "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    { attribution: "&copy; OpenStreetMap contributors" },
+    {
+      attribution: "&copy; OpenStreetMap contributors",
+      maxNativeZoom: 19,
+      maxZoom: 23,
+    },
   );
   const esriSat = L.tileLayer(
     "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    { attribution: "Tiles &copy; Esri" },
+    { attribution: "Tiles &copy; Esri", maxNativeZoom: 23, maxZoom: 25 },
   );
   const dark = L.tileLayer(
     "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-    { attribution: "&copy; OpenStreetMap &copy; Carto" },
+    {
+      attribution: "&copy; OpenStreetMap &copy; Carto",
+      maxNativeZoom: 19,
+      maxZoom: 23,
+    },
   );
 
-  const map = L.map("map", { center: [0, 0], zoom: 1, layers: [osm] });
-  const trackLayer = L.layerGroup().addTo(map);
-  const uiLayer = L.layerGroup().addTo(map);
+const map = L.map("map", {
+    center: [0, 0],
+    zoom: 13,
+    maxZoom: 23,
+    layers: [osm],
+    scrollWheelZoom: true,
+    fullscreenControl: true,
+    fullscreenControlOptions: {     
+        position: 'bottomright'
+    }
+});
+
+  L.control
+    .scale({
+      position: "bottomleft",
+      metric: true,
+      imperial: true,
+      updateWhenIdle: true,
+      maxWidth: 150,
+    })
+    .addTo(map);
+
+    
+
+  let polylineLayer = null;
+  const trackPointsLayer = L.layerGroup();
+  const minZoomForTrackPoints = 14;
 
   if (track_points.length > 0) {
     const latlngs = track_points.map((p) => [p.lat, p.lon]);
-    const polyline = L.polyline(latlngs, {
+    polylineLayer = L.polyline(latlngs, {
       color: "#008e00",
       weight: 7,
       opacity: 1,
-    }).addTo(trackLayer);
+    }).addTo(map);
 
     L.marker([track_points[0].lat, track_points[0].lon])
-      .addTo(uiLayer)
+      .addTo(map)
       .bindPopup("Start");
     L.marker([
       track_points[track_points.length - 1].lat,
       track_points[track_points.length - 1].lon,
     ])
-      .addTo(uiLayer)
+      .addTo(map)
       .bindPopup("End");
+  }
+
+  function renderTrackPoints() {
+    trackPointsLayer.clearLayers();
+    const zoom = map.getZoom();
+    if (zoom < minZoomForTrackPoints) return;
+
+    const radius = zoom < 18 ? 3 : 6;
 
     track_points.forEach((point) => {
       const marker = L.circleMarker([point.lat, point.lon], {
-        radius: 3,
+        radius: radius,
         color: "#1f3145",
         weight: 1,
         fillOpacity: 0.7,
-      }).addTo(trackLayer);
+      });
       marker.on("mouseover", () =>
-        marker.setStyle({ radius: 10, color: "yellow" }),
+        marker.setStyle({ radius: radius + 10, color: "yellow" }),
       );
       marker.on("mouseout", () =>
-        marker.setStyle({ radius: 3, color: "#1f3145" }),
+        marker.setStyle({ radius: radius, color: "#1f3145" }),
       );
       marker.on("click", () => {
         lastClickedPoint = point;
         renderTrackPanel(point);
       });
+      trackPointsLayer.addLayer(marker);
     });
 
-    map.fitBounds(polyline.getBounds());
+    if (!map.hasLayer(trackPointsLayer)) map.addLayer(trackPointsLayer);
   }
 
+  map.on("zoomend", renderTrackPoints);
+  renderTrackPoints();
+
   const baseLayers = { OSM: osm, Satellite: esriSat, Dark: dark };
-  L.control.layers(baseLayers).addTo(map);
+  const overlayLayers = { "Track Points": trackPointsLayer };
+  L.control.layers(baseLayers, overlayLayers).addTo(map);
+
+  if (polylineLayer) map.fitBounds(polylineLayer.getBounds());
+  console.log("Initial zoom:", map.getZoom());
 }
 
 // Start the map and render table
