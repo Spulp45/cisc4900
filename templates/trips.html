@@ -26,14 +26,22 @@
 </div>
   <!-- Stats table -->
   <table id="stats-table"></table>
+ <div style="width: 600px; height: 300px;">
+  <canvas id="tripsChart" style="background-color: white"></canvas>
+</div>
 
-  <canvas id="tripsChart" style="background-color: white;"></canvas>
-
+<div style="width: 600px; height: 300px;">
+  <canvas id="tripsChart2" style="background-color: white"></canvas>
+</div>
 
   <!-- Leaflet JS -->
   <script src="{{ url_for('static', filename='js/leaflet/leaflet.js') }}"></script>
   <!-- Chart JS -->
   <script src="{{ url_for('static', filename='js/chartjs/dist/chart.umd.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/chartjs/plugins/zoom/chartjs-plugin-zoom.js') }}"></script>
+  <canvas id="tripsChart"></canvas>
+  <script src="{{ url_for('static', filename='js/tripsChart.js') }}"></script>
+  
 
 
   <!-- Pass server-side data to JS -->

@@ -415,7 +415,6 @@ def get_totals(user_id: str) -> dict:
                 TOTAL(t.uphill)           AS uphill,
                 TOTAL(t.downhill)         AS downhill,
                 TOTAL(t.points)           AS points,
-                MAX(t.max_speed)          AS max_speed,
                 AVG(t.avg_speed)          AS overall_avg_speed,
                 SUM(CASE WHEN t.gpx_version = '1.0' THEN 1 ELSE 0 END) AS gpx_1_0_count,
                 SUM(CASE WHEN t.gpx_version = '1.1' THEN 1 ELSE 0 END) AS gpx_1_1_count        
@@ -431,7 +430,17 @@ def get_totals(user_id: str) -> dict:
         return dict(zip(columns, row))
 
 
-def update_description(track_id: int, user_id: int, new_description):
+def update_description(track_id: int, user_id: int, description: str) -> bool:
+    """
+    Update a track description
+    Arguments:
+        track_id (int): The id of the track
+        user_id (int): The id of the user
+        description (str): The new description text
+    Returns:
+        bool: True if success false otherwise
+    """
+
     with sqlite3.connect(DatabasePath) as conn:
         cur = conn.cursor()
 
@@ -446,12 +455,21 @@ def update_description(track_id: int, user_id: int, new_description):
             UPDATE track
             SET description = ?
             WHERE id = ?
-        """, (new_description, track_id))
+        """, (description, track_id))
 
         conn.commit()
         return True
+    return False
 
-def create_user(username, password):
+def create_user(username: str, password: str) -> bool:
+    """
+    Create a user
+    Arguments:
+        username (str): The username
+        password (str): The hashed password value
+    Returns:
+        bool: True if success insert of user, false if username already exists
+    """
     try:
         with sqlite3.connect(DatabasePath) as conn:
             cur = conn.cursor()
@@ -467,7 +485,15 @@ def create_user(username, password):
     except sqlite3.IntegrityError:
         return False  # username already exists
     
-def verify_user(username, password):
+def verify_user(username, password) -> int | bool:
+    """
+    Authenticate the user
+    Arguments:
+        username (str): The username
+        password (str): The hashed password value
+    Returns:
+        int | bool: Return the user_id if authenticated False if fail to authenticate
+    """
     with sqlite3.connect(DatabasePath) as conn:
         cur = conn.cursor()
 
