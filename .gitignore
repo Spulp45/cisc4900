@@ -253,4 +253,6 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/linux,macos,windows,python
 *.gpx
 *.db
-/static/leaflet/
+
+!static/js/chartjs/dist/
+!static/js/chartjs/dist/**
