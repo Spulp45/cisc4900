@@ -396,38 +396,38 @@ def get_trackpoints(id: str, track_point_column: str) -> list[dict] | str:
         ]
 
 
-def get_totals() -> dict:
+def get_totals(user_id: str) -> dict:
     """
     Retrieve all aggregate track statistics.
-
-    Returns:
-        dict: A dict of all aggregated values
     """
     with sqlite3.connect(DatabasePath) as conn:
         cur = conn.cursor()
 
         cur.execute("""
-            SELECT 
-                TOTAL(length_2d)        AS length_2d,
-                TOTAL(length_3d)        AS length_3d,
-                TOTAL(moving_time)      AS moving_time,
-                TOTAL(stopped_time)     AS stopped_time,
-                TOTAL(moving_distance)  AS moving_distance,
-                TOTAL(stopped_distance) AS stopped_distance,
-                TOTAL(uphill)           AS uphill,
-                TOTAL(downhill)         AS downhill,
-                TOTAL(points)           AS points,
-                MAX(max_speed)          AS max_speed,
-                AVG(avg_speed)          AS overall_avg_speed,
-                SUM(CASE WHEN gpx_version = '1.0' THEN 1 ELSE 0 END) AS gpx_1_0_count,
-                SUM(CASE WHEN gpx_version = '1.1' THEN 1 ELSE 0 END) AS gpx_1_1_count
-            FROM track
-        """)
+            SELECT
+                TOTAL(t.length_2d)        AS length_2d,
+                TOTAL(t.length_3d)        AS length_3d,
+                TOTAL(t.moving_time)      AS moving_time,
+                TOTAL(t.stopped_time)     AS stopped_time,
+                TOTAL(t.moving_distance)  AS moving_distance,
+                TOTAL(t.stopped_distance) AS stopped_distance,
+                TOTAL(t.uphill)           AS uphill,
+                TOTAL(t.downhill)         AS downhill,
+                TOTAL(t.points)           AS points,
+                MAX(t.max_speed)          AS max_speed,
+                AVG(t.avg_speed)          AS overall_avg_speed,
+                SUM(CASE WHEN t.gpx_version = '1.0' THEN 1 ELSE 0 END) AS gpx_1_0_count,
+                SUM(CASE WHEN t.gpx_version = '1.1' THEN 1 ELSE 0 END) AS gpx_1_1_count        
+            FROM user_tracks ut
+            JOIN track t ON ut.track_id = t.id
+            WHERE ut.user_id = ?
+        """, (user_id,))
 
-        columns = [desc[0] for desc in cur.description]
         row = cur.fetchone()
 
-        return dict(zip(columns, row)) if row else {}
+        # Convert to dict
+        columns = [col[0] for col in cur.description]
+        return dict(zip(columns, row))
 
 
 def create_user(username, password):

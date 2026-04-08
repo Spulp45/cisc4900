@@ -20,15 +20,7 @@ else:
     print("Failed to create database, unknown error. Exiting Program")
     exit()
 
-leafletResult = leafletInstall.download_leaflet()
 
-if leafletResult == leafletInstall.LEAFLET_EXISTS:
-    print("Leaflet files ready")
-elif leafletResult == leafletInstall.SUCCESS:
-    print("Leaflet download complete")
-else:
-    print("Leaflet was not downloaded correctly")
-    exit()
 
 #Start Flask
 from app import app 

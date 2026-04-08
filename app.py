@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, url_for
 from werkzeug.utils import secure_filename
 from backend import databaseFunctions
 from backend import parser
+from backend import units
 from functools import wraps
 import os
 import json
@@ -15,10 +16,6 @@ app.config['UPLOAD_DIRECTORY'] = json.load(open("config.json"))["UPLOAD_DIRECTOR
 app.config['ALLOWED_EXTENSIONS'] = json.load(open("config.json"))["ALLOWED_EXTENSIONS"]
 
 
-
-
-
-
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -28,10 +25,12 @@ def login_required(f):
     return decorated_function
 
 #Temp redirect
-
 @app.route('/')
 def tempRedirect():
-    return redirect('/login')
+    if 'user_id' not in session:
+            return redirect('/login')
+    else:
+        return redirect('/home')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -64,10 +63,10 @@ def login():
         return "Invalid Credentials"
     return render_template('login.html')
 
-@app.route('/logout')
+@app.route('/logout', methods=['POST'])
 def logout():
-    session.clear()
-    return redirect('login')
+    session.clear()  
+    return redirect(url_for('login'))
 
 
 @app.route('/home')
@@ -178,13 +177,42 @@ def delete_track(track_id):
 @app.route('/allTrip')
 @login_required
 def all_trips():
-    totals = databaseFunctions.get_totals()
+    totals = databaseFunctions.get_totals(session.get('user_id'))
 
     if not totals:
         return "No data found to calculate totals", 404
     
     
     return render_template('all_trips.html', totals=totals)
+
+
+# Unit toggle route
+@app.route('/set_units/<unit>')
+def set_units(unit):
+    if unit in ['metric', 'imperial', 'raw']:
+        session['units'] = unit
+    return redirect(request.referrer or '/')
+
+# Template filters
+@app.template_filter("speed")
+def speed_filter(value):
+    unit_setting = session.get("units", "metric")
+    return units.format_speed(value, unit_setting)
+
+@app.template_filter("distance")
+def distance_filter(value):
+    unit_setting = session.get("units", "metric")
+    return units.format_distance(value, unit_setting)
+
+@app.template_filter("elevation")
+def elevation_filter(value):
+    unit_setting = session.get("units", "metric")
+    return units.format_elevation(value, unit_setting)
+
+@app.template_filter("time")
+def time_filter(value):
+    unit_setting = session.get("units", "metric")
+    return units.format_time(value, unit_setting)
 
 
 # For running the app

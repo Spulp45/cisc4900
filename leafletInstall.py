@@ -5,7 +5,7 @@ SUCCESS = 0
 ERROR = 1
 LEAFLET_EXISTS = 2
 LEAFLET_VERSION = "1.9.4"
-STATIC_LEAFLET_DIR = "static/leaflet"
+STATIC_LEAFLET_DIR = "static/js/leaflet"
 
 LEAFLET_FILES = {
     "leaflet.js": f"https://unpkg.com/leaflet@{LEAFLET_VERSION}/dist/leaflet.js",
