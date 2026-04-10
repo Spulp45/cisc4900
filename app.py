@@ -16,10 +16,11 @@ app = Flask(__name__)
 app.secret_key = json.load(open("secret.json"))["SECRET_KEY"]
 app.config['UPLOAD_DIRECTORY'] = json.load(open("config.json"))["UPLOAD_DIRECTORY"]
 app.config['ALLOWED_EXTENSIONS'] = json.load(open("config.json"))["ALLOWED_EXTENSIONS"]
+app.config['DATABASE_PATH'] = json.load(open("config.json"))["DATABASE_PATH"]
 
 # This is to add database into frontend
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'backend', 'database.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, app.config['DATABASE_PATH'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
@@ -174,8 +175,8 @@ def search():
     try:
         q = request.args.get("q", "")
         # Pass the user_id from the session
-        results = databaseFunctions.search_tracks_by_name(db, q)
-        return render_template("search_results.html", track=results)
+        search_results = databaseFunctions.search_tracks_by_name(db, q, session.get('user_id'))
+        return render_template("search_results.html", track=search_results)
     except Exception as e:
         print(f"!!! SEARCH ERROR: {e}")
         return str(e), 500

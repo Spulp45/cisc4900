@@ -4,6 +4,7 @@ from backend.Track import Track
 import json
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import text
+from flask_sqlalchemy import SQLAlchemy
 
 
 
@@ -285,7 +286,7 @@ def get_tracks(user_id: int) -> list[dict]:
     """Retrive all rows from the track table for a specified user"""
     with sqlite3.connect(DatabasePath) as conn:
         cur = conn.cursor()
-        query = """SELECT * 
+        query = """SELECT tr.* 
                     FROM user_tracks ut
                     JOIN track tr
                     ON ut.track_id = tr.id
@@ -508,14 +509,40 @@ def verify_user(username, password) -> int | bool:
 
     return False
 
-def search_tracks_by_name(db, query_text):
+from sqlalchemy import text
+
+def search_tracks_by_name(db: SQLAlchemy, query_text: str, user_id: str) -> list[dict]:
+    """
+    Returns a list of the searched elements in the database
+    Note: Returns everything if the query is empty.
+    Arguments:
+        db (SQLAlchemy): The database to be queried
+        query_text (str): The thing being queried
+        user_id (str): The current logged in user id
+    Returns:
+    list[dict]: List of tracks as dictionaries
+    """
     if not query_text:
-        # Get everything if empty
-        sql = text("SELECT * FROM track")
-        result = db.session.execute(sql)
+        sql = text("""
+            SELECT tr.*
+            FROM track tr
+            JOIN user_tracks ut ON ut.track_id = tr.id
+            WHERE ut.user_id = :user_id
+        """)
+        result = db.session.execute(sql, {
+            "user_id": user_id
+        })
     else:
-        # Filtered search
-        sql = text("SELECT * FROM track WHERE LOWER(name) LIKE LOWER(:name)")
-        result = db.session.execute(sql, {"name": f"%{query_text}%"})
+        sql = text("""
+            SELECT tr.*
+            FROM track tr
+            JOIN user_tracks ut ON ut.track_id = tr.id
+            WHERE ut.user_id = :user_id
+            AND LOWER(tr.name) LIKE LOWER(:name)
+        """)
+        result = db.session.execute(sql, {
+            "user_id": user_id,
+            "name": f"%{query_text}%"
+        })
     
-    return result.fetchall() # Returns a list of tuples
+    return result.fetchall()
