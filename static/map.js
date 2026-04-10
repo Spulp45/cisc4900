@@ -89,7 +89,7 @@ function renderStatsTable(track, units) {
     <tr><td>Uphill</td><td>${formatValue(track.uphill, "elevation", units)}</td></tr>
     <tr><td>Downhill</td><td>${formatValue(track.downhill, "elevation", units)}</td></tr>
     <tr><td>Start Time</td><td>${new Date(track.start_time).toLocaleString()}</td></tr>
-    <tr><td>End Time</td><td>${new Date(track.start_time).toLocaleString()}</td></tr>
+    <tr><td>End Time</td><td>${new Date(track.end_time).toLocaleString()}</td></tr>
     <tr><td>Points</td><td>${track.points}</td></tr>
     <tr><td>GPX Version</td><td>${track.gpx_version}</td></tr>
   `;
