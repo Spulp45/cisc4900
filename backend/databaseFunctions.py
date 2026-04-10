@@ -3,6 +3,7 @@ import os
 from backend.Track import Track
 import json
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import text
 
 
 
@@ -506,3 +507,15 @@ def verify_user(username, password) -> int | bool:
         return user[0] # return user_id
 
     return False
+
+def search_tracks_by_name(db, query_text):
+    if not query_text:
+        # Get everything if empty
+        sql = text("SELECT * FROM track")
+        result = db.session.execute(sql)
+    else:
+        # Filtered search
+        sql = text("SELECT * FROM track WHERE LOWER(name) LIKE LOWER(:name)")
+        result = db.session.execute(sql, {"name": f"%{query_text}%"})
+    
+    return result.fetchall() # Returns a list of tuples

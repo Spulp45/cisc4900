@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, session, url_for, jsonify
 from werkzeug.utils import secure_filename
+from flask_sqlalchemy import SQLAlchemy
 from backend import databaseFunctions
 from backend import parser
 from backend import units
@@ -8,6 +9,7 @@ import os
 import json
 import uuid
 
+db = SQLAlchemy()
 
 
 app = Flask(__name__)
@@ -15,6 +17,12 @@ app.secret_key = json.load(open("secret.json"))["SECRET_KEY"]
 app.config['UPLOAD_DIRECTORY'] = json.load(open("config.json"))["UPLOAD_DIRECTORY"]
 app.config['ALLOWED_EXTENSIONS'] = json.load(open("config.json"))["ALLOWED_EXTENSIONS"]
 
+# This is to add database into frontend
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'backend', 'database.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db.init_app(app)
 
 def login_required(f):
     @wraps(f)
@@ -159,6 +167,19 @@ def upload():
             return f"Error saving the file: {e}"
 
         return redirect('/home')
+    
+@app.route('/search')
+@login_required
+def search():
+    try:
+        q = request.args.get("q", "")
+        # Pass the user_id from the session
+        results = databaseFunctions.search_tracks_by_name(db, q)
+        return render_template("search_results.html", track=results)
+    except Exception as e:
+        print(f"!!! SEARCH ERROR: {e}")
+        return str(e), 500
+
 
 
 @app.route('/delete/<int:track_id>', methods=['POST'])
@@ -229,4 +250,4 @@ def time_filter(value):
 
 # For running the app
 if __name__ == '__main__':
-    app.run(debug=True, use_reloader=False)
+    app.run(debug=True, use_reloader=True)

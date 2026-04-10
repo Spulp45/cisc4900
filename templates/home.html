@@ -7,6 +7,7 @@
     <title>My Driving Tracker</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='styleForWeb/home.css') }}" />
+     <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
   </head>
   <body>
     <div class="container">
@@ -41,6 +42,10 @@
 
       <!-- Saved Tracks Table -->
       <h2>All Saved Tracks</h2>
+
+      <input type="text" class="input" placeholder="Search" name="q" hx-get="/search" hx-trigger="keyup changed delay:500ms" hx-target = "#results">
+
+
       <table>
         <thead>
           <tr>
@@ -50,7 +55,7 @@
             <th>Action</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id = "results">
           {% for row in tracks %}
           <tr>
             <td>{{ row.id }}</td>
