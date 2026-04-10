@@ -218,6 +218,10 @@ def all_trips():
     
     return render_template('all_trips.html', totals=totals)
 
+@app.route('/compare', methods=['POST'])
+@login_required
+def compare():
+    return redirect('/')
 
 # Unit toggle route
 @app.route('/set_units/<unit>')
