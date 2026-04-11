@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, url_for, jsonify
+from flask import Flask, render_template, request, redirect, session, url_for, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
 from backend import databaseFunctions
@@ -8,6 +8,8 @@ from functools import wraps
 import os
 import json
 import uuid
+from pathlib import Path
+
 
 db = SQLAlchemy()
 
@@ -90,7 +92,7 @@ def home():
 @login_required
 def trip_stats(track_id):
 
-    data = databaseFunctions.get_gps_points(track_id,session.get('user_id'))
+    data = databaseFunctions.get_gpx_points(track_id,session.get('user_id'))
 
     return render_template(
         'trips.html',
@@ -168,7 +170,38 @@ def upload():
             return f"Error saving the file: {e}"
 
         return redirect('/home')
+
+@app.route('/download/<int:track_id>')
+@login_required
+def download_track(track_id):
+    data = databaseFunctions.get_track(track_id, session.get('user_id'))
     
+    if not data:
+        return "Track not found", 404
+    
+    track = data[0]
+    
+    # Get track hash
+    hash_value = track.get("track_hash")
+    # Get original filename
+    original_filename = track.get("filename")
+    
+    # Get the extension
+    extension = Path(original_filename).suffix
+
+    # Re-construct the filename + extension
+    stored_file = f"{hash_value}{extension}"
+
+    # Double check if the path exists
+    if not os.path.exists(os.path.join(app.config['UPLOAD_DIRECTORY'],stored_file)):
+            return f"{stored_file} File not found", 404
+
+    return send_from_directory(
+        app.config['UPLOAD_DIRECTORY'],
+        stored_file,
+        as_attachment=True,
+        download_name= original_filename
+    )
 @app.route('/search')
 @login_required
 def search():

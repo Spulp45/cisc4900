@@ -113,7 +113,8 @@ def createDatabase() -> int:
     conn.close()
 
     return SUCCESS
-#TODO update docstring
+
+
 def insert_track(track : Track, user_id : int) -> int:
     """
     First checks if a track is already present,
@@ -121,6 +122,7 @@ def insert_track(track : Track, user_id : int) -> int:
 
     Args:
         track (Track): Takes in track object
+        user_id (int): The current user_id
     Returns:
         (int):  0: Success
                 1: Duplicate exists in database
@@ -229,7 +231,8 @@ def insert_track(track : Track, user_id : int) -> int:
         return DUPLICATE_ERROR
     
     return SUCCESS
-        
+
+
 def delete_track_by_id(id: str, user_id: str) -> bool | int:
     """
     Deletes a track by id of the track
@@ -273,14 +276,6 @@ def delete_track_by_id(id: str, user_id: str) -> bool | int:
         
     return True
 
-def get_all_tracks() -> list[dict]:
-    """Retrieve all rows from the track table."""
-    with sqlite3.connect(DatabasePath) as conn:
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM track")
-
-        columns = [desc[0] for desc in cur.description]
-        return [dict(zip(columns, row)) for row in cur.fetchall()]
 
 def get_tracks(user_id: int) -> list[dict]:
     """Retrive all rows from the track table for a specified user"""
@@ -296,38 +291,9 @@ def get_tracks(user_id: int) -> list[dict]:
 
         columns = [desc[0] for desc in cur.description]
         return [dict(zip(columns, row)) for row in cur.fetchall()]
+    
 
-   
-def get_track_with_track_points_by_id(id: str) -> dict[str, list[dict]]:
-    """
-    Get a track with all related track_points by using the track id
-
-    Args:
-        id (str): The id of the track to get
-
-    Returns:
-        dict[str, list[dict]]: A dictionary containing:
-            - "track": A list of dictionaries representing a track row (SINGLE ROW ALWAYS)
-            - "track_points": A list of dictionaries representing track_point rows
-    """
- 
-    with sqlite3.connect(DatabasePath) as conn:
-        cur = conn.cursor()
-
-        cur.execute("SELECT * FROM track WHERE id = ?", (id,))
-        track_columns = [desc[0] for desc in cur.description]
-        track_rows = [dict(zip(track_columns, row)) for row in cur.fetchall()]
-
-        cur.execute("SELECT * FROM track_point WHERE track_id = ?", (id,))
-        tp_columns = [desc[0] for desc in cur.description]
-        track_point_rows = [dict(zip(tp_columns, row)) for row in cur.fetchall()]
-
-        return {
-            "track": track_rows,
-            "track_points": track_point_rows
-        }
-
-def get_gps_points(id: str, user_id: str) -> dict[str, list[dict]]:
+def get_gpx_points(id: str, user_id: str) -> dict[str, list[dict]]:
     """
     Get data from track table and track_point table based on user_id
     Args:
@@ -369,35 +335,6 @@ def get_gps_points(id: str, user_id: str) -> dict[str, list[dict]]:
             "track_points": track_point_rows
         }
 
-    
-def get_trackpoints(id: str, track_point_column: str) -> list[dict] | str:
-    """
-    Retrieve values from a specific column of track_point rows
-    associated with a given track ID.
-
-    Returns:
-        list[dict]: [{"column_name": value}, ...]
-        str: Error message if column is invalid
-    """
-
-    legal_arguments = [
-        "id", "track_id", "lat", "lon", "ele", "timestamp", "course",
-        "speed", "geoidheight", "src", "sat", "hdop", "vdop", "pdop"
-    ]
-
-    if track_point_column not in legal_arguments:
-        return f"Invalid column name: {track_point_column}"
-
-    with sqlite3.connect(DatabasePath) as conn:
-        cur = conn.cursor()
-        query = f"SELECT {track_point_column} FROM track_point WHERE track_id = ?"
-        cur.execute(query, (id,))
-
-        return [
-            {track_point_column: row[0]}
-            for row in cur.fetchall()
-        ]
-
 
 def get_totals(user_id: str) -> dict:
     """
@@ -430,7 +367,23 @@ def get_totals(user_id: str) -> dict:
         # Convert to dict
         columns = [col[0] for col in cur.description]
         return dict(zip(columns, row))
+    
+def get_track(track_id: str, user_id: str) -> list[dict]:
+    """
+    """
+    with sqlite3.connect(DatabasePath) as conn:
+        cur = conn.cursor()
 
+        getTrackInfo = """
+            SELECT t.*
+            FROM user_tracks ut
+            JOIN track t ON ut.track_id = t.id
+            WHERE ut.user_id = ?
+            AND t.id = ?
+        """
+        cur.execute(getTrackInfo, (user_id, track_id),)
+        columns = [desc[0] for desc in cur.description]
+        return [dict(zip(columns, row)) for row in cur.fetchall()]
 
 def update_description(track_id: int, user_id: int, description: str) -> bool:
     """
@@ -543,6 +496,5 @@ def search_tracks_by_name(db: SQLAlchemy, query_text: str, user_id: str) -> list
         result = db.session.execute(sql, {
             "user_id": user_id,
             "name": f"%{query_text}%"
-        })
-    
+        })  
     return result.fetchall()
