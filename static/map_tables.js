@@ -37,6 +37,8 @@ function formatValue(value, type, units) {
       return new Date(value).toLocaleString()
         default:
       return value;
+    case "misc":
+      return value
   }
 }
 
@@ -78,7 +80,7 @@ function renderStatsTable(track, units) {
     <tr><th>Data</th><th>Value</th></tr>
     <tr><td>Filename</td><td>${track.filename}</td></tr>
     <tr><td>Filepath</td><td>${track.filepath}</td></tr>
-    <tr><td>Description</td><td>${track.description}</td></tr>
+    <tr><td>Description</td><td>${formatValue(track.description, "misc", units)}</td></tr>
     <tr><td>Average Moving Speed</td><td>${formatValue(track.avg_speed, "speed", units)}</td></tr>
     <tr><td>Total Distance 2D</td><td>${formatValue(track.length_2d, "distance", units)}</td></tr>
     <tr><td>Total Distance 3D</td><td>${formatValue(track.length_3d, "distance", units)}</td></tr>
