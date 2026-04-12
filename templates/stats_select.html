@@ -1,0 +1,30 @@
+{% import 'macros.html' as func %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Last Stats</title>
+</head>
+<body>
+
+<h2>Select Time Range</h2>
+
+<a href="{{ url_for('stats', days=7) }}">
+  <button>Last 7 Days</button>
+</a>
+
+<a href="{{ url_for('stats', days=14) }}">
+  <button>Last 14 Days</button>
+</a>
+
+<a href="{{ url_for('stats', days=30) }}">
+  <button>Last 30 Days</button>
+</a>
+
+
+{{ func.back_button("← Back") }}
+
+</body>
+</html>

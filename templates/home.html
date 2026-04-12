@@ -16,7 +16,7 @@
       <div class="NovBar">
         {{ func.home_page_button("all_trips", link = url_for('all_trips')) }}
         {{ func.home_page_button("compare", link = url_for('compare_select')) }}
-        {{ func.home_page_button("whatever", link = url_for('all_trips')) }}
+        {{ func.home_page_button("View Recent Stats", link = url_for('stats_select')) }}
         {{ func.home_page_button("whatever2", link = url_for('all_trips')) }}
       </div>
 
@@ -25,19 +25,19 @@
       </form>
 
       <!-- GPX Upload Form -->
-      <div class="upload-section">
-        <h2>Upload a GPX File</h2>
-        <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
-          <input type="file" name="file" accept=".gpx" required />
-          <button type="submit">Upload</button>
-        </form>
-      </div>
+    <div class="upload-section">
+      <h2>Upload GPX File(s)</h2>
+      <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+        <input type="file" name="files" accept=".gpx" multiple required />
+        <button type="submit">Upload</button>
+      </form>
+    </div>
 
-      <hr />
+      <hr/>
 
       {% if tracks %}
       {% else %}
-        <p>No tracks uploaded yet. Start by uploading a GPX file above!</p>
+        <p>No tracks uploaded yet. Start by uploading one or more GPX file(s) above!</p>
       {% endif %}
 
       <!-- Saved Tracks Table -->

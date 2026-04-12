@@ -9,6 +9,8 @@ import os
 import json
 import uuid
 from pathlib import Path
+from datetime import datetime, timezone, timedelta
+
 
 
 db = SQLAlchemy()
@@ -103,73 +105,93 @@ def trip_stats(track_id):
 @app.route('/upload', methods=['GET', 'POST'])
 @login_required
 def upload():
+    
+    errors = []
+    success = []
     if request.method == 'POST':
-        if 'file' not in request.files:
+        if 'files' not in request.files:
             return redirect('/home')
 
-        file = request.files['file']
+        files = request.files.getlist('files')
 
-        if file.filename == "":
+        if not files or files[0].filename == "":
             return redirect('/home')
 
-        extension = os.path.splitext(file.filename)[1].lower().lstrip('.')
+        for file in files:
+            if file.filename == "":
+                continue
 
-        if extension not in app.config['ALLOWED_EXTENSIONS']:
-            return "The file is not a valid GPX file"
+            extension = os.path.splitext(file.filename)[1].lower().lstrip('.')
 
-        original_filename = secure_filename(file.filename)
+            if extension not in app.config['ALLOWED_EXTENSIONS']:
+                errors.append(f"{file.filename}The file is not a valid GPX file")
+                continue
 
-        # Create temp file
-        temp_filename = f"temp_{uuid.uuid4().hex}.{extension}"
-        temp_filepath = os.path.join(app.config['UPLOAD_DIRECTORY'], temp_filename)
-        original_filepath = os.path.join(app.config['UPLOAD_DIRECTORY'], file.filename)
-        try:
-            # Save temp file
-            file.save(temp_filepath)
+            original_filename = secure_filename(file.filename)
 
-            # Parse file
-            track = parser.getGPX(temp_filepath, original_filename, original_filepath)
+            # Create temp file
+            temp_filename = f"temp_{uuid.uuid4().hex}.{extension}"
+            temp_filepath = os.path.join(app.config['UPLOAD_DIRECTORY'], temp_filename)
+            original_filepath = os.path.join(app.config['UPLOAD_DIRECTORY'], file.filename)
 
-            if track == parser.FILE_CORRUPTED:
-                os.remove(temp_filepath)
-                return f"Error processing '{original_filename}', file is likely corrupted"
+            try:
+                # Save temp file
+                file.save(temp_filepath)
 
-            if track == parser.FILE_NOT_FOUND:
-                os.remove(temp_filepath)
-                return f"Error: {temp_filepath} was not found"
+                # Parse file
+                track = parser.getGPX(temp_filepath, original_filename, original_filepath)
 
-            # Compute hash
-            track_hash = track.track_hash()
+                if track == parser.FILE_CORRUPTED:
+                    os.remove(temp_filepath)
+                    errors.append(f"Error processing '{original_filename}', file is likely corrupted")
+                    continue
 
-            new_filename = f"{track_hash}.{extension}"
-            new_filepath = os.path.join(app.config['UPLOAD_DIRECTORY'], new_filename)
+                if track == parser.FILE_NOT_FOUND:
+                    os.remove(temp_filepath)
+                    errors.append(f"Error: {temp_filepath} was not found original_filename:{original_filename}")
+                    continue
 
-            # If file already exists, remove temp and skip rename
-            if os.path.exists(new_filepath):
-                os.remove(temp_filepath)
-                return f"The file '{original_filename}' already exists"
+                # Compute hash
+                track_hash = track.track_hash()
 
-            # Rename temp file to final name
-            os.replace(temp_filepath, new_filepath)
+                new_filename = f"{track_hash}.{extension}"
+                new_filepath = os.path.join(app.config['UPLOAD_DIRECTORY'], new_filename)
 
-            # Insert into DB also pass user_id
-            result = databaseFunctions.insert_track(track, session.get('user_id'))
+                # If file already exists, remove temp and skip rename
+               # if os.path.exists(new_filepath):
+                #    os.remove(temp_filepath)
+                 #   errors.append(f"{original_filename} already exists")
+                  #  continue
 
-            if result == databaseFunctions.DUPLICATE_ERROR:
-                os.remove(new_filepath)
-                return f"The file '{original_filename}' already exists in the database"
+                # Rename temp file to final name
+                os.replace(temp_filepath, new_filepath)
 
-            elif result == databaseFunctions.INTEGRITY_ERROR:
-                os.remove(new_filepath)
-                return f"Track integrity check failed for '{original_filename}'"
+                # Insert into DB also pass user_id
+                result = databaseFunctions.insert_track(track, session.get('user_id'))
 
-        except Exception as e:
-            # Cleanup temp file
-            if os.path.exists(temp_filepath):
-                os.remove(temp_filepath)
-            return f"Error saving the file: {e}"
+                if result == databaseFunctions.SUCCESS:
+                    success.append(f"{track.name} was uploaded successfully")
+                    continue
 
-        return redirect('/home')
+                if result == databaseFunctions.DUPLICATE_ERROR:
+                    os.remove(new_filepath)
+                    errors.append(f"{original_filename} already exists")
+                    continue
+
+                if result == databaseFunctions.INTEGRITY_ERROR:
+                    os.remove(new_filepath)
+                    errors.append(f"Track integrity check failed for '{original_filename}'")
+                    continue
+
+            except Exception as e:
+                # Cleanup temp file
+                if os.path.exists(temp_filepath):
+                    os.remove(temp_filepath)
+                errors.append(f"Error saving the file: {e}")
+
+        return render_template("upload_results.html",
+                        errors=errors,
+                        success=success)
 
 @app.route('/download/<int:track_id>')
 @login_required
@@ -199,7 +221,7 @@ def download_track(track_id):
     return send_from_directory(
         app.config['UPLOAD_DIRECTORY'],
         stored_file,
-        as_attachment=True,
+        as_attachment= True,
         download_name= original_filename
     )
 @app.route('/search')
@@ -240,7 +262,7 @@ def delete_track(track_id):
     if result == databaseFunctions.DELETE_FILE_ERROR:
         return f"Could not delete file associated with track with id: {track_id}"
 
-    return redirect('/home')
+    return redirect(request.referrer or '/')
 
 @app.route('/update_description/<int:track_id>', methods=['POST'])
 @login_required
@@ -301,6 +323,36 @@ def compare_view():
         track1=track1['track'][0],
          track2=track2['track'][0]
     )
+
+@app.route("/stats/select")
+@login_required
+def stats_select():
+    return render_template("stats_select.html")
+
+@app.route("/stats")
+@login_required
+def stats():
+    days = request.args.get("days", type=int)
+
+    if days:
+        cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
+
+        tracks = databaseFunctions.get_track_w_datecutoff(session.get('user_id'), cutoff_date)
+        track_ids = [track["id"] for track in tracks]
+
+        totals_filtered = databaseFunctions.get_totals_filtered(
+            session.get('user_id'),
+            track_ids
+        )
+
+        return render_template(
+            "stats_result.html",
+            tracks=tracks,
+            totals=totals_filtered,
+            days=days
+        )
+
+    return redirect(url_for("stats_select"))
 
 # Unit toggle route
 @app.route('/set_units/<unit>')

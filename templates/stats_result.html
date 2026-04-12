@@ -1,0 +1,178 @@
+{% import 'macros.html' as func %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Last: {{ days }}</title>
+</head>
+<body>
+    {% if tracks %}
+ <h2>Tracks from the last {{days}} days</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody id="results">
+            {% for row in tracks %}
+            <tr>
+                <td>{{ row.id }}</td>
+                <td>{{ row.name }}</td>
+
+                <td>
+                    <span id="desc-text-{{ row.id }}">
+                        {{ row.description if row.description else "No description" }}
+                    </span>
+
+                    <input
+                        type="text"
+                        id="desc-input-{{ row.id }}"
+                        value="{{ row.description or '' }}"
+                        style="display:none;"
+                    >
+                </td>
+
+                <td>
+                    <div class="action-buttons">
+
+                        <button
+                            type="button"
+                            onclick="saveEdit({{ row.id }})"
+                            id="save-btn-{{ row.id }}"
+                            style="display:none;"
+                        >
+                            Save
+                        </button>
+
+                        <a href="{{ url_for('trip_stats', track_id=row.id) }}">
+                            <button type="button">View Stats</button>
+                        </a>
+
+                        <a href="{{ url_for('download_track', track_id=row.id) }}">
+                            <button type="button">Download File</button>
+                        </a>
+
+                        <form
+                            action="{{ url_for('delete_track', track_id=row.id) }}"
+                            method="post"
+                            style="display:inline;"
+                            onsubmit="return confirm('Are you sure you want to delete this track?');"
+                        >
+                            <button type="submit">Delete</button>
+                        </form>
+
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+
+         <h2>Total Statistics from the last {{days}} days </h2>
+
+  <div class="unit-toggle">
+ <span>Units:</span>
+<a href="/set_units/metric" class="unit-btn">Metric</a>
+<a href="/set_units/imperial" class="unit-btn">Imperial</a>
+<a href="/set_units/raw" class="unit-btn">Raw</a>
+  </div>
+
+  <hr />
+
+  <!-- Distance Stats -->
+  <div class="stats-group card">
+    <h3>Distances</h3>
+    <table class="vertical-table">
+      <tr>
+        <th>Distance (2D)</th>
+        <td>{{ totals.length_2d | distance }}</td>
+      </tr>
+      <tr>
+        <th>Distance (3D)</th>
+        <td>{{ totals.length_3d | distance }}</td>
+      </tr>
+      <tr>
+        <th>Moving Distance</th>
+        <td>{{ totals.moving_distance | distance }}</td>
+      </tr>
+      <tr>
+        <th>Stopped Distance</th>
+        <td>{{ totals.stopped_distance | distance }}</td>
+      </tr>
+      <tr>
+        <th>Uphill</th>
+        <td>{{ totals.uphill | elevation }}</td>
+      </tr>
+      <tr>
+        <th>Downhill</th>
+        <td>{{ totals.downhill | elevation }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Time Stats -->
+  <div class="stats-group card">
+    <h3>Time</h3>
+    <table class="vertical-table">
+      <tr>
+        <th>Moving Time</th>
+        <td>{{ totals.moving_time | time }}</td>
+      </tr>
+      <tr>
+        <th>Stopped Time</th>
+        <td>{{ totals.stopped_time | time }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Speed Stats -->
+  <div class="stats-group card">
+    <h3>Speed</h3>
+    <table class="vertical-table">
+      <tr>
+      </tr>
+      <tr>
+        <th>Average Speed Overall</th>
+        <td>{{ totals.overall_avg_speed | speed }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Misc Stats -->
+  <div class="stats-group card">
+    <h3>Misc</h3>
+    <table class="vertical-table">
+      <tr>
+        <th>GPS Track Points</th>
+        <td>{{ totals.points | int }}</td>
+      </tr>
+      <tr>
+        <th>GPX 1.0 Files</th>
+        <td>{{ totals.gpx_1_0_count | int }}</td>
+      </tr>
+      <tr>
+        <th>GPX 1.1 Files</th>
+        <td>{{ totals.gpx_1_1_count | int }}</td>
+      </tr>
+    </table>
+  </div>
+
+  {{ func.stats_select("← Back") }}
+</div>
+
+    {% else %}
+        <p>No tracks within that time range</p>
+    {% endif %}
+
+
+
+</body>
+</html>
