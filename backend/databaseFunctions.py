@@ -367,9 +367,56 @@ def get_totals(user_id: str) -> dict:
         # Convert to dict
         columns = [col[0] for col in cur.description]
         return dict(zip(columns, row))
+
+def get_totals_filtered(user_id: str, track_ids: list[int]) -> dict:
+    """
+    Retrieve aggregate track statistics for a user filtered by track IDs.
+    """
+
+    if not track_ids:
+        return {}
+    
+    with sqlite3.connect(DatabasePath) as conn:
+        cur = conn.cursor()
+
+        placeholders = ",".join(["?"] * len(track_ids))
+
+        cur.execute(f"""
+            SELECT
+                TOTAL(t.length_2d)        AS length_2d,
+                TOTAL(t.length_3d)        AS length_3d,
+                TOTAL(t.moving_time)      AS moving_time,
+                TOTAL(t.stopped_time)     AS stopped_time,
+                TOTAL(t.moving_distance)  AS moving_distance,
+                TOTAL(t.stopped_distance) AS stopped_distance,
+                TOTAL(t.uphill)           AS uphill,
+                TOTAL(t.downhill)         AS downhill,
+                TOTAL(t.points)           AS points,
+                AVG(t.avg_speed)          AS overall_avg_speed,
+                SUM(CASE WHEN t.gpx_version = '1.0' THEN 1 ELSE 0 END) AS gpx_1_0_count,
+                SUM(CASE WHEN t.gpx_version = '1.1' THEN 1 ELSE 0 END) AS gpx_1_1_count
+            FROM user_tracks ut
+            JOIN track t ON ut.track_id = t.id
+            WHERE ut.user_id = ?
+              AND ut.track_id IN ({placeholders})
+        """, (user_id, *track_ids))
+
+        row = cur.fetchone()
+
+        if not row:
+            return {}
+
+        columns = [col[0] for col in cur.description]
+        return dict(zip(columns, row))
     
 def get_track(track_id: str, user_id: str) -> list[dict]:
     """
+    Retrieve a specific track info given its id and user_id
+    Args:
+        track_id(str): The id of the track
+        user_id(str): The user_id
+    Returns:
+        list[dict]: A list of dict containing all of the track info
     """
     with sqlite3.connect(DatabasePath) as conn:
         cur = conn.cursor()
@@ -382,6 +429,29 @@ def get_track(track_id: str, user_id: str) -> list[dict]:
             AND t.id = ?
         """
         cur.execute(getTrackInfo, (user_id, track_id),)
+        columns = [desc[0] for desc in cur.description]
+        return [dict(zip(columns, row)) for row in cur.fetchall()]
+
+def get_track_w_datecutoff(user_id: str, cutoff_date: str) -> list[dict]:
+    """
+    Gets all track info given a user_id and cut-off date
+    Args:
+        user_id(str): The user_id
+        cutoff(str): The date from where to stop
+    Returns:
+     list[dict]: A list of dict containing all of the track info
+    """
+    with sqlite3.connect(DatabasePath) as conn:
+        cur = conn.cursor()
+
+        getTrackInfo = """
+            SELECT t.*
+            FROM user_tracks ut
+            JOIN track t ON ut.track_id = t.id
+            WHERE ut.user_id = ?
+            AND start_time >= ?
+        """
+        cur.execute(getTrackInfo, (user_id, cutoff_date),)
         columns = [desc[0] for desc in cur.description]
         return [dict(zip(columns, row)) for row in cur.fetchall()]
 
