@@ -5,8 +5,9 @@
     <td>{{ t.description if t.description else "No description" }}</td>
     <td>
         <div class="action-buttons">
-            <button type="button" onclick="enableEdit({{ t.id }})">Edit</button>
-            <a href="/stats/{{ t.id }}"><button type="button">View Stats</button></a>
+                 <a href="{{ url_for('trip_stats', track_id=t.id) }}">
+                  <button type="button">View Stats</button>
+                </a>
             </div>
     </td>
 </tr>

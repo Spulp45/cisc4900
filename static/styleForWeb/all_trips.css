@@ -1,0 +1,119 @@
+/* Container for the whole stats page */
+.All-Stats {
+    background-color: #111;
+    margin: 0 auto; 
+    width: 90%;     
+    max-width: 1200px; 
+    padding: 20px;
+}
+
+/* Heading style matching your Trip page */
+.All-Stats h2 {
+    font-family: 'Orbitron', sans-serif;
+    color: #f1c40f;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+}
+
+/* Unit Toggle Buttons */
+.unit-toggle .unit-btn {
+    display: inline-block;
+    padding: 8px 15px;
+    margin-right: 10px;
+    background: #222;
+    color: #f1c40f;
+    border: 1px solid #f1c40f;
+    text-decoration: none;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+.unit-toggle .unit-btn:hover {
+    background: #f1c40f;
+    color: #111;
+}
+
+/* Stats Group Cards (The "Modules") */
+.stats-group.card {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-left: 5px solid #f1c40f;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+.stats-group h3 {
+    font-family: 'Orbitron', sans-serif;
+    color: #f1c40f;
+    font-size: 1.1rem;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+/* Vertical Table Styling */
+.vertical-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.vertical-table th {
+    text-align: left;
+    color: #888; /* Dimmer labels */
+    font-size: 0.9rem;
+    padding: 8px 0;
+    border-bottom: 1px solid #333;
+    width: 40%;
+}
+
+.vertical-table td {
+    text-align: right;
+    color: #ffffff;
+    font-family: 'Courier New', monospace; /* Techy readout font */
+    font-weight: bold;
+    font-size: 1.1rem;
+    padding: 8px 0;
+    border-bottom: 1px solid #333;
+}
+
+/* Remove border from the last row */
+.vertical-table tr:last-child th, 
+.vertical-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* This targets the actual background of the browser window */
+html, body {
+    background-color: #111 !important;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+}
+
+/* Target the "Units:" label text */
+.unit-toggle span {
+    color: #ffffff; /* Pure white so it's readable */
+    font-family: 'Orbitron', sans-serif; /* Keep the techy font */
+    font-size: 0.9rem;
+    margin-right: 10px;
+    text-transform: uppercase;
+}
+
+/* Ensure the buttons have the right text color */
+.unit-btn {
+    color: #f1c40f !important;
+    border-color: #f1c40f;
+    background: transparent;
+}
+
+
+.unit-btn:hover {
+    background: #f1c40f;
+    color: #111 !important;
+}
