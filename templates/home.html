@@ -7,15 +7,15 @@
     <title>My Driving Tracker</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='styleForWeb/home.css') }}" />
-     <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
   </head>
   <body>
     <div class="container">
       <h1>Welcome {{username }} </h1>
 
-      <div class="NovBar"> 
+      <div class="NovBar">
         {{ func.home_page_button("all_trips", link = url_for('all_trips')) }}
-        {{ func.home_page_button("compare", link = url_for('all_trips')) }}
+        {{ func.home_page_button("compare", link = url_for('select/compare_select')) }}
         {{ func.home_page_button("whatever", link = url_for('all_trips')) }}
         {{ func.home_page_button("whatever2", link = url_for('all_trips')) }}
       </div>
@@ -43,8 +43,15 @@
       <!-- Saved Tracks Table -->
       <h2>All Saved Tracks</h2>
 
-      <input type="text" class="input" placeholder="Search" name="q" hx-get="/search" hx-trigger="keyup changed delay:500ms" hx-target = "#results">
-
+      <input
+        type="text"
+        class="input"
+        placeholder="Search"
+        name="q"
+        hx-get="/search"
+        hx-trigger="keyup changed delay:500ms"
+        hx-target="#results"
+      >
 
       <table>
         <thead>
@@ -55,60 +62,65 @@
             <th>Action</th>
           </tr>
         </thead>
-        <tbody id = "results">
+        <tbody id="results">
           {% for row in tracks %}
-          <tr>
-            <td>{{ row.id }}</td>
-            <td>{{ row.name }}</td>
+            <tr>
+              <td>{{ row.id }}</td>
+              <td>{{ row.name }}</td>
 
-            <!-- Description -->
-            <td>
-              <span id="desc-text-{{ row.id }}">
-                {{ row.description if row.description else "No description" }}
-              </span>
+              <!-- Description -->
+              <td>
+                <span id="desc-text-{{ row.id }}">
+                  {{ row.description if row.description else "No description" }}
+                </span>
 
-              <input 
-                type="text" 
-                id="desc-input-{{ row.id }}" 
-                value="{{ row.description or '' }}" 
-                style="display:none;"
-              >
-            </td>
+                <input
+                  type="text"
+                  id="desc-input-{{ row.id }}"
+                  value="{{ row.description or '' }}"
+                  style="display:none;"
+                >
+              </td>
 
-            <!-- Actions -->
-            <td>
-              <div class="action-buttons">
+              <!-- Actions -->
+              <td>
+                <div class="action-buttons">
+                  <button
+                    type="button"
+                    id="edit-btn-{{ row.id }}"
+                    onclick="enableEdit({{ row.id }})"
+                  >
+                    Edit
+                  </button>
 
-                        <button type="button"
-                id="edit-btn-{{ row.id }}"
-                onclick="enableEdit({{ row.id }})">
-          Edit
-        </button>
+                  <button
+                    type="button"
+                    onclick="saveEdit({{ row.id }})"
+                    id="save-btn-{{ row.id }}"
+                    style="display:none;"
+                  >
+                    Save
+                  </button>
 
-                <button type="button"
-                        onclick="saveEdit({{ row.id }})"
-                        id="save-btn-{{ row.id }}"
-                        style="display:none;">
-                  Save
-                </button>
+                  <a href="{{ url_for('trip_stats', track_id=row.id) }}">
+                    <button type="button">View Stats</button>
+                  </a>
 
-                <a href="{{ url_for('trip_stats', track_id=row.id) }}">
-                  <button type="button">View Stats</button>
-                </a>
-                <a href="{{ url_for('download_track', track_id=row.id) }}">
-                  <button type="button">Download File</button>
-                </a>
+                  <a href="{{ url_for('download_track', track_id=row.id) }}">
+                    <button type="button">Download File</button>
+                  </a>
 
-                <form action="{{ url_for('delete_track', track_id=row.id) }}" 
-                      method="post" 
-                      style="display:inline;"
-                      onsubmit="return confirm('Are you sure you want to delete this track?');">
-                  <button type="submit">Delete</button>
-                </form>
-
-              </div>
-            </td>
-          </tr>
+                  <form
+                    action="{{ url_for('delete_track', track_id=row.id) }}"
+                    method="post"
+                    style="display:inline;"
+                    onsubmit="return confirm('Are you sure you want to delete this track?');"
+                  >
+                    <button type="submit">Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
           {% endfor %}
         </tbody>
       </table>
@@ -128,7 +140,6 @@
       document.getElementById(`save-btn-${id}`).style.display = 'inline';
 
       document.getElementById(`edit-btn-${id}`).style.display = 'none';
-
     }
 
     function saveEdit(id) {

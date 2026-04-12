@@ -1,0 +1,8 @@
+{% for t in track %}
+<tr>
+    <td>{{ t.id }}</td>
+    <td>{{ t.name }}</td>
+    <td>{{ t.description if t.description else "No description" }}</td>
+    <td></td>
+</tr>
+{% endfor %}

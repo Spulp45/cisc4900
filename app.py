@@ -213,6 +213,19 @@ def search():
     except Exception as e:
         print(f"!!! SEARCH ERROR: {e}")
         return str(e), 500
+    
+@app.route('/search_only')
+@login_required
+def search_only():
+    try:
+        q = request.args.get("q", "")
+        # Pass the user_id from the session
+        search_results = databaseFunctions.search_tracks_by_name(db, q, session.get('user_id'))
+        return render_template("search_only.html", track=search_results)
+    except Exception as e:
+        print(f"!!! SEARCH ERROR: {e}")
+        return str(e), 500
+
 
 
 
@@ -252,10 +265,42 @@ def all_trips():
     
     return render_template('all_trips.html', totals=totals)
 
-@app.route('/compare', methods=['POST'])
+
+##          COMPARISON              ##
+@app.route("/compare", methods=["GET"])
 @login_required
-def compare():
-    return redirect('/')
+def compare_select():
+    tracks = databaseFunctions.get_tracks(session.get('user_id'))
+    return render_template("compare_select.html", tracks=tracks)
+
+@app.route("/compare", methods=["POST"])
+@login_required
+def compare_submit():
+    selected = request.form.getlist("track_ids")
+
+    if len(selected) != 2:
+        return "Please select exactly 2 tracks", 400
+
+    return redirect(url_for(
+        "compare_view",
+        track1_id=selected[0],
+        track2_id=selected[1]
+    ))
+
+@app.route("/compare/view")
+@login_required
+def compare_view():
+    track1_id = request.args.get("track1_id")
+    track2_id = request.args.get("track2_id")
+    track1 = databaseFunctions.get_gpx_points(track1_id, session.get('user_id'))
+    track2 = databaseFunctions.get_gpx_points(track2_id, session.get('user_id'))
+
+    
+    return render_template(
+        "compare_view.html",
+        track1=track1['track'][0],
+         track2=track2['track'][0]
+    )
 
 # Unit toggle route
 @app.route('/set_units/<unit>')
