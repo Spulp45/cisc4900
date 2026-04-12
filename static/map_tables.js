@@ -33,7 +33,9 @@ function formatValue(value, type, units) {
       return `${h}:${m.toString().padStart(2, "0")}:${s
         .toString()
         .padStart(2, "0")}`;
-    default:
+    case "timestamp":
+      return new Date(value).toLocaleString()
+        default:
       return value;
   }
 }
@@ -47,12 +49,12 @@ function renderTrackPanel(point) {
 
   panel.innerHTML = `
     <h3>Track Point</h3>
-
+                                                
     ${point.lat != null ? `<p><b>Latitude:</b> ${point.lat}</p>` : ""}
     ${point.lon != null ? `<p><b>Longitude:</b> ${point.lon}</p>` : ""}
     ${point.speed != null ? `<p><b>Speed:</b> ${formatValue(point.speed, "speed", userUnits)}</p>` : ""}
     ${point.ele != null ? `<p><b>Elevation:</b> ${formatValue(point.ele, "elevation", userUnits)}</p>` : ""}
-    ${point.timestamp != null ? `<p><b>Time:</b> ${new Date(point.timestamp).toLocaleString()}</p>` : ""}
+    ${point.timestamp != null ? `<p><b>Time:</b> ${formatValue(point.timestamp, "timestamp", userUnits)}</p>` : ""}
     ${point.course != null ? `<p><b>Course:</b> ${point.course}</p>` : ""}
     ${point.geoidheight != null ? `<p><b>Geoid Height:</b> ${point.geoidheight}</p>` : ""}
     ${point.src != null ? `<p><b>Source:</b> ${point.src}</p>` : ""}
@@ -88,8 +90,8 @@ function renderStatsTable(track, units) {
     <tr><td>Average Speed</td><td>${formatValue(track.avg_speed, "speed", units)}</td></tr>
     <tr><td>Uphill</td><td>${formatValue(track.uphill, "elevation", units)}</td></tr>
     <tr><td>Downhill</td><td>${formatValue(track.downhill, "elevation", units)}</td></tr>
-    <tr><td>Start Time</td><td>${new Date(track.start_time).toLocaleString()}</td></tr>
-    <tr><td>End Time</td><td>${new Date(track.start_time).toLocaleString()}</td></tr>
+    <tr><td>Start Time</td><td>${formatValue(track.start_time, "timestamp", units)}</td></tr>
+    <tr><td>End Time</td><td>${formatValue(track.end_time, "timestamp", units)}</td></tr>
     <tr><td>Points</td><td>${track.points}</td></tr>
     <tr><td>GPX Version</td><td>${track.gpx_version}</td></tr>
   `;

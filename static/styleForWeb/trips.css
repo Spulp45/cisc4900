@@ -10,7 +10,7 @@ body {
 #map-container {
     display: flex;
     height: 65vh; /* Using 70% of the screen height */
-    width: 50vw;  /* Changed to 90vw to give you that wide 'parity' look */
+    width: 75vw;  /* Changed to 90vw to give you that wide 'parity' look */
     max-width: 1600px;
     margin: 20px auto;
     gap: 15px;
