@@ -1,0 +1,93 @@
+/* 1. Global Page Background */
+html, body {
+    background-color: #111 !important;
+    color: #eee;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+/* 2. Container for the Select Table */
+form {
+    max-width: 1000px;
+    margin: 40px auto;
+    background: #1a1a1a;
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid #333;
+    border-top: 4px solid #f1c40f; /* Signature Yellow Accent */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* 3. Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    background: #222;
+    border-radius: 8px;
+    overflow: hidden; /* Keeps corners rounded */
+}
+
+/* Header (The "Computer Terminal" look) */
+thead th {
+    background: #333;
+    color: #f1c40f;
+    font-family: 'Orbitron', sans-serif;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    padding: 15px;
+    text-align: left;
+    border-bottom: 2px solid #444;
+}
+
+/* Rows */
+tbody tr {
+    border-bottom: 1px solid #333;
+    transition: background 0.2s ease;
+}
+
+tbody tr:hover {
+    background: #2a2a2a; /* Subtle hover effect */
+}
+
+tbody td {
+    padding: 15px;
+    font-family: 'Courier New', monospace; /* Techy readout font */
+    font-size: 0.95rem;
+}
+
+/* 4. Checkbox Styling (Yellow highlight) */
+input[type="checkbox"] {
+    accent-color: #f1c40f; /* Makes the checkbox yellow in modern browsers */
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+/* 5. The "Compare" Button */
+button[type="submit"] {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background: #f1c40f;
+    color: #111;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    font-size: 1rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background: #d4ac0d; /* Slightly darker yellow */
+    box-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
+    transform: translateY(-2px);
+}
+
+button[type="submit"]:active {
+    transform: translateY(0);
+}

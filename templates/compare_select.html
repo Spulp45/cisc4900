@@ -3,12 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styleForWeb/compare_select.css') }}" />
   <title>Select Tracks</title>
 </head>
 
 <body>
 
-<form method="POST" action="{{ url_for('compare_submit') }}">
+<body>
+  <h2 style="font-family: 'Orbitron', sans-serif; color: #f1c40f; text-align: center; text-transform: uppercase;">
+      Track Database
+  </h2>
+
+  <form method="POST" action="{{ url_for('compare_submit') }}">
+     </form>
+</body>
 
   <table>
     <thead>
