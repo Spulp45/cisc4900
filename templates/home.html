@@ -15,7 +15,7 @@
 
       <div class="NovBar">
         {{ func.home_page_button("all_trips", link = url_for('all_trips')) }}
-        {{ func.home_page_button("compare", link = url_for('select/compare_select')) }}
+        {{ func.home_page_button("compare", link = url_for('compare_select')) }}
         {{ func.home_page_button("whatever", link = url_for('all_trips')) }}
         {{ func.home_page_button("whatever2", link = url_for('all_trips')) }}
       </div>
@@ -46,7 +46,7 @@
       <input
         type="text"
         class="input"
-        placeholder="Search"
+        placeholder="Search by name"
         name="q"
         hx-get="/search"
         hx-trigger="keyup changed delay:500ms"

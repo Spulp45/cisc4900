@@ -1,14 +1,61 @@
 {% for t in track %}
 <tr>
-    <td>{{ t.id }}</td>
-    <td>{{ t.name }}</td>
-    <td>{{ t.description if t.description else "No description" }}</td>
-    <td>
-        <div class="action-buttons">
-                 <a href="{{ url_for('trip_stats', track_id=t.id) }}">
-                  <button type="button">View Stats</button>
-                </a>
-            </div>
-    </td>
+  <td>{{ t.id }}</td>
+  <td>{{ t.name }}</td>
+
+  <!-- Description -->
+  <td>
+    <span id="desc-text-{{ t.id }}">
+      {{ t.description if t.description else "No description" }}
+    </span>
+
+    <input
+      type="text"
+      id="desc-input-{{ t.id }}"
+      value="{{ t.description or '' }}"
+      style="display:none;"
+    >
+  </td>
+
+  <!-- Actions -->
+  <td>
+    <div class="action-buttons">
+
+      <button
+        type="button"
+        id="edit-btn-{{ t.id }}"
+        onclick="enableEdit({{ t.id }})"
+      >
+        Edit
+      </button>
+
+      <button
+        type="button"
+        onclick="saveEdit({{ t.id }})"
+        id="save-btn-{{ t.id }}"
+        style="display:none;"
+      >
+        Save
+      </button>
+
+      <a href="{{ url_for('trip_stats', track_id=t.id) }}">
+        <button type="button">View Stats</button>
+      </a>
+
+      <a href="{{ url_for('download_track', track_id=t.id) }}">
+        <button type="button">Download File</button>
+      </a>
+
+      <form
+        action="{{ url_for('delete_track', track_id=t.id) }}"
+        method="post"
+        style="display:inline;"
+        onsubmit="return confirm('Are you sure you want to delete this track?');"
+      >
+        <button type="submit">Delete</button>
+      </form>
+
+    </div>
+  </td>
 </tr>
 {% endfor %}
