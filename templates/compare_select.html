@@ -1,3 +1,4 @@
+{% import 'macros.html' as func %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,27 +10,25 @@
 
 <body>
 
-<body>
   <h2 style="font-family: 'Orbitron', sans-serif; color: #f1c40f; text-align: center; text-transform: uppercase;">
       Track Database
   </h2>
 
+  <!-- FORM STARTS HERE -->
   <form method="POST" action="{{ url_for('compare_submit') }}">
-     </form>
-</body>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Select</th>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
+    <table>
+      <thead>
+        <tr>
+          <th>Select</th>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Description</th>
+        </tr>
+      </thead>
 
-    <tbody id="results">
-      {% for row in tracks %}
+      <tbody id="results">
+        {% for row in tracks %}
         <tr>
           <td>
             <input 
@@ -38,21 +37,20 @@
               value="{{ row.id }}"
             >
           </td>
-
           <td>{{ row.id }}</td>
           <td>{{ row.name }}</td>
-
           <td>
             {{ row.description if row.description else "No description" }}
           </td>
         </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+        {% endfor %}
+      </tbody>
+    </table>
 
-  <button type="submit">Compare Selected</button>
+    <button type="submit">Compare Selected</button>
 
-</form>
-
+  </form>
+  <!-- FORM ENDS HERE -->
+{{ func.back_button(label="← Back") }}
 </body>
 </html>

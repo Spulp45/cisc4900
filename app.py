@@ -309,6 +309,8 @@ def compare_submit():
         track2_id=selected[1]
     ))
 
+##          COMPARISON  END         ##
+
 @app.route("/compare/view")
 @login_required
 def compare_view():

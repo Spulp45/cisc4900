@@ -14,10 +14,10 @@
       <h1>Welcome {{username }} </h1>
 
       <div class="NovBar">
-        {{ func.home_page_button("all_trips", link = url_for('all_trips')) }}
-        {{ func.home_page_button("compare", link = url_for('compare_select')) }}
+        {{ func.home_page_button("All Trips", link = url_for('all_trips')) }}
+        {{ func.home_page_button("Compare", link = url_for('compare_select')) }}
         {{ func.home_page_button("View Recent Stats", link = url_for('stats_select')) }}
-        {{ func.home_page_button("whatever2", link = url_for('all_trips')) }}
+        {{ func.home_page_button("placeholder", link = url_for('all_trips')) }}
       </div>
 
       <form action="{{ url_for('logout') }}" method="get" style="display:inline;">
