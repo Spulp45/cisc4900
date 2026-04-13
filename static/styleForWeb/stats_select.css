@@ -1,0 +1,64 @@
+/* 1. Page-wide dark mode */
+html, body {
+    background-color: #111 !important;
+    color: #eee;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* 2. Heading Style */
+h2 {
+    font-family: 'Orbitron', sans-serif;
+    color: #f1c40f;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+}
+
+/* 3. Button Container/Links */
+a {
+    text-decoration: none;
+    margin: 10px 0;
+    width: 100%;
+    max-width: 300px;
+}
+
+/* 4. Tactical Button Styling */
+button {
+    width: 100%;
+    padding: 20px;
+    background-color: #1a1a1a;
+    color: #f1c40f;
+    border: 1px solid #333;
+    border-left: 5px solid #f1c40f; 
+    border-radius: 4px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left; /* Makes it look like a list of options */
+}
+
+/* Hover Effects */
+button:hover {
+    background-color: #222;
+    border-color: #f1c40f;
+    box-shadow: 0 0 15px rgba(241, 196, 15, 0.2);
+    transform: translateX(10px); /* Subtle slide effect */
+}
+
+/* Back Button specific fix (if needed via macro) */
+.back-button-class { /* Replace with actual class from your macro if applicable */
+    margin-top: 40px;
+    color: #888;
+    font-family: 'Courier New', monospace;
+}

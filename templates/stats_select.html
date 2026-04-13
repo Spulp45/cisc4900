@@ -5,26 +5,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styleForWeb/stats_select.css') }}" />
     <title>Last Stats</title>
 </head>
 <body>
 
-<h2>Select Time Range</h2>
+<div class="selection-container">
+    <h2>Select Time Range</h2>
 
-<a href="{{ url_for('stats', days=7) }}">
-  <button>Last 7 Days</button>
-</a>
+    <a href="{{ url_for('stats', days=7) }}">
+      <button>Last 7 Days</button>
+    </a>
 
-<a href="{{ url_for('stats', days=14) }}">
-  <button>Last 14 Days</button>
-</a>
+    <a href="{{ url_for('stats', days=14) }}">
+      <button>Last 14 Days</button>
+    </a>
 
-<a href="{{ url_for('stats', days=30) }}">
-  <button>Last 30 Days</button>
-</a>
+    <a href="{{ url_for('stats', days=30) }}">
+      <button>Last 30 Days</button>
+    </a>
 
-
-{{ func.back_button("← Back") }}
+    <div style="margin-top: 30px;">
+        {{ func.back_button("← Back") }}
+    </div>
+</div>
 
 </body>
 </html>

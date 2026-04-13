@@ -1,0 +1,137 @@
+/* 1. Global Setup */
+html, body {
+    background-color: #111 !important;
+    color: #eee;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+h2 {
+    font-family: 'Orbitron', sans-serif;
+    color: #f1c40f;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+    margin-top: 40px;
+}
+
+/* 2. Horizontal Table (Tracks List) */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #1a1a1a;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 40px;
+    border: 1px solid #333;
+}
+
+thead th {
+    background: #222;
+    color: #f1c40f;
+    font-family: 'Orbitron', sans-serif;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    padding: 15px;
+    text-align: left;
+    border-bottom: 2px solid #f1c40f;
+}
+
+tbody td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #333;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+/* 3. Action Buttons inside Table */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.action-buttons button {
+    background: #222;
+    color: #f1c40f;
+    border: 1px solid #f1c40f;
+    padding: 5px 10px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+.action-buttons button:hover {
+    background: #f1c40f;
+    color: #111;
+}
+
+/* Delete button special style */
+.action-buttons form button {
+    border-color: #e74c3c;
+    color: #e74c3c;
+}
+
+.action-buttons form button:hover {
+    background: #e74c3c;
+    color: #fff;
+}
+
+/* 4. Stats Cards (Bottom Section) */
+.stats-group.card {
+    background: #1a1a1a;
+    border-left: 5px solid #f1c40f;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+.vertical-table {
+    width: 100%;
+    border: none;
+}
+
+.vertical-table th {
+    color: #888;
+    text-align: left;
+    font-family: 'Segoe UI', sans-serif;
+    border-bottom: 1px solid #333;
+    padding: 8px 0;
+}
+
+.vertical-table td {
+    color: #fff;
+    text-align: right;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    border-bottom: 1px solid #333;
+}
+
+/* 5. Unit Toggle Buttons */
+.unit-toggle {
+    margin-bottom: 20px;
+}
+
+.unit-toggle span {
+    color: #fff;
+    margin-right: 10px;
+}
+
+.unit-btn {
+    text-decoration: none;
+    color: #f1c40f;
+    border: 1px solid #f1c40f;
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.unit-btn:hover {
+    background: #f1c40f;
+    color: #111;
+}

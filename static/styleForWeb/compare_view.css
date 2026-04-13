@@ -1,0 +1,67 @@
+/* 1. Global Setup */
+html, body {
+    background-color: #111 !important;
+    color: #eee;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    font-family: 'Orbitron', sans-serif;
+    color: #f1c40f;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 40px;
+}
+
+/* 2. The Comparison Container */
+.comparison-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* 3. Individual Track Modules */
+.track-module {
+    flex: 1;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-top: 5px solid #f1c40f; 
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.track-module h2 {
+    font-family: 'Orbitron', sans-serif;
+    color: #f1c40f;
+    font-size: 1.4rem;
+    margin-top: 0;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+}
+
+/* 4. Data Row Styling */
+.track-module p {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.9rem;
+    color: #888; /* Label color */
+}
+
+/* The actual data values */
+.track-module p span {
+    color: #ffffff;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+}
+
+/* Last item shouldn't have a border */
+.track-module p:last-child {
+    border-bottom: none;
+}
