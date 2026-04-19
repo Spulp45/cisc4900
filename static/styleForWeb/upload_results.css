@@ -1,0 +1,71 @@
+/* 1. Global Page Background */
+html, body {
+    background-color: #111 !important;
+    color: #eee;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    font-family: 'Orbitron', sans-serif;
+    color: #f1c40f;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 40px;
+}
+
+/* 2. Section Headers */
+h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    margin-top: 30px;
+    width: 100%;
+    max-width: 600px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 5px;
+}
+
+/* 3. Message Containers */
+p {
+    width: 100%;
+    max-width: 600px;
+    padding: 15px;
+    margin: 10px 0;
+    background: #1a1a1a;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    border: 1px solid #333;
+}
+
+/* 4. Success Styling */
+h2:nth-of-type(1) {
+    color: #2ecc71; 
+}
+
+/* Target success messages */
+h2:nth-of-type(1) + p, 
+h2:nth-of-type(1) ~ p:not(h2 ~ p) { 
+    border-left: 5px solid #2ecc71;
+}
+
+/* 5. Error Styling */
+h2:nth-of-type(2) {
+    color: #e74c3c; /* Alert Red */
+}
+
+/* Target error messages after the second H2 */
+h2:nth-of-type(2) ~ p {
+    border-left: 5px solid #e74c3c;
+    color: #ff9999;
+}
+
+/* 6. Back Button Spacing */
+.back-button-container {
+    margin-top: 50px;
+}
