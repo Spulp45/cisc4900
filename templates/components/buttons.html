@@ -1,17 +1,14 @@
 "Contains reusable buttons"
-{% macro back_button(label="Back") %}
-<a href="{{ url_for('home') }}" class="btn-primary">← Back</a>
+{% macro back_button(label="← Back", endpoint='home') %}
+    <a href="{{ url_for(endpoint) }}" class="btn btn-primary">{{ label }}</a>
+{% endmacro %}
+{% macro stats_select(label="Stats") %}
+    <a href="{{ url_for('stats_select') }}" class="btn btn-primary">{{ label }}</a>
 {% endmacro %}
 
-{% macro stats_select(label="Back") %}
-<a href="{{ url_for('stats_select') }}" class="btn-primary">{{ label }}</a>
+{% macro total_table() %}
+    <a href="{{ url_for('all_trips') }}" class="btn btn-primary">Total Table</a>
 {% endmacro %}
-
-{%macro
-    total_table(label="total_table") %}
-<a href="{{ url_for('all_trips') }}" class="btn-primary">Total Table</a>
-{% endmacro %}
-
 
 {% macro home_page_button(text, link='#', type='button', class='racing-btn') %}
     <a href="{{ link }}" style="text-decoration: none;">
