@@ -1,4 +1,4 @@
-{% import 'macros.html' as func %}
+{% import 'components/buttons.html' as func %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -171,6 +171,7 @@
 
     {% else %}
         <p>No tracks within that time range</p>
+        {{ func.back_button(label="← Back") }}
     {% endif %}
 
 
