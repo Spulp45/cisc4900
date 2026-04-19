@@ -7,11 +7,16 @@
     <title>My Driving Tracker</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='styleForWeb/home.css') }}" />
-    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
+    <script src="static/js/htmx/htmx.min.js.js"></script>
   </head>
   <body>
     <div class="container">
-      <h1>Welcome {{username }} </h1>
+      <h1>Welcome {{username }} 
+         <form class="action-buttons" action="{{ url_for('logout') }}" method="post">
+      <button type="submit">Logout</button>
+    </form>
+      </h1>
+      
 
       <div class="NovBar">
         {{ func.home_page_button("All Trips", link = url_for('all_trips')) }}
@@ -128,9 +133,7 @@
       <hr/>
     </div>
 
-    <form class="action-buttons" action="{{ url_for('logout') }}" method="post">
-      <button type="submit">Logout</button>
-    </form>
+   
   </body>
 
   <script>
