@@ -1,4 +1,5 @@
 {% import 'components/buttons.html' as func %}
+{% import 'components/tables.html' as tables %}
 <!doctype html>
 <html lang="en">
   <head>
@@ -16,7 +17,6 @@
       <button type="submit">Logout</button>
     </form>
       </h1>
-      
 
       <div class="NovBar">
         {{ func.home_page_button("All Trips", link = url_for('all_trips')) }}
@@ -58,82 +58,11 @@
         hx-target="#results"
       >
 
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="results">
-          {% for row in tracks %}
-            <tr>
-              <td>{{ row.id }}</td>
-              <td>{{ row.name }}</td>
-
-              <!-- Description -->
-              <td>
-                <span id="desc-text-{{ row.id }}">
-                  {{ row.description if row.description else "No description" }}
-                </span>
-
-                <input
-                  type="text"
-                  id="desc-input-{{ row.id }}"
-                  value="{{ row.description or '' }}"
-                  style="display:none;"
-                >
-              </td>
-
-              <!-- Actions -->
-              <td>
-                <div class="action-buttons">
-                  <button
-                    type="button"
-                    id="edit-btn-{{ row.id }}"
-                    onclick="enableEdit({{ row.id }})"
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    type="button"
-                    onclick="saveEdit({{ row.id }})"
-                    id="save-btn-{{ row.id }}"
-                    style="display:none;"
-                  >
-                    Save
-                  </button>
-
-                  <a href="{{ url_for('trip_stats', track_id=row.id) }}">
-                    <button type="button">View Stats</button>
-                  </a>
-
-                  <a href="{{ url_for('download_track', track_id=row.id) }}">
-                    <button type="button">Download File</button>
-                  </a>
-
-                  <form
-                    action="{{ url_for('delete_track', track_id=row.id) }}"
-                    method="post"
-                    style="display:inline;"
-                    onsubmit="return confirm('Are you sure you want to delete this track?');"
-                  >
-                    <button type="submit">Delete</button>
-                  </form>
-                </div>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    {{ tables.render_tracks_table(tracks) }}
 
       <hr/>
     </div>
 
-   
   </body>
 
   <script>

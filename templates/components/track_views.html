@@ -1,0 +1,16 @@
+{% macro track_card(track) %}
+<div class="track-module">
+    <h2>{{ track.name }}</h2>
+    <p>ID: <span>{{ track.id }}</span></p>
+    <p>Length 2D: <span>{{ track.length_2d | distance}}</span></p>
+    <p>Length 3D: <span>{{ track.length_3d | distance }}</span></p>
+    <p>Moving Time: <span>{{ track.moving_time | distance }}</span></p>
+    <p>Stopped Time: <span>{{ track.stopped_time | distance }}</span></p>
+    <p>Max Speed: <span>{{ track.max_speed | speed }}</span></p>
+    <p>Avg Speed: <span>{{ track.avg_speed | speed }}</span></p>
+    <p>Uphill: <span>{{ track.uphill | elevation }}</span></p>
+    <p>Downhill: <span>{{ track.downhill | elevation }}</span></p>
+    <p>Points: <span>{{ track.points }}</span></p>
+    <p>GPX Version: <span>{{ track.gpx_version }}</span></p>
+</div>
+{% endmacro %}

@@ -1,0 +1,92 @@
+{% import 'components/buttons.html' as func %}
+{% macro render_tracks_table(tracks) %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if tracks %}
+                    {% for row in tracks %}
+                        <tr>
+                            <!-- ID -->
+                            <td>{{ row.id }}</td>
+                            
+                            <!-- Name -->
+                            <td>{{ row.name }}</td>
+
+                            <!-- Description (Editable) -->
+                            <td>
+                                <span id="desc-text-{{ row.id }}">
+                                    {{ row.description if row.description else "No description" }}
+                                </span>
+
+                                <input
+                                    type="text"
+                                    id="desc-input-{{ row.id }}"
+                                    value="{{ row.description or '' }}"
+                                    style="display:none;"
+                                    class="form-control"
+                                >
+                            </td>
+
+                            <!-- Actions -->
+                            <td>
+                                <div class="action-buttons">
+                                    <!-- Edit/Save Buttons -->
+                                    <button
+                                        type="button"
+                                        id="edit-btn-{{ row.id }}"
+                                        onclick="enableEdit({{ row.id }})"
+                                        class="btn btn-sm btn-warning"
+                                    >
+                                        Edit
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onclick="saveEdit({{ row.id }})"
+                                        id="save-btn-{{ row.id }}"
+                                        style="display:none;"
+                                        class="btn btn-sm btn-success"
+                                    >
+                                        Save
+                                    </button>
+
+                                    <!-- View Stats -->
+                                    <a href="{{ url_for('trip_stats', track_id=row.id) }}">
+                                        <button type="button" class="btn btn-sm btn-info">View Stats</button>
+                                    </a>
+
+                                    <!-- Download -->
+                                    <a href="{{ url_for('download_track', track_id=row.id) }}">
+                                        <button type="button" class="btn btn-sm btn-secondary">Download</button>
+                                    </a>
+
+                                    <!-- Delete Form -->
+                                    <form
+                                        action="{{ url_for('delete_track', track_id=row.id) }}"
+                                        method="post"
+                                        style="display:inline;"
+                                        onsubmit="return confirm('Are you sure you want to delete this track?');"
+                                    >
+                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center">No tracks found.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+{% endmacro %}

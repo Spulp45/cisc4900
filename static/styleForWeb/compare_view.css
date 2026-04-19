@@ -65,3 +65,18 @@ h1 {
 .track-module p:last-child {
     border-bottom: none;
 }
+
+/* Unit Toggle Buttons */
+.unit-toggle .unit-btn {
+    display: inline-block;
+    padding: 8px 15px;
+    margin-right: 10px;
+    background: #222;
+    color: #f1c40f;
+    border: 1px solid #f1c40f;
+    text-decoration: none;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    transition: 0.3s;
+}

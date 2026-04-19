@@ -1,50 +1,34 @@
-{% import 'components/buttons.html' as func %}
-<!DOCTYPE html>
+{% import 'components/track_views.html' as views %} {% import
+'components/buttons.html' as func %}
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Track Comparison</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styleForWeb/compare_view.css') }}" />
-</head>
-<body>
     
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styleForWeb/compare_view.css') }}"
+    />
+  </head>
+  <body>
     <h1>Track Comparison</h1>
+    <h1>
+      <div class="unit-toggle">
+        <span>Units:</span>
+        <a href="/set_units/metric" class="unit-btn">Metric</a>
+        <a href="/set_units/imperial" class="unit-btn">Imperial</a>
+        <a href="/set_units/raw" class="unit-btn">Raw</a>
+      </div>
+    </h1>
 
-<div class="comparison-wrapper">
-    
-    <div class="track-module">
-       <h2>{{ track1.name }}</h2>
-       <p>ID: <span>{{track1.id}}</span></p>
-       <p>Length 2D: <span>{{track1.length_2d}}</span></p>
-       <p>Length 3D: <span>{{track1.length_3d}}</span></p>
-       <p>Moving Time: <span>{{track1.moving_time}}</span></p>
-       <p>Stopped Time: <span>{{track1.stopped_time}}</span></p>
-       <p>Max Speed: <span>{{track1.max_speed}}</span></p>
-       <p>Avg Speed: <span>{{track1.avg_speed}}</span></p>
-       <p>Uphill: <span>{{track1.uphill}}</span></p>
-       <p>Downhill: <span>{{track1.downhill}}</span></p>
-       <p>Points: <span>{{track1.points}}</span></p>
-       <p>GPX Version: <span>{{track1.gpx_version}}</span></p>
+    <div class="comparison-wrapper">
+      <div class="comparison-wrapper">
+        {{ views.track_card(track1) }} {{ views.track_card(track2) }}
+      </div>
     </div>
 
-    <div class="track-module">
-       <h2>{{ track2.name }}</h2>
-       <p>ID: <span>{{track2.id}}</span></p>
-       <p>Length 2D: <span>{{track2.length_2d}}</span></p>
-       <p>Length 3D: <span>{{track2.length_3d}}</span></p>
-       <p>Moving Time: <span>{{track2.moving_time}}</span></p>
-       <p>Stopped Time: <span>{{track2.stopped_time}}</span></p>
-       <p>Max Speed: <span>{{track2.max_speed}}</span></p>
-       <p>Avg Speed: <span>{{track2.avg_speed}}</span></p>
-       <p>Uphill: <span>{{track2.uphill}}</span></p>
-       <p>Downhill: <span>{{track2.downhill}}</span></p>
-       <p>Points: <span>{{track2.points}}</span></p>
-       <p>GPX Version: <span>{{track2.gpx_version}}</span></p>
-    </div>
-
-</div>
-
-{{ func.back_button(label="← Back") }}
-</body>
+    {{ func.back_button(label="← Back") }}
+  </body>
 </html>
