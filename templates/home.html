@@ -8,7 +8,8 @@
     <title>My Driving Tracker</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='styleForWeb/home.css') }}" />
-    <script src="static/js/htmx/htmx.min.js.js"></script>
+    <script src="{{ url_for('static', filename='js/htmx/htmx.min.js') }}"></script>
+
   </head>
   <body>
     <div class="container">
@@ -57,9 +58,9 @@
         hx-trigger="keyup changed delay:500ms"
         hx-target="#results"
       >
-
-    {{ tables.render_tracks_table(tracks) }}
-
+      <div id="results">
+  {{ tables.render_tracks_table(tracks) }}
+      </div>
       <hr/>
     </div>
 
