@@ -1,18 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-</head>
-<body>
-    <form method="POST">
-  <input name="username" placeholder="Username" required>
-  <input name="password" type="password" placeholder="Password" required>
-  <button type="submit">Register</button>
-  <p>After registering your username and password</p>
-  <p>You will be redirected back to login screen</p>
-  <p>WIP</p>
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      <title>Register</title>
+      <link rel="stylesheet" href="{{ url_for('static', filename='styleForWeb/register.css') }}">
+  </head>
+ <body>
+
+  <form method="POST">
+     <h2 style="font-family: 'Orbitron', sans-serif; color: #f1c40f; text-align: center; text-transform: uppercase; margin-bottom: 30px;">
+        System Register
+     </h2>
+
+      <input name="username" placeholder="Username" required>
+      <input name="password" type="password" placeholder="Password" required>
+     
+     <button type="submit">Register</button>
+
+      <p>After registering, you will be redirected</p>
+      <p>to the login screen.</p>
 </form>
+
 </body>
-</html>
+  </html>
