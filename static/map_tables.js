@@ -34,7 +34,7 @@ function formatValue(value, type, units) {
         .toString()
         .padStart(2, "0")}`;
     case "timestamp":
-      return new Date(value).toLocaleString()
+      return new Date(value).toLocaleString();
         default:
       return value;
     case "misc":
@@ -104,8 +104,18 @@ document.addEventListener("click", (e) => {
   if (e.target.classList.contains("unit-btn")) {
     const unit = e.target.dataset.unit;
     setUnits(unit);
+
     renderStatsTable(track, unit);
     if (lastClickedPoint) renderTrackPanel(lastClickedPoint);
+
+    myChart.data.datasets[0].label =
+      unit === "imperial" ? "Speed (mph)" : "Speed (km/h)";
+
+    myChart2.data.datasets[0].label =
+      unit === "imperial" ? "Elevation (ft)" : "Elevation (m)";
+
+    myChart.update();
+    myChart2.update();
   }
 });
 
