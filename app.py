@@ -384,9 +384,10 @@ def account_settings():
 
         if not result:
             return render_template('account_settings.html', username=username, error="Failed to update password, database error")
-        return "Password updated successfully"
+        
+        return render_template('account_settings.html', username=username, error=None, success="Password updated Successfully")
 
-    return render_template('account_settings.html', username=username, error=None)
+    return render_template('account_settings.html', username=username, error=None, success=None)
 
 
 # Unit toggle route

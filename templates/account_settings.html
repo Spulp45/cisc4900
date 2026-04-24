@@ -20,24 +20,28 @@
     <br>
 
     <!-- Change Password -->
-    <fieldset>
-      <legend>Change Password</legend>
+  <fieldset>
+    <legend>Change Password</legend>
+
+    {% if success %}
+      <p>{{ success }}</p>
+    {% else %}
 
       <input name="currentPassword" type="password" placeholder="Current Password" required><br><br>
       <input name="newPassword" type="password" placeholder="New Password" required><br><br>
       <input name="confirmPassword" type="password" placeholder="Confirm New Password" required><br><br>
 
       <button type="submit">Update Password</button>
-      
-      {% if error is none%}
+
       <p>If successful, your password will be updated.</p>
-      {% endif %}
-      
-      {% if error is not none %}
-      <p>Error: {{error}} </p>
-      {% endif %}
-  
-    </fieldset>
+
+    {% endif %}
+
+    {% if error %}
+      <p>Error: {{ error }}</p>
+    {% endif %}
+
+  </fieldset>
     
     <br>
 
