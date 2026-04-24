@@ -532,7 +532,6 @@ def verify_user(username, password) -> int | bool:
 
     return False
 
-from sqlalchemy import text
 
 def search_tracks_by_name(db: SQLAlchemy, query_text: str, user_id: str) -> list[dict]:
     """
@@ -568,3 +567,45 @@ def search_tracks_by_name(db: SQLAlchemy, query_text: str, user_id: str) -> list
             "name": f"%{query_text}%"
         })  
     return result.fetchall()
+
+def get_user_by_id(user_id: str) -> list[dict]:
+    """
+    Gets all user info by id
+    Args:
+        user_id(str): The user_id
+    Returns:
+    list[dict]: A list of dict containing all requested info
+
+    """
+    with sqlite3.connect(DatabasePath) as conn:
+        cur = conn.cursor()
+
+        cur.execute("""
+        SELECT * 
+        FROM user 
+        WHERE id = ? """,(user_id,))
+        
+        columns = [desc[0] for desc in cur.description]
+        return [dict(zip(columns, row)) for row in cur.fetchall()]
+
+def update_user_password(user_id: str, new_password: str)-> bool:
+    """
+    Updates user's password, send password in as plain text
+    Arguments:
+        user_id(str): The user id
+        new_password(str): The new password in plain text
+    Returns:
+        bool: True if success false otherwise
+    """
+    with sqlite3.connect(DatabasePath) as conn:
+        password_hash = generate_password_hash(new_password)
+        cur = conn.cursor()
+
+        cur.execute("""
+        UPDATE user 
+        SET password_hash = ? 
+        WHERE id = ? """, (password_hash, user_id,))
+        
+        return True
+    return False
+    

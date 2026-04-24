@@ -1,0 +1,57 @@
+{% import 'components/buttons.html' as func %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Settings</title>
+</head>
+<body>
+
+  <h1>User Settings</h1>
+
+  <form method="POST">
+
+    <!-- Profile Information -->
+    <fieldset>
+      <legend>Profile Information</legend>
+      <label>Username: {{ username }}</label><br>
+    </fieldset>
+
+    <br>
+
+    <!-- Change Password -->
+    <fieldset>
+      <legend>Change Password</legend>
+
+      <input name="currentPassword" type="password" placeholder="Current Password" required><br><br>
+      <input name="newPassword" type="password" placeholder="New Password" required><br><br>
+      <input name="confirmPassword" type="password" placeholder="Confirm New Password" required><br><br>
+
+      <button type="submit">Update Password</button>
+      
+      {% if error is none%}
+      <p>If successful, your password will be updated.</p>
+      {% endif %}
+      
+      {% if error is not none %}
+      <p>Error: {{error}} </p>
+      {% endif %}
+  
+    </fieldset>
+    
+    <br>
+
+    <!-- Account Options -->
+    <fieldset>
+      <legend>Account Options</legend>
+
+      <button type="button">Download All Tracks</button>
+      <button type="button">Delete Account</button>
+
+      {{ func.back_button(label="← Back") }}
+    </fieldset>
+
+  </form>
+
+</body>
+</html>

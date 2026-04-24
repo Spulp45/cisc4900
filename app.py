@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, session, url_for, jsonify, send_from_directory
+from flask import Flask, render_template, request, redirect, session, url_for, jsonify, send_from_directory, flash
 from werkzeug.utils import secure_filename
+from werkzeug.security import check_password_hash, generate_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from backend import databaseFunctions
 from backend import parser
@@ -309,7 +310,7 @@ def compare_submit():
         track2_id=selected[1]
     ))
 
-##          COMPARISON  END         ##
+
 
 @app.route("/compare/view")
 @login_required
@@ -330,6 +331,8 @@ def compare_view():
 @login_required
 def stats_select():
     return render_template("stats_select.html")
+
+##          COMPARISON  END         ##
 
 @app.route("/stats")
 @login_required
@@ -355,6 +358,36 @@ def stats():
         )
 
     return redirect(url_for("stats_select"))
+
+
+@app.route('/account_settings', methods=['GET', 'POST'])
+@login_required
+def account_settings():
+    user_id = session.get('user_id')
+    user_db = databaseFunctions.get_user_by_id(user_id)[0]
+    username = session.get('username')
+    password_hash = user_db['password_hash']
+    
+    if request.method == 'POST':
+        
+        current_password = request.form['currentPassword']
+        new_password = request.form['newPassword']
+        confirm_password = request.form['confirmPassword']    
+
+        if not check_password_hash(password_hash, current_password):
+             return render_template('account_settings.html', username=username, error="Current password is incorrect")
+
+        if new_password != confirm_password:
+            return render_template('account_settings.html', username=username, error="New password does not match")
+     
+        result = databaseFunctions.update_user_password(user_id, new_password)
+
+        if not result:
+            return render_template('account_settings.html', username=username, error="Failed to update password, database error")
+        return "Password updated successfully"
+
+    return render_template('account_settings.html', username=username, error=None)
+
 
 # Unit toggle route
 @app.route('/set_units/<unit>')

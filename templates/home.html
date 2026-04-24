@@ -13,11 +13,15 @@
   </head>
   <body>
     <div class="container">
-      <h1>Welcome {{username }} 
+      <h1>Welcome {{ username }} 
          <form class="action-buttons" action="{{ url_for('logout') }}" method="post">
       <button type="submit">Logout</button>
     </form>
       </h1>
+
+      <form class="action-buttons" action="{{ url_for('account_settings') }}" method="get">
+      <button type="submit">Account Settings</button>
+    </form>
 
       <div class="NovBar">
         {{ func.home_page_button("All Trips", link = url_for('all_trips')) }}
