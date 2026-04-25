@@ -1,11 +1,13 @@
-from flask import Flask, render_template, request, redirect, session, url_for, jsonify, send_from_directory, flash
+from flask import Flask, render_template, request, redirect, session, url_for, jsonify, send_from_directory, send_file
 from werkzeug.utils import secure_filename
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from backend import databaseFunctions
 from backend import parser
 from backend import units
 from functools import wraps
+import zipfile
+import io
 import os
 import json
 import uuid
@@ -86,7 +88,6 @@ def logout():
 @app.route('/home')
 @login_required
 def home():
-    print("CURRENTUSER: ",session.get('user_id'))
     all_rows = databaseFunctions.get_tracks(session.get('user_id'))
     return render_template('home.html', tracks=all_rows, username=session.get('username'))
 
@@ -190,9 +191,10 @@ def upload():
                     os.remove(temp_filepath)
                 errors.append(f"Error saving the file: {e}")
 
-        return render_template("upload_results.html",
+        return render_template("transfer_results.html",
                         errors=errors,
-                        success=success)
+                        success=success,
+                        transfer_type='Upload')
 
 @app.route('/download/<int:track_id>')
 @login_required
@@ -203,28 +205,13 @@ def download_track(track_id):
         return "Track not found", 404
     
     track = data[0]
+    file_path, original_filename = get_track_file_info(data[0])
     
-    # Get track hash
-    hash_value = track.get("track_hash")
-    # Get original filename
-    original_filename = track.get("filename")
-    
-    # Get the extension
-    extension = Path(original_filename).suffix
-
-    # Re-construct the filename + extension
-    stored_file = f"{hash_value}{extension}"
-
-    # Double check if the path exists
-    if not os.path.exists(os.path.join(app.config['UPLOAD_DIRECTORY'],stored_file)):
-            return f"{stored_file} File not found", 404
-
-    return send_from_directory(
-        app.config['UPLOAD_DIRECTORY'],
-        stored_file,
-        as_attachment= True,
-        download_name= original_filename
-    )
+    if not os.path.exists(file_path):
+        return "File not found on server", 404
+    return send_file(file_path, 
+                     as_attachment=True,
+                     download_name=original_filename)
 @app.route('/search')
 @login_required
 def search():
@@ -389,6 +376,40 @@ def account_settings():
 
     return render_template('account_settings.html', username=username, error=None, success=None)
 
+@app.route('/download_all_tracks', methods=['GET', 'POST'])
+@login_required
+def download_all_tracks():
+    user_id = session.get('user_id')
+    username = session.get('username')
+        
+    all_tracks = databaseFunctions.get_tracks(user_id)
+    if not all_tracks:
+        return "No tracks found to download", 404
+    
+    
+    log_content = f"Download Report for {username}\n"
+    log_content += "="*30 + "\n\n"
+    memory_file = io.BytesIO()
+    with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
+        for track in all_tracks:
+            file_path, original_filename = get_track_file_info(track)
+            
+            if os.path.exists(file_path):
+                zf.write(file_path, arcname=original_filename)
+                log_content += f"[SUCCESS] {original_filename} filepath: {file_path} \n"
+            else:
+                log_content += f"[ERROR]   {original_filename} filepath: {file_path} - File missing on server\n"
+        zf.writestr('download_log.txt', log_content)
+    memory_file.seek(0)
+    
+        
+    return send_file(
+        memory_file,
+        mimetype='application/zip',
+        as_attachment=True,
+        download_name=f'{username}_gpx_files.zip'
+    )
+
 
 # Unit toggle route
 @app.route('/set_units/<unit>')
@@ -418,7 +439,22 @@ def time_filter(value):
     unit_setting = session.get("units", "metric")
     return units.format_time(value, unit_setting)
 
+## TODO ADD better docstring or move somewhere else
+def get_track_file_info(track):
+    """Returns (absolute_file_path, original_filename)"""
+    # Get track hash
+    hash_value = track.get("track_hash")
+    # Get original filename
+    original_filename = track.get("filename")
+    # Get the extension
+    extension = Path(original_filename).suffix
+    # Re-construct the filename + extension
+    stored_file = f"{hash_value}{extension}"
+    
+    file_path = os.path.join(app.config['UPLOAD_DIRECTORY'], stored_file)
+    
+    return file_path, original_filename
 
 # For running the app
 if __name__ == '__main__':
-    app.run(debug=True, use_reloader=True)
+    app.run(debug=True, use_reloader=True)    

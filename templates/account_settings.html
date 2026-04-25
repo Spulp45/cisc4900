@@ -49,7 +49,9 @@
     <fieldset>
       <legend>Account Options</legend>
 
+      <a href="{{ url_for('download_all_tracks') }}">
       <button type="button">Download All Tracks</button>
+      </a>
       <button type="button">Delete Account</button>
 
       {{ func.back_button(label="← Back") }}

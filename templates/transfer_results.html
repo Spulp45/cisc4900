@@ -9,7 +9,7 @@
 </head>
 <body>
 
-    <h1>Upload Results:</h1>
+    <h1>{{transfer_type}} Results:</h1>
 
     <h2>Success:</h2>
     {% if success %}
@@ -17,7 +17,7 @@
             <p>{{ msg }}</p>
         {% endfor %}
     {% else %}
-        <p>No successful uploads.</p>
+        <p>No successful {{transfer_type}}.</p>
     {% endif %}
 
     <h2>Errors:</h2>
