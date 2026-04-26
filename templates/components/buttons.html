@@ -1,6 +1,10 @@
 "Contains reusable buttons"
-{% macro back_button(label="← Back", endpoint='home') %}
-    <a href="{{ url_for(endpoint) }}" class="btn btn-primary">{{ label }}</a>
+{% macro back_button(label="← Back", fallback_endpoint='home') %}
+    <a href="{{ url_for(fallback_endpoint) }}"
+       onclick="if (document.referrer) { history.back(); return false; }"
+       class="btn btn-primary">
+        {{ label }}
+    </a>
 {% endmacro %}
 {% macro stats_select(label="Stats") %}
     <a href="{{ url_for('stats_select') }}" class="btn btn-primary">{{ label }}</a>

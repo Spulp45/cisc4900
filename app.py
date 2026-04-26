@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, url_for, jsonify, send_from_directory, send_file
+from flask import Flask, render_template, request, redirect, session, url_for, jsonify, flash , send_file
 from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash
 from flask_sqlalchemy import SQLAlchemy
@@ -410,6 +410,56 @@ def download_all_tracks():
         download_name=f'{username}_gpx_files.zip'
     )
 
+## USER DELETE PROCESS ##
+
+@app.route('/delete_account', methods=['GET', 'POST'])
+@login_required
+def delete_account():
+
+    step = 1
+    message = None
+
+    if request.method == 'POST':
+        step = int(request.form.get('step', 1))
+
+       
+        if step == 1:
+            step = 2
+
+        
+        elif step == 2:
+            username = request.form.get('username')
+            password = request.form.get('password')
+
+            # must match logged-in user
+            # otherwise anyone with the user's credentials
+            # can just delete the user
+            if username != session.get('username'):
+                message = "Username is incorrect"
+                step = 2
+
+            # verify password using db verify_user
+            elif not databaseFunctions.verify_user(username, password):
+                message = "Password is incorrect"
+                step = 2
+
+            else:
+                # user deletion is pending
+                session['pending_delete_user'] = username
+                step = 3
+
+        # delete process 
+        elif step == 3:
+            username = session.pop('pending_delete_user', None)
+
+            if username:
+                #IMPLEMENT DELETE SEQUENCE IN DB
+
+                session.clear()
+
+                return redirect(url_for('home'))
+
+    return render_template('delete_account.html', step=step, message=message)
 
 # Unit toggle route
 @app.route('/set_units/<unit>')

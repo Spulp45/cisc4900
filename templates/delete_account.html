@@ -1,0 +1,70 @@
+{% import 'components/buttons.html' as func %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <!-- Error or Info Message -->
+    {% if message %}
+        <p>{{ message }}</p>
+    {% endif %}
+
+    {% if step == 1 %}
+        <h1>Delete Account</h1>
+        <p>Are you sure you want to delete your account? This action is irreversible.</p>
+
+        <form method="POST">
+            <input type="hidden" name="step" value="1">
+            <button type="submit">Continue to Verification</button>
+        </form>
+
+        <br>
+        {{ func.back_button(label="← Back") }}
+
+    {% elif step == 2 %}
+        <h1>Verify Your Identity</h1>
+        <p>Please enter your credentials to continue.</p>
+
+        <form method="POST">
+            <input type="hidden" name="step" value="2">
+
+            <div>
+                <label>Username:</label><br>
+                <input type="text" name="username" required>
+            </div>
+
+            <br>
+
+            <div>
+                <label>Password:</label><br>
+                <input type="password" name="password" required>
+            </div>
+
+            <br>
+
+            <button type="submit">Verify & Continue</button>
+        </form>
+
+        <br>
+        <a href="{{ url_for('delete_account') }}">Back</a>
+
+    {% elif step == 3 %}
+        <h1>FINAL WARNING</h1>
+        <p>This action cannot be undone.</p>
+        <p>Do you want to permanently delete your account?</p>
+
+        <form method="POST">
+            <input type="hidden" name="step" value="3">
+            <button type="submit">YES, DELETE MY ACCOUNT</button>
+        </form>
+
+        <br>
+        <a href="{{ url_for('delete_account') }}">Cancel</a>
+
+    {% endif %}
+
+</html>
