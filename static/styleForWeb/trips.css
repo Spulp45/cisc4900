@@ -133,3 +133,26 @@ canvas {
     background-color: transparent !important; 
     display: block;
 }
+
+.playback-controls {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #333; 
+}
+
+#play-btn {
+    width: 100%;
+    padding: 10px;
+    background: #111; 
+    color: #f1c40f;   
+    border: 1px solid #f1c40f;
+    font-family: 'Orbitron', sans-serif;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#play-btn:hover {
+    background: #f1c40f;
+    color: #111;
+}
