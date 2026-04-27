@@ -91,8 +91,8 @@ def createDatabase() -> int:
         user_id INT NOT NULL,
         track_id NOT NULL,
                       
-        FOREIGN KEY (track_id) REFERENCES track(id)
-        FOREIGN KEY (user_id) REFERENCES user(id)
+        FOREIGN KEY (track_id) REFERENCES track(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
                       
         PRIMARY KEY(user_id, track_id)
     );
@@ -235,45 +235,70 @@ def insert_track(track : Track, user_id : int) -> int:
 
 def delete_track_by_id(id: str, user_id: str) -> bool | int:
     """
-    Deletes a track by id of the track
-    and CASCADE DELETE all related track points 
-    from the track_point table
-    
+    Removes a track from a user, (uses ON DELETE CASCADE in database)
+
     Args:
-        id (str): id of the track
+        id (str): track id
+        user_id (str): user id
+
     Returns:
-        bool: True if deleted sucessfully
-        int: A error code if something bad happened
+        bool: True if successful
+        int: error code otherwise
     """
-    try:
-        int_id = int(id)  # convert id to int
-    except ValueError:
-        return False
+    filepath = None
+    track_hash = None
+    track_deleted = False
     
-    with sqlite3.connect(DatabasePath) as conn:
-        cur = conn.cursor()
+    try:
+        with sqlite3.connect(DatabasePath) as conn:
+            conn.execute("PRAGMA foreign_keys = ON")
+            cur = conn.cursor()
 
-        cur.execute("SELECT filepath, track_hash FROM track WHERE id = ?", (int_id,))
-        row = cur.fetchone()
+            # Get filepath and track hash
+            cur.execute(
+                "SELECT filepath, track_hash FROM track WHERE id = ?",
+                (id,)
+            )
+            row = cur.fetchone()
 
-        if not row:
-            return DELETE_ERROR  # track does not exist
+            if not row:
+                return DELETE_ERROR
 
-        filepath, track_hash = row
-        pathOnly = filepath.rsplit('/', 1)[0]
-        hashFilePath = os.path.join(pathOnly, track_hash) + ".gpx" #TODO Might Break in the Future
+            filepath, track_hash = row
 
-        cur.execute("DELETE FROM track_point WHERE track_id = ?", (int_id,))
-        cur.execute("DELETE FROM track WHERE id = ?", (int_id,))
+            # Remove the track assosiation from the user_tracks table
+            cur.execute(
+                "DELETE FROM user_tracks WHERE track_id = ? AND user_id = ?",
+                (id, user_id)
+            )
+            
+            # Delete track ONLY if no users reference it
+            cur.execute("""
+                DELETE FROM track
+                WHERE id = ?
+                AND NOT EXISTS (
+                    SELECT 1 FROM user_tracks WHERE track_id = ?
+                )
+            """, (id, id))
 
-        cur.execute("DELETE FROM user_tracks WHERE track_id = ? AND user_id = ?",(id,user_id,))
-        
-    try: 
-        if filepath and os.path.exists(hashFilePath):
-            os.remove(hashFilePath)
-    except:
-        return DELETE_FILE_ERROR
-        
+            track_deleted = cur.rowcount > 0
+
+    except sqlite3.Error:
+        return DELETE_ERROR
+
+    # Delete the file only if the track was successfully deleted
+    if track_deleted:
+        try:
+            if filepath and track_hash:
+                # Reconstruct filepath
+                path_only = filepath.rsplit('/', 1)[0]
+                hash_file_path = os.path.join(path_only, track_hash + ".gpx")
+
+                if os.path.exists(hash_file_path):
+                    os.remove(hash_file_path)
+        except Exception:
+            return DELETE_FILE_ERROR
+
     return True
 
 
