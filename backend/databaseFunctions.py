@@ -5,6 +5,7 @@ import json
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import text
 from flask_sqlalchemy import SQLAlchemy
+import uuid
 
 
 
@@ -19,6 +20,7 @@ DELETE_ERROR = 5
 # Directories #
 DatabasePath = json.load(open("config.json"))["DATABASE_PATH"]
 UploadDirectory = json.load(open("config.json"))["UPLOAD_DIRECTORY"]
+TempDirectory = json.load(open("config.json"))["TEMP_FOLDER"]
 
 def createDatabase() -> int:
     """
@@ -105,6 +107,18 @@ def createDatabase() -> int:
 
     CREATE INDEX idx_track_point_timestamp 
     ON track_point(timestamp);
+    
+    CREATE INDEX idx_track_user_id
+    ON track(user_id);
+    
+    CREATE INDEX idx_track_start_time
+    ON track(start_time);
+    
+    CREATE INDEX idx_track_name
+    ON track(name);
+    
+    CREATE INDEX idx_track_point_track_time
+    ON track_point(track_id, timestamp);
     """
 
     # Create tables and index
@@ -613,7 +627,7 @@ def get_user_by_id(user_id: str) -> list[dict]:
         columns = [desc[0] for desc in cur.description]
         return [dict(zip(columns, row)) for row in cur.fetchall()]
 
-def update_user_password(user_id: str, new_password: str)-> bool:
+def update_user_password(user_id: str, new_password: str) -> bool:
     """
     Updates user's password, send password in as plain text
     Arguments:
@@ -633,4 +647,81 @@ def update_user_password(user_id: str, new_password: str)-> bool:
         
         return True
     return False
+
+def delete_user_by_id(user_id: str) -> bool:
+    try:
+        with sqlite3.connect(DatabasePath) as conn:
+            conn.execute("PRAGMA foreign_keys = ON")
+            cur = conn.cursor()
+
+            # Get filepaths and filenames (via user_tracks)
+            cur.execute("""
+                SELECT tr.filepath, tr.filename
+                FROM user_tracks ut
+                JOIN track tr ON tr.id = ut.track_id
+                WHERE ut.user_id = ?
+            """, (user_id,))
+            rows = cur.fetchall()
+
+            filepaths = [row[0] for row in rows]
+            filenames = [row[1] for row in rows]
+
+            cur.execute("""
+                SELECT track_id
+                FROM user_tracks
+                WHERE user_id = ?
+            """, (user_id,))
+
+            track_ids = [row[0] for row in cur.fetchall()]
+
+            if track_ids:
+                placeholders = ",".join(["?"] * len(track_ids))
+
+                # Delete tracks
+                cur.execute(f"""
+                    DELETE FROM track
+                    WHERE id IN ({placeholders})
+                """, track_ids)
+                        
+            # Delete user-track mappings
+            cur.execute("""
+                DELETE FROM user_tracks
+                WHERE user_id = ?
+            """, (user_id,))
+            
+            # Delete user
+            cur.execute("""
+                DELETE FROM user
+                WHERE id = ?
+            """, (user_id,))
+
+            # Commit all changes to database
+            conn.commit()
+            
+    except sqlite3.error:
+        return False
     
+    # Move files to temp
+    moved_files = []
+
+    for filepath, original_filename in zip(filepaths, filenames):
+        try:
+            if not os.path.exists(filepath):
+                continue
+
+            destination = os.path.join(
+                TempDirectory,
+                f"{user_id}_{uuid.uuid4()}{original_filename}"
+            )
+
+            os.replace(filepath, destination)
+
+            moved_files.append((destination, original_filename))
+
+        except Exception:
+            print(f"Error moving {filepath}")
+
+    for file, original_filename in moved_files:
+        print(f"{file} was moved to temp folder and marked for deletion")
+
+    return True
