@@ -108,9 +108,6 @@ def createDatabase() -> int:
     CREATE INDEX idx_track_point_timestamp 
     ON track_point(timestamp);
     
-    CREATE INDEX idx_track_user_id
-    ON track(user_id);
-    
     CREATE INDEX idx_track_start_time
     ON track(start_time);
     
