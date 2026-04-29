@@ -453,8 +453,8 @@ def delete_account():
             username = session.pop('pending_delete_user', None)
 
             if username:
-                #IMPLEMENT DELETE SEQUENCE IN DB
-
+                databaseFunctions.delete_user_by_id(session.get('user_id'))
+                
                 session.clear()
 
                 return redirect(url_for('home'))
