@@ -57,7 +57,8 @@ def register():
         result = databaseFunctions.create_user(username, password)
 
         if not result:
-            return "Username already Exists"
+            return render_template('show_msg.html',
+                                    msg="Username already exists")
         
         return redirect('/login')
     
