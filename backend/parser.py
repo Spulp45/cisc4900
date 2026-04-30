@@ -50,12 +50,16 @@ def getGPX(filepath: str, original_filename: str, original_filepath: str) -> Tra
     length_2d = gpx.length_2d()         # float
     length_3d = gpx.length_3d()         # float
     moving_data = gpx.get_moving_data(raw=True) # tuple (moving_time, stopped_time, moving_distance, stopped_distance, max_speed)
-    avg_speed = moving_data.moving_distance / moving_data.moving_time # float
+    
     uphill = gpx.get_uphill_downhill() #tuple (uphill, downhill)
     time_bounds = gpx.get_time_bounds() # datetime (start, end)
     points = gpx.get_points_no() # int
     gpxVersion = gpx.version # str
-
+    
+    if moving_data.moving_time > 0:
+        avg_speed = moving_data.moving_distance / moving_data.moving_time # float
+    else:
+        avg_speed = 0.0 # float
     # Initialize the track with the filename as its name and include all
     # computed data
     track = Track(original_filename, length_2d, length_3d, moving_data, 
