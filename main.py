@@ -1,6 +1,6 @@
 import generate_secret
 from backend import databaseFunctions
-import leafletInstall
+
 
 ## First Time Tests
 generateKeyResult = generate_secret.generate()

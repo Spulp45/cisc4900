@@ -77,7 +77,8 @@ def login():
             session['username'] = username
             return redirect('/home')
         
-        return "Invalid Credentials"
+        return render_template('show_msg.html',
+                               msg="Invalid Credentials")
     return render_template('login.html')
 
 @app.route('/logout', methods=['POST'])
@@ -171,7 +172,8 @@ def upload():
 
                 # Insert into DB also pass user_id
                 result = databaseFunctions.insert_track(track, session.get('user_id'))
-
+                
+                # As we process the uploaded data, log all errros                
                 if result == databaseFunctions.SUCCESS:
                     success.append(f"{track.name} was uploaded successfully")
                     continue
@@ -203,13 +205,16 @@ def download_track(track_id):
     data = databaseFunctions.get_track(track_id, session.get('user_id'))
     
     if not data:
-        return "Track not found", 404
+        return render_template('show_msg.html',
+                               msg='No Tracks Found To download')
     
     track = data[0]
     file_path, original_filename = get_track_file_info(data[0])
     
     if not os.path.exists(file_path):
-        return "File not found on server", 404
+        return render_template('show_msg.html',
+                               msg=f"File'{file_path}' with original filename '{original_filename}' not found on server")
+    
     return send_file(file_path, 
                      as_attachment=True,
                      download_name=original_filename)
@@ -223,7 +228,8 @@ def search():
         return render_template("search_results.html", track=search_results)
     except Exception as e:
         print(f"!!! SEARCH ERROR: {e}")
-        return str(e), 500
+        return render_template('msg.html',
+                               msg="Search Error")
     
 @app.route('/search_only')
 @login_required
@@ -235,9 +241,8 @@ def search_only():
         return render_template("search_only.html", track=search_results)
     except Exception as e:
         print(f"!!! SEARCH ERROR: {e}")
-        return str(e), 500
-
-
+        return render_template('msg.html',
+                               msg="Search Error")
 
 
 @app.route('/delete/<int:track_id>', methods=['POST'])
@@ -247,10 +252,11 @@ def delete_track(track_id):
     result = databaseFunctions.delete_track_by_id(track_id, session.get('user_id'))
 
     if result == databaseFunctions.DELETE_ERROR:
-        return f"Could not delete track {track_id}", 400
+        return render_template('show_msg.hmtl',
+                               msg=f"Could not delete track {track_id}")
     if result == databaseFunctions.DELETE_FILE_ERROR:
-        return f"Could not delete file associated with track with id: {track_id}"
-
+        render_template('show_msg.html',
+                        msg=f"Could not delete file associated with track with id: {track_id}")
     return redirect(request.referrer or '/')
 
 @app.route('/update_description/<int:track_id>', methods=['POST'])
@@ -271,7 +277,8 @@ def all_trips():
     totals = databaseFunctions.get_totals(session.get('user_id'))
 
     if not totals:
-        return "No data found to calculate totals", 404
+        return render_template("show_msg.html",
+                               msg="No data found to calculate totals"), 404
     
     
     return render_template('all_trips.html', totals=totals)
@@ -290,7 +297,8 @@ def compare_submit():
     selected = request.form.getlist("track_ids")
 
     if len(selected) != 2:
-        return "Please select exactly 2 tracks", 400
+        return render_template('show_msg.html',
+                               msg="Please select only 2 tracks"), 400
 
     return redirect(url_for(
         "compare_view",
@@ -363,19 +371,36 @@ def account_settings():
         confirm_password = request.form['confirmPassword']    
 
         if not check_password_hash(password_hash, current_password):
-             return render_template('account_settings.html', username=username, error="Current password is incorrect")
+             return render_template('account_settings.html',
+                                    username=username,
+                                    user_id=user_id,
+                                    error="Current password is incorrect")
 
         if new_password != confirm_password:
-            return render_template('account_settings.html', username=username, error="New password does not match")
+            return render_template('account_settings.html',
+                                   username=username,
+                                   user_id=user_id,
+                                   error="New password does not match")
      
         result = databaseFunctions.update_user_password(user_id, new_password)
 
         if not result:
-            return render_template('account_settings.html', username=username, error="Failed to update password, database error")
+            return render_template('account_settings.html',
+                                   user_id=user_id,
+                                   username=username,
+                                   error="Failed to update password, database error")
         
-        return render_template('account_settings.html', username=username, error=None, success="Password updated Successfully")
+        return render_template('account_settings.html',
+                               username=username,
+                               user_id=user_id,
+                               error=None, 
+                               success="Password updated Successfully")
 
-    return render_template('account_settings.html', username=username, error=None, success=None)
+    return render_template('account_settings.html',
+                           username=username,
+                           user_id=user_id,
+                           error=None,
+                           success=None)
 
 @app.route('/download_all_tracks', methods=['GET', 'POST'])
 @login_required
@@ -385,7 +410,8 @@ def download_all_tracks():
         
     all_tracks = databaseFunctions.get_tracks(user_id)
     if not all_tracks:
-        return "No tracks found to download", 404
+        return render_template("show_msg.html",
+                               msg="No tracks found to download"), 404
     
     
     log_content = f"Download Report for {username}\n"
