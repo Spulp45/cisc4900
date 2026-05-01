@@ -255,8 +255,8 @@ def delete_track(track_id):
         return render_template('show_msg.html',
                                msg=f"Could not delete track {track_id}")
     if result == databaseFunctions.DELETE_FILE_ERROR:
-        render_template('show_msg.html',
-                        msg=f"Could not delete file associated with track with id: {track_id}")
+        return render_template('show_msg.html',
+                           msg=f"Could not delete file associated with track with id: {track_id}")
     return redirect(request.referrer or '/')
 
 @app.route('/update_description/<int:track_id>', methods=['POST'])
