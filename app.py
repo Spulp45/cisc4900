@@ -136,7 +136,7 @@ def upload():
             # Create temp file
             temp_filename = f"temp_{uuid.uuid4().hex}.{extension}"
             temp_filepath = os.path.join(app.config['UPLOAD_DIRECTORY'], temp_filename)
-            original_filepath = os.path.join(app.config['UPLOAD_DIRECTORY'], file.filename)
+            original_filepath = os.path.join(app.config['UPLOAD_DIRECTORY'], original_filename)
 
             try:
                 # Save temp file
@@ -252,7 +252,7 @@ def delete_track(track_id):
     result = databaseFunctions.delete_track_by_id(track_id, session.get('user_id'))
 
     if result == databaseFunctions.DELETE_ERROR:
-        return render_template('show_msg.hmtl',
+        return render_template('show_msg.html',
                                msg=f"Could not delete track {track_id}")
     if result == databaseFunctions.DELETE_FILE_ERROR:
         render_template('show_msg.html',
