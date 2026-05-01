@@ -17,14 +17,13 @@ DATABASE_EXISTS = 3
 DELETE_FILE_ERROR = 4
 DELETE_ERROR = 5
 
-# Directories #
-DatabasePath = json.load(open("config.json"))["DATABASE_PATH"]
-UploadDirectory = json.load(open("config.json"))["UPLOAD_DIRECTORY"]
-TempDirectory = json.load(open("config.json"))["TEMP_FOLDER"]
 
-def createDatabase() -> int:
+
+def createDatabase(DatabasePath: str) -> int:
     """
     Creates a SQLite3 Database, if one is already present returns 3
+    Arguments:
+        DatabasePath(str): Path of where the database will be stored
     Returns:
         (int): 0 for SUCCESS, 3 for Database already exists
         
@@ -126,7 +125,7 @@ def createDatabase() -> int:
     return SUCCESS
 
 
-def insert_track(track : Track, user_id : int) -> int:
+def insert_track(track : Track, user_id : int, DatabasePath: str, UploadDirectory: str) -> int:
     """
     First checks if a track is already present,
     if not it adds to the database
@@ -134,6 +133,8 @@ def insert_track(track : Track, user_id : int) -> int:
     Args:
         track (Track): Takes in track object
         user_id (int): The current user_id
+        DatabsePath (str): The current path of the database
+        UploadDirectory (str): The path of where the track would be saved
     Returns:
         (int):  0: Success
                 1: Duplicate exists in database
@@ -244,13 +245,14 @@ def insert_track(track : Track, user_id : int) -> int:
     return SUCCESS
 
 
-def delete_track_by_id(id: str, user_id: str) -> bool | int:
+def delete_track_by_id(id: str, user_id: str, DatabasePath: str) -> bool | int:
     """
     Removes a track from a user, (uses ON DELETE CASCADE in database)
 
     Args:
         id (str): track id
         user_id (str): user id
+        DatabasePath (str): Path of where the database is located
 
     Returns:
         bool: True if successful
@@ -313,8 +315,14 @@ def delete_track_by_id(id: str, user_id: str) -> bool | int:
     return True
 
 
-def get_tracks(user_id: int) -> list[dict]:
-    """Retrive all rows from the track table for a specified user"""
+def get_tracks(user_id: int, DatabasePath: str) -> list[dict]:
+    """Retrive all rows from the track table for a specified user
+    Args:
+        user_id (int): The id of the user
+        DatabasePath (str): The path of where the database is located
+    Returns:
+        list[dict]: contains all the tracks information
+    """
     with sqlite3.connect(DatabasePath) as conn:
         cur = conn.cursor()
         query = """SELECT tr.* 
@@ -329,12 +337,13 @@ def get_tracks(user_id: int) -> list[dict]:
         return [dict(zip(columns, row)) for row in cur.fetchall()]
     
 
-def get_gpx_points(id: str, user_id: str) -> dict[str, list[dict]]:
+def get_gpx_points(id: str, user_id: str, DatabasePath: str) -> dict[str, list[dict]]:
     """
     Get data from track table and track_point table based on user_id
     Args:
         id(str): The id of the track
         user_id(str): The current user id in the session
+        DatabasePath (str): The path of where the database is located
     Returns:
         dict[str, list[dict]]: A dictionary containing:
             - "track": A list of dictionaries representing a track row (SINGLE ROW ALWAYS)
@@ -372,9 +381,15 @@ def get_gpx_points(id: str, user_id: str) -> dict[str, list[dict]]:
         }
 
 
-def get_totals(user_id: str) -> dict:
+def get_totals(user_id: str, DatabasePath: str) -> list[dict]:
     """
     Retrieve all aggregate track statistics.
+    
+    Args:
+        user_id(str): The user id
+        DatabasePath (str): The path of where the database is located
+    Returns
+        list[dict]: All aggregated values from track table
     """
     with sqlite3.connect(DatabasePath) as conn:
         cur = conn.cursor()
@@ -404,9 +419,13 @@ def get_totals(user_id: str) -> dict:
         columns = [col[0] for col in cur.description]
         return dict(zip(columns, row))
 
-def get_totals_filtered(user_id: str, track_ids: list[int]) -> dict:
+def get_totals_filtered(user_id: str, track_ids: list[int], DatabasePath: str) -> list[dict]:
     """
     Retrieve aggregate track statistics for a user filtered by track IDs.
+    Args:
+        user_id (str): The user_id
+        track_ids list[int]: A list containing all the track ids that you want
+        DatabasePath (str): The path of where the database is located
     """
 
     if not track_ids:
@@ -445,12 +464,13 @@ def get_totals_filtered(user_id: str, track_ids: list[int]) -> dict:
         columns = [col[0] for col in cur.description]
         return dict(zip(columns, row))
     
-def get_track(track_id: str, user_id: str) -> list[dict]:
+def get_track(track_id: str, user_id: str, DatabasePath: str) -> list[dict]:
     """
     Retrieve a specific track info given its id and user_id
     Args:
         track_id(str): The id of the track
         user_id(str): The user_id
+        DatabasePath (str): The path of where the database is located
     Returns:
         list[dict]: A list of dict containing all of the track info
     """
@@ -468,12 +488,13 @@ def get_track(track_id: str, user_id: str) -> list[dict]:
         columns = [desc[0] for desc in cur.description]
         return [dict(zip(columns, row)) for row in cur.fetchall()]
 
-def get_track_w_datecutoff(user_id: str, cutoff_date: str) -> list[dict]:
+def get_track_w_datecutoff(user_id: str, cutoff_date: str, DatabasePath: str) -> list[dict]:
     """
     Gets all track info given a user_id and cut-off date
     Args:
         user_id(str): The user_id
         cutoff(str): The date from where to stop
+        DatabasePath (str): The path of where the database is located
     Returns:
      list[dict]: A list of dict containing all of the track info
     """
@@ -491,13 +512,14 @@ def get_track_w_datecutoff(user_id: str, cutoff_date: str) -> list[dict]:
         columns = [desc[0] for desc in cur.description]
         return [dict(zip(columns, row)) for row in cur.fetchall()]
 
-def update_description(track_id: int, user_id: int, description: str) -> bool:
+def update_description(track_id: int, user_id: int, description: str, DatabasePath: str) -> bool:
     """
     Update a track description
     Arguments:
         track_id (int): The id of the track
         user_id (int): The id of the user
         description (str): The new description text
+        DatabasePath (str): The path of where the database is located
     Returns:
         bool: True if success false otherwise
     """
@@ -522,12 +544,13 @@ def update_description(track_id: int, user_id: int, description: str) -> bool:
         return True
     return False
 
-def create_user(username: str, password: str) -> bool:
+def create_user(username: str, password: str, DatabasePath: str) -> bool:
     """
     Create a user
     Arguments:
         username (str): The username
         password (str): The hashed password value
+        DatabasePath (str): The path of where the database is located
     Returns:
         bool: True if success insert of user, false if username already exists
     """
@@ -546,12 +569,13 @@ def create_user(username: str, password: str) -> bool:
     except sqlite3.IntegrityError:
         return False  # username already exists
     
-def verify_user(username, password) -> int | bool:
+def verify_user(username, password, DatabasePath: str) -> int | bool:
     """
     Authenticate the user
     Arguments:
         username (str): The username
         password (str): The hashed password value
+        DatabasePath (str): The path of where the database is located
     Returns:
         int | bool: Return the user_id if authenticated False if fail to authenticate
     """
@@ -569,7 +593,7 @@ def verify_user(username, password) -> int | bool:
     return False
 
 
-def search_tracks_by_name(db: SQLAlchemy, query_text: str, user_id: str) -> list[dict]:
+def search_tracks_by_name(db: SQLAlchemy, query_text: str, user_id: str, DatabasePath :str) -> list[dict]:
     """
     Returns a list of the searched elements in the database
     Note: Returns everything if the query is empty.
@@ -577,6 +601,7 @@ def search_tracks_by_name(db: SQLAlchemy, query_text: str, user_id: str) -> list
         db (SQLAlchemy): The database to be queried
         query_text (str): The thing being queried
         user_id (str): The current logged in user id
+        DatabasePath (str): The path of where the database is located
     Returns:
     list[dict]: List of tracks as dictionaries
     """
@@ -604,11 +629,12 @@ def search_tracks_by_name(db: SQLAlchemy, query_text: str, user_id: str) -> list
         })  
     return result.fetchall()
 
-def get_user_by_id(user_id: str) -> list[dict]:
+def get_user_by_id(user_id: str, DatabasePath: str) -> list[dict]:
     """
     Gets all user info by id
     Args:
         user_id(str): The user_id
+        DatabasePath (str): The path of where the database is located
     Returns:
     list[dict]: A list of dict containing all requested info
 
@@ -624,12 +650,13 @@ def get_user_by_id(user_id: str) -> list[dict]:
         columns = [desc[0] for desc in cur.description]
         return [dict(zip(columns, row)) for row in cur.fetchall()]
 
-def update_user_password(user_id: str, new_password: str) -> bool:
+def update_user_password(user_id: str, new_password: str, DatabasePath: str) -> bool:
     """
     Updates user's password, send password in as plain text
     Arguments:
         user_id(str): The user id
         new_password(str): The new password in plain text
+        DatabasePath (str): The path of where the database is located
     Returns:
         bool: True if success false otherwise
     """
@@ -645,7 +672,18 @@ def update_user_password(user_id: str, new_password: str) -> bool:
         return True
     return False
 
-def delete_user_by_id(user_id: str) -> bool:
+def delete_user_by_id(user_id: str, DatabasePath: str, TempDirectory: str) -> bool:
+    """
+    Deletes ALL data from one user, that includes all tracks, track_points, username, password
+    aswell as the data stored in uploads!!!
+    Arguments:
+        user_id (str): The user id
+        DatabasePath (str): The path of where the database is located
+        TempDirectory (str): The path of where the files will be moved and marked for deletion
+    Returns:
+        bool: True if success false otherwise
+    """
+    
     try:
         with sqlite3.connect(DatabasePath) as conn:
             conn.execute("PRAGMA foreign_keys = ON")
@@ -722,3 +760,9 @@ def delete_user_by_id(user_id: str) -> bool:
         print(f"{file} was moved to temp folder and marked for deletion")
 
     return True
+
+def reset_database(DatabasePath):
+    """Delete and recreate the database from scratch."""
+    if os.path.exists(DatabasePath):
+        os.remove(DatabasePath)
+    return createDatabase()

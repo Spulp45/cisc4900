@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, url_for, jsonify, flash , send_file
+from flask import Flask, render_template, request, redirect, session, url_for, jsonify, send_file
 from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash
 from flask_sqlalchemy import SQLAlchemy
@@ -24,6 +24,7 @@ app.secret_key = json.load(open("secret.json"))["SECRET_KEY"]
 app.config['UPLOAD_DIRECTORY'] = json.load(open("config.json"))["UPLOAD_DIRECTORY"]
 app.config['ALLOWED_EXTENSIONS'] = json.load(open("config.json"))["ALLOWED_EXTENSIONS"]
 app.config['DATABASE_PATH'] = json.load(open("config.json"))["DATABASE_PATH"]
+app.config['TEMP_FOLDER'] = json.load(open("config.json"))['TEMP_FOLDER']
 
 # This is to add database into frontend
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -40,21 +41,20 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-#Temp redirect
+# Redirect to login if the user is not in session
 @app.route('/')
-def tempRedirect():
+def notLoggedIn():
     if 'user_id' not in session:
             return redirect('/login')
     else:
         return redirect('/home')
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
 
-        result = databaseFunctions.create_user(username, password)
+        result = databaseFunctions.create_user(username, password, app.config['DATABASE_PATH'])
 
         if not result:
             return render_template('show_msg.html',
@@ -70,7 +70,7 @@ def login():
         username = request.form['username']
         passowrd = request.form['password']
 
-        user_id = databaseFunctions.verify_user(username, passowrd)
+        user_id = databaseFunctions.verify_user(username, passowrd, app.config['DATABASE_PATH'])
 
         if user_id is not False:
             session['user_id'] = user_id
@@ -90,7 +90,7 @@ def logout():
 @app.route('/home')
 @login_required
 def home():
-    all_rows = databaseFunctions.get_tracks(session.get('user_id'))
+    all_rows = databaseFunctions.get_tracks(session.get('user_id'), app.config['DATABASE_PATH'])
     return render_template('home.html', tracks=all_rows, username=session.get('username'))
 
 
@@ -98,7 +98,7 @@ def home():
 @login_required
 def trip_stats(track_id):
 
-    data = databaseFunctions.get_gpx_points(track_id,session.get('user_id'))
+    data = databaseFunctions.get_gpx_points(track_id,session.get('user_id'), app.config['DATABASE_PATH'])
 
     return render_template(
         'trips.html',
@@ -171,7 +171,7 @@ def upload():
                 os.replace(temp_filepath, new_filepath)
 
                 # Insert into DB also pass user_id
-                result = databaseFunctions.insert_track(track, session.get('user_id'))
+                result = databaseFunctions.insert_track(track, session.get('user_id'), app.config['DATABASE_PATH'], app.config['UPLOAD_DIRECTORY'])
                 
                 # As we process the uploaded data, log all errros                
                 if result == databaseFunctions.SUCCESS:
@@ -202,7 +202,7 @@ def upload():
 @app.route('/download/<int:track_id>')
 @login_required
 def download_track(track_id):
-    data = databaseFunctions.get_track(track_id, session.get('user_id'))
+    data = databaseFunctions.get_track(track_id, session.get('user_id'), app.config['DATABASE_PATH'])
     
     if not data:
         return render_template('show_msg.html',
@@ -224,7 +224,7 @@ def search():
     try:
         q = request.args.get("q", "")
         # Pass the user_id from the session
-        search_results = databaseFunctions.search_tracks_by_name(db, q, session.get('user_id'))
+        search_results = databaseFunctions.search_tracks_by_name(db, q, session.get('user_id'), app.config['DATABASE_PATH'])
         return render_template("search_results.html", track=search_results)
     except Exception as e:
         print(f"!!! SEARCH ERROR: {e}")
@@ -237,7 +237,7 @@ def search_only():
     try:
         q = request.args.get("q", "")
         # Pass the user_id from the session
-        search_results = databaseFunctions.search_tracks_by_name(db, q, session.get('user_id'))
+        search_results = databaseFunctions.search_tracks_by_name(db, q, session.get('user_id'), app.config['DATABASE_PATH'])
         return render_template("search_only.html", track=search_results)
     except Exception as e:
         print(f"!!! SEARCH ERROR: {e}")
@@ -249,7 +249,7 @@ def search_only():
 @login_required
 def delete_track(track_id):
 
-    result = databaseFunctions.delete_track_by_id(track_id, session.get('user_id'))
+    result = databaseFunctions.delete_track_by_id(track_id, session.get('user_id'), app.config['DATABASE_PATH'])
 
     if result == databaseFunctions.DELETE_ERROR:
         return render_template('show_msg.html',
@@ -266,7 +266,7 @@ def update_description(track_id):
 
     new_description = data.get('description')
 
-    databaseFunctions.update_description(track_id, session.get('user_id'), new_description)
+    databaseFunctions.update_description(track_id, session.get('user_id'), new_description, app.config['DATABASE_PATH'])
 
     return jsonify({"success": True})
 
@@ -274,7 +274,7 @@ def update_description(track_id):
 @app.route('/allTrip')
 @login_required
 def all_trips():
-    totals = databaseFunctions.get_totals(session.get('user_id'))
+    totals = databaseFunctions.get_totals(session.get('user_id'), app.config['DATABASE_PATH'])
 
     if not totals:
         return render_template("show_msg.html",
@@ -288,7 +288,7 @@ def all_trips():
 @app.route("/compare", methods=["GET"])
 @login_required
 def compare_select():
-    tracks = databaseFunctions.get_tracks(session.get('user_id'))
+    tracks = databaseFunctions.get_tracks(session.get('user_id'), app.config['DATABASE_PATH'])
     return render_template("compare_select.html", tracks=tracks)
 
 @app.route("/compare", methods=["POST"])
@@ -313,8 +313,8 @@ def compare_submit():
 def compare_view():
     track1_id = request.args.get("track1_id")
     track2_id = request.args.get("track2_id")
-    track1 = databaseFunctions.get_gpx_points(track1_id, session.get('user_id'))
-    track2 = databaseFunctions.get_gpx_points(track2_id, session.get('user_id'))
+    track1 = databaseFunctions.get_gpx_points(track1_id, session.get('user_id'), app.config['DATABASE_PATH'])
+    track2 = databaseFunctions.get_gpx_points(track2_id, session.get('user_id'), app.config['DATABASE_PATH'])
 
     
     return render_template(
@@ -338,12 +338,13 @@ def stats():
     if days:
         cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
 
-        tracks = databaseFunctions.get_track_w_datecutoff(session.get('user_id'), cutoff_date)
+        tracks = databaseFunctions.get_track_w_datecutoff(session.get('user_id'), cutoff_date, app.config['DATABASE_PATH'])
         track_ids = [track["id"] for track in tracks]
 
         totals_filtered = databaseFunctions.get_totals_filtered(
             session.get('user_id'),
-            track_ids
+            track_ids,
+            app.config['DATABASE_PATH']
         )
 
         return render_template(
@@ -360,7 +361,7 @@ def stats():
 @login_required
 def account_settings():
     user_id = session.get('user_id')
-    user_db = databaseFunctions.get_user_by_id(user_id)[0]
+    user_db = databaseFunctions.get_user_by_id(user_id, app.config['DATABASE_PATH'])[0]
     username = session.get('username')
     password_hash = user_db['password_hash']
     
@@ -382,7 +383,7 @@ def account_settings():
                                    user_id=user_id,
                                    error="New password does not match")
      
-        result = databaseFunctions.update_user_password(user_id, new_password)
+        result = databaseFunctions.update_user_password(user_id, new_password, app.config['DATABASE_PATH'])
 
         if not result:
             return render_template('account_settings.html',
@@ -408,7 +409,7 @@ def download_all_tracks():
     user_id = session.get('user_id')
     username = session.get('username')
         
-    all_tracks = databaseFunctions.get_tracks(user_id)
+    all_tracks = databaseFunctions.get_tracks(user_id, app.config['DATABASE_PATH'])
     if not all_tracks:
         return render_template("show_msg.html",
                                msg="No tracks found to download"), 404
@@ -466,7 +467,7 @@ def delete_account():
                 step = 2
 
             # verify password using db verify_user
-            elif not databaseFunctions.verify_user(username, password):
+            elif not databaseFunctions.verify_user(username, password, app.config['DATABASE_PATH']):
                 message = "Password is incorrect"
                 step = 2
 
@@ -480,7 +481,7 @@ def delete_account():
             username = session.pop('pending_delete_user', None)
 
             if username:
-                databaseFunctions.delete_user_by_id(session.get('user_id'))
+                databaseFunctions.delete_user_by_id(session.get('user_id'), app.config['DATABASE_PATH'], app.config['TEMP_FOLDER'] )
                 
                 session.clear()
 
