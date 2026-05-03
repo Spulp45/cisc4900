@@ -634,3 +634,37 @@ def update_user_password(user_id: str, new_password: str)-> bool:
         return True
     return False
     
+def get_leaderboard(stat_field: str, limit: int = 10):
+    """
+    Retrieve a leaderboard ranking users by their name instead of their user ID number.
+    """
+    valid_fields = {
+        "length_2d": "TOTAL(t.length_2d)",
+        "moving_time": "TOTAL(t.moving_time)",
+        "uphill": "TOTAL(t.uphill)"
+    }
+    
+    if stat_field not in valid_fields:
+        return []
+
+    aggregate_expression = valid_fields[stat_field]
+
+    with sqlite3.connect(DatabasePath) as conn:
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        
+# Change the GROUP BY line in your query:
+
+        cur.execute(f"""
+            SELECT
+                u.username,
+                {aggregate_expression} AS total_score
+            FROM user_tracks ut
+            JOIN track t ON ut.track_id = t.id
+            JOIN user u ON ut.user_id = u.id
+            GROUP BY u.id  -- Changed this from 'u.username' or 'ut.user_id' to 'u.id'
+            ORDER BY total_score DESC
+            LIMIT ?
+        """, (limit,))
+        
+        return [dict(row) for row in cur.fetchall()]

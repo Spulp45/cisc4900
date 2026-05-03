@@ -31,7 +31,7 @@
     // 3. UI Rendering (Original)
     function renderTrackPanel(point) {
         if (!point) return;
-        const panel = document.getElementById("track-details");
+        const panel = document.getElementById("point-readout");
         const userUnits = getUnits();
         panel.innerHTML = `<h3>Track Point</h3>
             ${point.lat != null ? `<p><b>Latitude:</b> ${point.lat}</p>` : ""}
@@ -73,6 +73,18 @@
         const trackPointsLayer = L.layerGroup();
         const polyline = L.polyline(track_points.map(p => [p.lat, p.lon]), { color: "#008e00", weight: 7 }).addTo(map);
 
+        // --- ADDED START & END WAYPOINTS BACK ---
+        if (track_points.length > 0) {
+            L.marker([track_points[0].lat, track_points[0].lon])
+                .addTo(map)
+                .bindPopup("Start");
+
+            L.marker([track_points[track_points.length - 1].lat, track_points[track_points.length - 1].lon])
+                .addTo(map)
+                .bindPopup("End");
+        }
+        // ----------------------------------------
+
         function renderTrackPoints() {
             trackPointsLayer.clearLayers();
             if (map.getZoom() < 14) return;
@@ -112,15 +124,28 @@
         function animateCar() {
             if (!isPlaying || animationIndex >= track_points.length) return;
             const p = track_points[animationIndex];
+    
+            // 1. Move the car marker to the new coordinates
             carMarker.setLatLng([p.lat, p.lon]);
+
+            // 2. Rotate the car based on heading
             if (p.course) {
-                const el = carMarker.getElement();
-                if (el) el.style.transform = `translate3d(${el._leaflet_pos.x}px, ${el._leaflet_pos.y}px, 0px) rotate(${p.course}deg)`;
-            }
-            map.panTo([p.lat, p.lon]);
-            animationIndex++;
-            setTimeout(animateCar, 50);
-        }
+                 const el = carMarker.getElement();
+            if (el) {
+                el.style.transform = `translate3d(${el._leaflet_pos.x}px, ${el._leaflet_pos.y}px, 0px) rotate(${p.course}deg)`;
+             }
+         }
+
+    // 3. CHECKBOX LOGIC: Only move the camera if the user wants it to follow
+    const followCarToggle = document.getElementById("follow-car-toggle");
+    if (followCarToggle && followCarToggle.checked) {
+        map.panTo([p.lat, p.lon]);
+    }
+
+    // 4. Step forward and loop
+    animationIndex++;
+    setTimeout(animateCar, 50);
+}
     }
 
     // 5. Initialize

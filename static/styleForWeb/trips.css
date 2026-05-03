@@ -156,3 +156,16 @@ canvas {
     background: #f1c40f;
     color: #111;
 }
+
+.follow-label {
+    display: flex;
+    align-items: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    color: #f1c40f;
+    cursor: pointer;
+    
+    /* This pushes elements away from the top and bottom of the label */
+    margin-top: 12px;
+    margin-bottom: 12px;
+}

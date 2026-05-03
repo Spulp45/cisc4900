@@ -505,6 +505,20 @@ def get_track_file_info(track):
     
     return file_path, original_filename
 
+@app.route('/leaderboard', methods=['GET', 'POST'])
+@login_required
+def leaderboard():
+
+    field = request.args.get('field', 'length_2d')
+
+    leaderboard_users = databaseFunctions.get_leaderboard(field)
+
+    if request.headers.get('HX-Request'):
+        return render_template('components/leaderboard_table.html', leaderboard_users=leaderboard_users, field=field)
+    
+    return render_template('leaderboard.html', leaderboard_users=leaderboard_users, field=field)
+
+
 # For running the app
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=True)    
