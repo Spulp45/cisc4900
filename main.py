@@ -1,6 +1,6 @@
-import generate_secret
+import generate_secret, json
 from backend import databaseFunctions
-import leafletInstall
+
 
 ## First Time Tests
 generateKeyResult = generate_secret.generate()
@@ -10,8 +10,9 @@ if generateKeyResult == generate_secret.SUCCESS:
 if generateKeyResult == generate_secret.KEY_EXISTS:
     print("Key already exists. Skipping this step...")
 
+DatabasePath = json.load(open("config.json"))["DATABASE_PATH"]
 
-databaseResult = databaseFunctions.createDatabase()
+databaseResult = databaseFunctions.createDatabase(DatabasePath)
 if databaseResult == databaseFunctions.DATABASE_EXISTS:
     print("Database already exists, skipping create database..")
 elif databaseResult == databaseFunctions.SUCCESS:

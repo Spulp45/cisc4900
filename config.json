@@ -3,5 +3,6 @@
     "UPLOAD_DIRECTORY": "uploads/",
     "ALLOWED_EXTENSIONS": [
         "gpx"
-    ]
+    ],
+    "TEMP_FOLDER": "temp/"
 }
