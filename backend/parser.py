@@ -49,7 +49,7 @@ def getGPX(filepath: str, original_filename: str, original_filepath: str) -> Tra
 
     length_2d = gpx.length_2d()         # float
     length_3d = gpx.length_3d()         # float
-    moving_data = gpx.get_moving_data(raw=True) # tuple (moving_time, stopped_time, moving_distance, stopped_distance, max_speed)
+    moving_data = gpx.get_moving_data(raw=False) # tuple (moving_time, stopped_time, moving_distance, stopped_distance, max_speed)
     
     uphill = gpx.get_uphill_downhill() #tuple (uphill, downhill)
     time_bounds = gpx.get_time_bounds() # datetime (start, end)
