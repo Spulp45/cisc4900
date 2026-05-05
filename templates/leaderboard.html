@@ -1,0 +1,46 @@
+{% import 'components/buttons.html' as func %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeaderBoard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styleForWeb/leaderboard.css') }}">
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</head>
+<body>
+    <div class="LeaderBoard_container">
+        <h2>Global Leaderboards</h2>
+        
+        <div class="sort_by">
+            <button class="sort_btn" 
+                    hx-get="/leaderboard" 
+                    hx-vals='{"field": "length_2d"}' 
+                    hx-target="#leaderboard-table">
+                2D Distance
+            </button>
+            <button class="sort_btn" 
+                    hx-get="/leaderboard" 
+                    hx-vals='{"field": "moving_time"}' 
+                    hx-target="#leaderboard-table">
+                Moving Time
+            </button>
+            <button class="sort_btn" 
+                    hx-get="/leaderboard" 
+                    hx-vals='{"field": "uphill"}' 
+                    hx-target="#leaderboard-table">
+                Elevation Gain
+            </button>
+        </div>
+
+        <div id="leaderboard-table">
+            {% include 'components/leaderboard_table.html' %}
+        </div>
+    </div>
+    
+    <div class="back-navigation">
+        {{ func.back_button(label="← Back") }}
+    </div>
+</body>
+</html>

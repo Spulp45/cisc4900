@@ -1,0 +1,95 @@
+/* --- LEADERBOARD PAGE STYLING --- */
+
+body {
+    background-color: #111 !important;
+    color: #eee;
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+.LeaderBoard_container {
+    max-width: 800px;
+    margin: 40px auto;
+    background: #1a1a1a;
+    border-top: 5px solid #f1c40f;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.LeaderBoard_container h2 {
+    font-size: 1.8rem;
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: #fff;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+}
+
+.sort_by {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.sort_btn {
+    flex: 1;
+    padding: 12px 15px;
+    cursor: pointer;
+    background: #1f3145;
+    color: #eee;
+    border: 1px solid #2c3e50;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.sort_btn:hover {
+    background: #f1c40f;
+    color: #111;
+    border-color: #f1c40f;
+}
+
+/* HTMX active state: highlight button when it's selected */
+.htmx-request.sort_btn {
+    background: #f1c40f;
+    color: #111;
+}
+
+/* Leaderboard Content & Table */
+#leaderboard-table {
+    margin-top: 15px;
+}
+
+#leaderboard-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+#leaderboard-table th, 
+#leaderboard-table td {
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid #2a2a2a;
+}
+
+#leaderboard-table th {
+    background-color: #222;
+    color: #f1c40f;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+#leaderboard-table tr:hover td {
+    background-color: #242424;
+}
+
+#leaderboard-table td b {
+    color: #f1c40f; /* Highlight top ranks */
+}
+

@@ -1,0 +1,30 @@
+<div class="top_part">
+    <h3>Ranking by: {{ field.replace('_', ' ').title() }}</h3>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Rank</th>
+            <th>Username</th> <th>Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in leaderboard_users %}
+        <tr>
+            <td><b>#{{ loop.index }}</b></td>
+            <td>{{ row.username }}</td> <td>
+                {% if field == 'moving_time' or field == 'stopped_time' %}
+                    {{ '%d:%02d:%02d' | format(row.total_score // 3600, (row.total_score % 3600) // 60, row.total_score % 60) }}
+                {% else %}
+                    {{ '%.2f' | format(row.total_score) }}
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="3">No records found for this category.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

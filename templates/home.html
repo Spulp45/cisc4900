@@ -27,7 +27,7 @@
         {{ func.home_page_button("All Trips", link = url_for('all_trips')) }}
         {{ func.home_page_button("Compare", link = url_for('compare_select')) }}
         {{ func.home_page_button("View Recent Stats", link = url_for('stats_select')) }}
-        {{ func.home_page_button("placeholder", link = url_for('all_trips')) }}
+        {{ func.home_page_button("leaderboard", link = url_for('leaderboard')) }}
       </div>
 
       <form action="{{ url_for('logout') }}" method="get" style="display:inline;">
