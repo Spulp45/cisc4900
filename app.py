@@ -489,6 +489,87 @@ def delete_account():
 
     return render_template('delete_account.html', step=step, message=message)
 
+
+@app.route('/faq')
+def faq():
+    faq_data = [
+        {
+            "section": "General",
+            "questions": [
+                {"q": "Where are all uploaded files uploaded to?", "a": "They are all in the uploads folder"},
+                {"q": "Can I upload more than one GPX file?", "a": "Yes you can upload more than one file at a time!"},
+                {"q": "What type of GPX files are supported?", "a": "GPX 1.0 and GPX 1.1"},
+                {"q": "What is the difference between GPX 1.0 and 1.1?", "a": """The speed attribute is missing in GPX 1.1 
+                but we are still able to get it back through GPX 1.1 extensions. Bearing is also missing in 1.1"""},
+                {"q": "What happens when I delete my account?", "a": """After account deletion all user information is deleted,
+                 then all the deleted users files are moved to the "temp" folder where they can be recovered one last time"""},
+            ]
+        },
+        {
+            "section": "Limitations of GPS data",
+            "questions": [
+                {"q": "Why is my max speed an absurd amount like 5000 mph?", "a": "This is due to GPS jumps, we try to filter out the most we can"},
+                {"q": "GPS Drift", "a": """This means when the GPS device reports that is moving but actually is just stationary,
+                                        a high stopped distance may indicate a poor recording"""},
+                {"q": "GPS Jump", "a": "Can be caused when a GPS signal is weak, so the calculations for (speed, distance and others) may be entirely incorrect"}
+            ]
+        },
+        {
+            "section": "Understanding GPS data types",
+            "questions": [
+                {"q": "How do I view my tracks?", "a": "Go to the home page."},
+                {"q": "Can I delete a track?", "a": "Yes, use the delete button. Deleting a track would also delete the file"}
+            ]
+        }
+    ]
+    
+    # TODO ADD in gps limitations GPS Drift, GPS JUMP FAQ
+    types = [
+        {
+            "section": "Track",
+            "trackTypes": [
+                {"k": "Filename", "v": "Name of the track"},
+                {"k": "Filepath", "v": "Path of where a track is saved on disk"},
+                {"k": "Description", "v": "Custom field, you can write whatever you want here"},
+                {"k": "Average Moving Speed", "v": "Average Speed when you were moving"},
+                {"k": "Total Distance 2D", "v": "Total distance traveled in 2 Dimensions (Altitude & Longitude)"},
+                {"k": "Total Distance 3D", "v": "Total distance traveled in 3 Dimensions (Altitude, Longitude & Elevation)"},
+                {"k": "Moving Time", "v": "Time spent moving"},
+                {"k": "Stopped Time", "v": "Time spent NOT moving"},
+                {"k": "Stopped Distance", "v": "Should always be 0, if not then GPS Drift happened (see GPS limitations -> GPS Drift)"},
+                {"k": "Max Speed", "v": "Maximum speed reached in a trip, can sometimes be incorrect (see GPS limitations -> GPS Jump)"},
+                {"k": "Average Speed", "v": "Average speed throughout the entire trip"},
+                {"k": "Uphill", "v": "Total elevation increase during the trip"},
+                {"k": "Downhill", "v": "Total elevation decrease during the trip"},
+                {"k": "Start Time", "v": "Time where the trip started"},
+                {"k": "End Time", "v": "Time where the trip ended"},
+                {"k": "Points", "v": "Total number of track points (GPS data points) recorded on the trip"},
+                {"k": "GPX Version","v": "Version of the GPX file for a trip"}
+            ]
+        },
+        {
+            "section": "Track Points",
+            "trackTypes": [
+                  {"k": "Latitude", "v": "A geographic coordinate"},
+                  {"k": "Longitude", "v": "A geographic coordinate"},
+                  # Optional data
+                  {"k": "Elevation", "v": "Height at that trackpoint"},
+                  {"k": "Time", "v": "Time when the track point was recorded"},
+                  {"k": "Course", "v": "Angle of the device when the point was recorded"},
+                  {"k": "Speed", "v": "Speed at that point"},
+                  #{"k": "Geoidheight", "v": ""},
+                  {"k": "Source", "v": "What did the device use to record the point Eg. Cell towers, Satellites"},
+                  {"k": "Satellites", "v": "Count of how many satellites where in sight during the recording"},
+                  {"k": "HDOP", "v": "Horizontal dilution of precision (lower values mean more accurate data)"},
+                  {"k": "VDOP", "v": "Vertical dilution of precision (lower values mean more accurate data)"},
+                  {"k": "PDOP", "v": "Position dilution of precision (lower values mean more accurate data)"},
+                  
+            ]
+        }
+    ]
+
+    return render_template('faq.html', title="Frequently Asked Questions", faq_data=faq_data, types=types)
+
 # Unit toggle route
 @app.route('/set_units/<unit>')
 def set_units(unit):

@@ -41,7 +41,8 @@ def app():
     # delete temp files
     if os.path.exists(test_config['UPLOAD_DIRECTORY']):
         shutil.rmtree(test_config['UPLOAD_DIRECTORY'])
-        
+      
+    # delete temp_folder  
     if os.path.exists(test_config['TEMP_FOLDER']):
         shutil.rmtree(test_config['TEMP_FOLDER'])
 
