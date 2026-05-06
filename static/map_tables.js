@@ -4,7 +4,9 @@
     let lastClickedPoint = null;
     let isPlaying = false;
     let animationIndex = 0;
+    let animationDirection = 1 // 1 = forward, -1 = backward
     let carMarker = null;
+    let animationTimer = null;
 
     // 2. Unit Management (Original)
     function getUnits() { return sessionStorage.getItem("units") || "metric"; }
@@ -33,13 +35,22 @@
         if (!point) return;
         const panel = document.getElementById("point-readout");
         const userUnits = getUnits();
-        panel.innerHTML = `<h3>Track Point</h3>
+        panel.innerHTML = `
+            <h3>Track Point</h3>
+                                                        
             ${point.lat != null ? `<p><b>Latitude:</b> ${point.lat}</p>` : ""}
             ${point.lon != null ? `<p><b>Longitude:</b> ${point.lon}</p>` : ""}
             ${point.speed != null ? `<p><b>Speed:</b> ${formatValue(point.speed, "speed", userUnits)}</p>` : ""}
             ${point.ele != null ? `<p><b>Elevation:</b> ${formatValue(point.ele, "elevation", userUnits)}</p>` : ""}
             ${point.timestamp != null ? `<p><b>Time:</b> ${formatValue(point.timestamp, "timestamp", userUnits)}</p>` : ""}
-            ${point.course != null ? `<p><b>Course:</b> ${point.course}</p>` : ""}`;
+            ${point.course != null ? `<p><b>Course:</b> ${point.course}</p>` : ""}
+            ${point.geoidheight != null ? `<p><b>Geoid Height:</b> ${point.geoidheight}</p>` : ""}
+            ${point.src != null ? `<p><b>Source:</b> ${point.src}</p>` : ""}
+            ${point.sat != null ? `<p><b>Satellites:</b> ${point.sat}</p>` : ""}
+            ${point.hdop != null ? `<p><b>HDOP:</b> ${point.hdop}</p>` : ""}
+            ${point.vdop != null ? `<p><b>VDOP:</b> ${point.vdop}</p>` : ""}
+            ${point.pdop != null ? `<p><b>PDOP:</b> ${point.pdop}</p>` : ""}
+            `;
     }
 
     function renderStatsTable(track, units) {
@@ -47,10 +58,10 @@
         if (!table) return;
         table.innerHTML = `
             <div class="unit-toggle">
-                <span>Units:</span>
-                <button type="button" class="unit-btn" data-unit="metric">Metric</button>
-                <button type="button" class="unit-btn" data-unit="imperial">Imperial</button>
-                <button type="button" class="unit-btn" data-unit="raw">Raw</button>
+            <span>Units:</span>
+            <button type="button" class="unit-btn" data-unit="metric">Metric</button>
+            <button type="button" class="unit-btn" data-unit="imperial">Imperial</button>
+            <button type="button" class="unit-btn" data-unit="raw">Raw</button>
             </div>
             <tr><th>Data</th><th>Value</th></tr>
             <tr><td>Filename</td><td>${track.filename}</td></tr>
@@ -58,8 +69,20 @@
             <tr><td>Description</td><td>${formatValue(track.description, "misc", units)}</td></tr>
             <tr><td>Average Moving Speed</td><td>${formatValue(track.avg_speed, "speed", units)}</td></tr>
             <tr><td>Total Distance 2D</td><td>${formatValue(track.length_2d, "distance", units)}</td></tr>
+            <tr><td>Total Distance 3D</td><td>${formatValue(track.length_3d, "distance", units)}</td></tr>
             <tr><td>Moving Time</td><td>${formatValue(track.moving_time, "time", units)}</td></tr>
-            <tr><td>Max Speed</td><td>${formatValue(track.max_speed, "speed", units)}</td></tr>`;
+            <tr><td>Stopped Time</td><td>${formatValue(track.stopped_time, "time", units)}</td></tr>
+            <tr><td>Moving Distance</td><td>${formatValue(track.moving_distance, "distance", units)}</td></tr>
+            <tr><td>Stopped Distance</td><td>${formatValue(track.stopped_distance, "distance", units)}</td></tr>
+            <tr><td>Max Speed</td><td>${formatValue(track.max_speed, "speed", units)}</td></tr>
+            <tr><td>Average Speed</td><td>${formatValue(track.avg_speed, "speed", units)}</td></tr>
+            <tr><td>Uphill</td><td>${formatValue(track.uphill, "elevation", units)}</td></tr>
+            <tr><td>Downhill</td><td>${formatValue(track.downhill, "elevation", units)}</td></tr>
+            <tr><td>Start Time</td><td>${formatValue(track.start_time, "timestamp", units)}</td></tr>
+            <tr><td>End Time</td><td>${formatValue(track.end_time, "timestamp", units)}</td></tr>
+            <tr><td>Points</td><td>${track.points}</td></tr>
+            <tr><td>GPX Version</td><td>${track.gpx_version}</td></tr>
+        `;
     }
 
     // 4. Map & Animation Logic (Original + Car)
@@ -112,39 +135,93 @@
 
         carMarker = L.marker([track_points[0].lat, track_points[0].lon], { icon: carIcon }).addTo(map);
         
-        const playBtn = document.getElementById("play-btn");
-        if (playBtn) {
-            playBtn.addEventListener("click", () => {
-                isPlaying = !isPlaying;
-                playBtn.innerHTML = isPlaying ? "⏸ Pause" : "▶ Play Timelapse";
-                if (isPlaying) animateCar();
-            });
+    const playBtn = document.getElementById("play-btn");
+    const rewindBtn = document.getElementById("rewind-btn");
+    const forwardBtn = document.getElementById("forward-btn");
+
+    if (playBtn) {
+        playBtn.addEventListener("click", () => {
+            clearTimeout(animationTimer); 
+            isPlaying = !isPlaying;
+
+            playBtn.innerHTML = isPlaying ? "⏸ Pause" : "▶ Play Timelapse";
+
+            if (isPlaying) animateCar();
+        });
+    }
+
+    if (rewindBtn) {
+        rewindBtn.addEventListener("click", () => {
+            clearTimeout(animationTimer);
+
+            animationDirection = -1;
+            isPlaying = true;
+
+            animateCar();
+        });
+    }
+
+
+if (forwardBtn) {
+    forwardBtn.addEventListener("click", () => {
+        clearTimeout(animationTimer); // prevent stacking
+
+        animationDirection = 1; 
+        isPlaying = true;
+
+        animateCar();
+    });
+}
+
+function animateCar() {
+    if (!isPlaying) return;
+
+    // Stop at bounds
+    if (animationIndex >= track_points.length) {
+        animationIndex = track_points.length - 1;
+        isPlaying = false;
+        return;
+    }
+
+    if (animationIndex < 0) {
+        animationIndex = 0;
+        isPlaying = false;
+        return;
+    }
+
+    const p = track_points[animationIndex];
+
+    //console.log("Track point:", p); // optional debug
+
+    // 1. Move car
+    carMarker.setLatLng([p.lat, p.lon]);
+    renderTrackPanel(p);
+
+    // 2. Rotate car
+    if (p.course != null) {
+        const el = carMarker.getElement();
+        if (el) {
+            const heading =
+                animationDirection === 1
+                    ? p.course
+                    : (p.course + 180) % 360;
+
+            el.style.transform =
+                `translate3d(${el._leaflet_pos.x}px, ${el._leaflet_pos.y}px, 0px) rotate(${heading}deg)`;
         }
+    }
 
-        function animateCar() {
-            if (!isPlaying || animationIndex >= track_points.length) return;
-            const p = track_points[animationIndex];
-    
-            // 1. Move the car marker to the new coordinates
-            carMarker.setLatLng([p.lat, p.lon]);
-
-            // 2. Rotate the car based on heading
-            if (p.course) {
-                 const el = carMarker.getElement();
-            if (el) {
-                el.style.transform = `translate3d(${el._leaflet_pos.x}px, ${el._leaflet_pos.y}px, 0px) rotate(${p.course}deg)`;
-             }
-         }
-
-    // 3. CHECKBOX LOGIC: Only move the camera if the user wants it to follow
+    // 3. Follow toggle
     const followCarToggle = document.getElementById("follow-car-toggle");
     if (followCarToggle && followCarToggle.checked) {
         map.panTo([p.lat, p.lon]);
     }
 
-    // 4. Step forward and loop
-    animationIndex++;
-    setTimeout(animateCar, 50);
+    // 4. Move forward/backward
+    animationIndex += animationDirection;
+
+    // 5. Loop safely
+    animationTimer = setTimeout(animateCar, 50);
 }
     }
 
