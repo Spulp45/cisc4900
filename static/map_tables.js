@@ -7,6 +7,11 @@
     let animationDirection = 1 // 1 = forward, -1 = backward
     let carMarker = null;
     let animationTimer = null;
+    let playbackSpeed = 1.0;
+
+    let startTime = null;
+    let pausedAt = null;
+    
 
     // 2. Unit Management (Original)
     function getUnits() { return sessionStorage.getItem("units") || "metric"; }
@@ -161,6 +166,25 @@
         });
     }
 
+const customSpeedInput = document.getElementById("custom-speed");
+const customSpeedBtn = document.getElementById("custom-speed-btn");
+
+if (customSpeedBtn && customSpeedInput) {
+    customSpeedBtn.addEventListener("click", () => {
+        const val = parseFloat(customSpeedInput.value);
+
+        if (!isNaN(val) && val > 0) {
+            playbackSpeed = val;
+            console.log("Custom speed set to:", playbackSpeed);
+        }
+    });
+
+    customSpeedInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            customSpeedBtn.click();
+        }
+    });
+}
 
 if (forwardBtn) {
     forwardBtn.addEventListener("click", () => {
@@ -221,7 +245,7 @@ function animateCar() {
     animationIndex += animationDirection;
 
     // 5. Loop safely
-    animationTimer = setTimeout(animateCar, 50);
+    animationTimer = setTimeout(animateCar, 1000 / playbackSpeed);
 }
     }
 
