@@ -7,10 +7,8 @@
     let animationDirection = 1 // 1 = forward, -1 = backward
     let carMarker = null;
     let animationTimer = null;
-    let playbackSpeed = 1.0;
-
-    let startTime = null;
-    let pausedAt = null;
+    let playbackSpeed = 1;
+    let currentAngle = 0;
     
 
     // 2. Unit Management (Original)
@@ -133,13 +131,16 @@
 
         // --- CAR ANIMATION ---
         const carIcon = L.icon({
-            iconUrl: "/static/car.png",
-            iconSize: [32, 32],
-            iconAnchor: [16, 16]
-        });
+        iconUrl: '/static/test_arrow.png',
+        shadowUrl: '/static/car.png',
 
-        carMarker = L.marker([track_points[0].lat, track_points[0].lon], { icon: carIcon }).addTo(map);
-        
+        iconSize:     [24, 24], // size of the icon
+        shadowSize:   [32, 32], // size of the shadow
+        iconAnchor:   [8, 8], // point of the icon which will correspond to marker's location
+        shadowAnchor: [8, 8],  // the same for the shadow
+    });
+
+        carMarker = L.marker([track_points[0].lat, track_points[0].lon], {icon : carIcon }).addTo(map);
     const playBtn = document.getElementById("play-btn");
     const rewindBtn = document.getElementById("rewind-btn");
     const forwardBtn = document.getElementById("forward-btn");
@@ -197,8 +198,61 @@ if (forwardBtn) {
     });
 }
 
+const slider = document.getElementById("timeline-slider");
+slider.max = track_points.length - 1;
+slider.value = 0;
+
+
+slider.addEventListener("input", () => {
+    isPlaying = false;                 // stop animation when scrubbing
+    clearTimeout(animationTimer);      
+
+    animationIndex = parseInt(slider.value);
+
+    const p = track_points[animationIndex];
+
+    // instant UI update
+    carMarker.setLatLng([p.lat, p.lon]);
+    renderTrackPanel(p);
+
+});
+
+// Calculate Angle 
+function calculateBearing(lat1, lon1, lat2, lon2) {
+    const toRad = (deg) => deg * Math.PI / 180;
+    const toDeg = (rad) => rad * 180 / Math.PI;
+
+    const phi1 = toRad(lat1);
+    const phi2 = toRad(lat2);
+    const delta = toRad(lon2 - lon1);
+
+    const y = Math.sin(delta) * Math.cos(phi2);
+    const x =
+        Math.cos(phi1) * Math.sin(phi2) -
+        Math.sin(phi1) * Math.cos(phi2) * Math.cos(delta);
+
+    let θ = Math.atan2(y, x);
+    θ = toDeg(θ);
+
+    return (θ + 360) % 360; // normalize 0–360
+}
+
+function lerpAngle(a, b, t) {
+    const diff = ((b - a + 540) % 360) - 180; // shortest direction
+    return (a + diff * t + 360) % 360;
+}
+function easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
+}
+
+
 function animateCar() {
     if (!isPlaying) return;
+
+    // Update the slider as we run the animation
+    if (slider) {
+    slider.value = animationIndex;
+    }
 
     // Stop at bounds
     if (animationIndex >= track_points.length) {
@@ -221,18 +275,18 @@ function animateCar() {
     carMarker.setLatLng([p.lat, p.lon]);
     renderTrackPanel(p);
 
-    // 2. Rotate car
-    if (p.course != null) {
-        const el = carMarker.getElement();
-        if (el) {
-            const heading =
-                animationDirection === 1
-                    ? p.course
-                    : (p.course + 180) % 360;
+    // 2. Rotate arrow
+    const p1 = track_points[animationIndex];
+    const p2 = track_points[Math.min(animationIndex + 1, track_points.length - 1)];
 
-            el.style.transform =
-                `translate3d(${el._leaflet_pos.x}px, ${el._leaflet_pos.y}px, 0px) rotate(${heading}deg)`;
-        }
+    const baseHeading = calculateBearing(p1.lat, p1.lon, p2.lat, p2.lon);
+    
+    currentAngle = lerpAngle(currentAngle, baseHeading, 0.67);
+
+    const el = carMarker.getElement(); 
+    if (el) {
+        const base = el.style.transform.replace(/rotate\(.*?\)/, "");
+        el.style.transform = `${base} rotate(${currentAngle}deg)`;
     }
 
     // 3. Follow toggle
@@ -245,7 +299,7 @@ function animateCar() {
     animationIndex += animationDirection;
 
     // 5. Loop safely
-    animationTimer = setTimeout(animateCar, 1000 / playbackSpeed);
+    animationTimer = setTimeout(animateCar, 300 / playbackSpeed);
 }
     }
 
