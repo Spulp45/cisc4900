@@ -37,6 +37,15 @@
     color: #111;
 }
 
+/* Target the "Units:" label text */
+.unit-toggle span {
+    color: #ffffff; /* Pure white so it's readable */
+    font-family: 'Orbitron', sans-serif; /* Keep the techy font */
+    font-size: 0.9rem;
+    margin-right: 10px;
+    text-transform: uppercase;
+}
+
 /* Stats Group Cards (The "Modules") */
 .stats-group.card {
     background: #1a1a1a;
@@ -96,14 +105,7 @@ html, body {
     min-height: 100vh;
 }
 
-/* Target the "Units:" label text */
-.unit-toggle span {
-    color: #ffffff; /* Pure white so it's readable */
-    font-family: 'Orbitron', sans-serif; /* Keep the techy font */
-    font-size: 0.9rem;
-    margin-right: 10px;
-    text-transform: uppercase;
-}
+
 
 /* Ensure the buttons have the right text color */
 .unit-btn {

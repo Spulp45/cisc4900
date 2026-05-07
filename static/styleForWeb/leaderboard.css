@@ -93,3 +93,52 @@ body {
     color: #f1c40f; /* Highlight top ranks */
 }
 
+/*Buttons sort and ordering*/
+.sort_by {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.button-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.sort_btn {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Unit Toggle Buttons */
+.unit-toggle .unit-btn {
+    display: inline-block;
+    padding: 8px 15px;
+    margin-right: 10px;
+    background: #222;
+    color: #f1c40f;
+    border: 1px solid #f1c40f;
+    text-decoration: none;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+.unit-toggle .unit-btn:hover {
+    background: #f1c40f;
+    color: #111;
+}
+
+/* Target the "Units:" label text */
+.unit-toggle span {
+    color: #ffffff; /* Pure white so it's readable */
+    font-family: 'Orbitron', sans-serif; /* Keep the techy font */
+    font-size: 0.9rem;
+    margin-right: 10px;
+    text-transform: uppercase;
+}
+

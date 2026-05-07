@@ -1,12 +1,23 @@
 <div class="top_part">
     <h3>Ranking by: {{ field.replace('_', ' ').title() }}</h3>
 </div>
+<div class="unit-toggle">
+<a href="{{ url_for('set_units', unit='metric', field=field) }}" class="unit-btn">
+    Metric
+</a>
+<a href="{{ url_for('set_units', unit='imperial', field=field) }}" class="unit-btn">
+    Imperial
+</a>
+<a href="{{ url_for('set_units', unit='raw', field=field) }}" class="unit-btn">
+    Raw
+</a>
+</div>
 
 <table>
     <thead>
         <tr>
             <th>Rank</th>
-            <th>Username</th> <th>Score</th>
+            <th>Username</th> <th>{{ field.replace('_', ' ').title() }}</th>
         </tr>
     </thead>
     <tbody>
@@ -14,10 +25,35 @@
         <tr>
             <td><b>#{{ loop.index }}</b></td>
             <td>{{ row.username }}</td> <td>
-                {% if field == 'moving_time' or field == 'stopped_time' %}
-                    {{ '%d:%02d:%02d' | format(row.total_score // 3600, (row.total_score % 3600) // 60, row.total_score % 60) }}
-                {% else %}
-                    {{ '%.2f' | format(row.total_score) }}
+                {% if field == 'length_2d'%}
+                    {{row.total_score | distance }}
+
+                {% elif field == 'moving_time'%}
+                    {{ row.total_score | time }}
+
+                {% elif field == 'uphill'%}
+                    {{ row.total_score | elevation}}
+                      
+                {% elif field == 'length_3d'%}
+                    {{ row.total_score | distance }}
+
+                {% elif field == 'stopped_time'%}
+                    {{ row.total_score | time }}
+
+                {% elif field == 'moving_distance'%}
+                    {{ row.total_score | distance }}
+
+                {% elif field == 'stopped_distance'%}
+                    {{ row.total_score | distance }}
+
+                {% elif field == 'max_speed'%}
+                    {{ row.total_score | speed }}
+
+                {% elif field == 'downhill'%}
+                    {{ row.total_score | elevation }}
+
+                {% elif field == 'points'%}
+                    {{ row.total_score | int }}  
                 {% endif %}
             </td>
         </tr>
