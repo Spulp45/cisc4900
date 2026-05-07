@@ -736,6 +736,31 @@ def delete_user_by_id(user_id: str, DatabasePath: str, TempDirectory: str) -> bo
     except sqlite3.error:
         return False
     
+    # Move files to temp
+    moved_files = []
+
+    for filepath, original_filename in zip(filepaths, filenames):
+        try:
+            if not os.path.exists(filepath):
+                continue
+
+            destination = os.path.join(
+                TempDirectory,
+                f"{user_id}_{uuid.uuid4()}{original_filename}"
+            )
+
+            os.replace(filepath, destination)
+
+            moved_files.append((destination, original_filename))
+
+        except Exception:
+            print(f"Error moving {filepath}")
+
+    for file, original_filename in moved_files:
+        print(f"{file} was moved to temp folder and marked for deletion")
+
+    return True
+    
 def get_leaderboard(stat_field: str, DatabasePath: str, limit: int = 10):
     """
     Retrieve a leaderboard ranking users by their name instead of their user ID number.
@@ -770,30 +795,7 @@ def get_leaderboard(stat_field: str, DatabasePath: str, limit: int = 10):
         """, (limit,))
         
         return [dict(row) for row in cur.fetchall()]
-    # Move files to temp
-    moved_files = []
 
-    for filepath, original_filename in zip(filepaths, filenames):
-        try:
-            if not os.path.exists(filepath):
-                continue
-
-            destination = os.path.join(
-                TempDirectory,
-                f"{user_id}_{uuid.uuid4()}{original_filename}"
-            )
-
-            os.replace(filepath, destination)
-
-            moved_files.append((destination, original_filename))
-
-        except Exception:
-            print(f"Error moving {filepath}")
-
-    for file, original_filename in moved_files:
-        print(f"{file} was moved to temp folder and marked for deletion")
-
-    return True
 
 def reset_database(DatabasePath):
     """Delete and recreate the database from scratch."""
