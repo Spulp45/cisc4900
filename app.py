@@ -598,9 +598,20 @@ def time_filter(value):
     unit_setting = session.get("units", "metric")
     return units.format_time(value, unit_setting)
 
-## TODO ADD better docstring or move somewhere else
+
 def get_track_file_info(track):
-    """Returns (absolute_file_path, original_filename)"""
+    """
+    Resolves the physical storage path and original name of a track file.
+
+    Args:
+        track (dict): A track record containing at least 'track_hash' 
+            and 'filename'.
+
+    Returns:
+        tuple: A pair containing:
+            - file_path (str): The absolute path to the file on the server.
+            - original_filename (str): The original name of the uploaded file.
+    """
     # Get track hash
     hash_value = track.get("track_hash")
     # Get original filename
