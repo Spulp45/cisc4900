@@ -575,6 +575,13 @@ def faq():
 def set_units(unit):
     if unit in ['metric', 'imperial', 'raw']:
         session['units'] = unit
+
+    # Check if this request came from leaderboard controls
+    field = request.args.get('field')
+
+    if field:
+        return redirect(url_for('leaderboard', field=field))
+
     return redirect(request.referrer or '/')
 
 # Template filters
@@ -625,18 +632,57 @@ def get_track_file_info(track):
     
     return file_path, original_filename
 
-@app.route('/leaderboard', methods=['GET', 'POST'])
+@app.route('/leaderboard', methods=['GET'])
 @login_required
 def leaderboard():
 
-    field = request.args.get('field', 'length_2d')
+    valid_fields = {
+        "length_2d": "TOTAL(t.length_2d)",
+        "moving_time": "TOTAL(t.moving_time)",
+        "uphill": "TOTAL(t.uphill)",
+        "length_3d": "TOTAL(t.length_3d)",
+        "stopped_time": "TOTAL(t.stopped_time)",
+        "moving_distance": "TOTAL(t.moving_distance)",
+        "stopped_distance": "TOTAL(t.stopped_distance)",
+        "max_speed": "TOTAL(t.max_speed)",
+        "downhill": "TOTAL(t.downhill)",
+        "points": "TOTAL(t.points)"
+    }
 
-    leaderboard_users = databaseFunctions.get_leaderboard(field, app.config['DATABASE_PATH'])
+    default_field = "length_2d"
 
-    if request.headers.get('HX-Request'):
-        return render_template('components/leaderboard_table.html', leaderboard_users=leaderboard_users, field=field)
-    
-    return render_template('leaderboard.html', leaderboard_users=leaderboard_users, field=field)
+    # Get selected field from query params
+    field_key = request.args.get("field", default_field)
+
+    # Fallback to default if invalid
+    if field_key not in valid_fields:
+        field_key = default_field
+
+    # Fetch leaderboard data
+    leaderboard_users = databaseFunctions.get_leaderboard(
+        field_key,
+        app.config['DATABASE_PATH']
+    )
+
+    # Shared template context
+    context = {
+        "leaderboard_users": leaderboard_users,
+        "field": field_key,
+        "valid_fields": valid_fields
+    }
+
+    # HTMX partial render
+    if request.headers.get("HX-Request"):
+        return render_template(
+            "components/leaderboard_table.html",
+            **context
+        )
+
+    # Full page render
+    return render_template(
+        "leaderboard.html",
+        **context
+    )
 
 
 # For running the app
