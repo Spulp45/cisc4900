@@ -29,6 +29,14 @@
       <button>Last 30 Days</button>
     </a>
 
+    <a href="{{ url_for('stats', days=90) }}">
+      <button>Last 90 Days</button>
+    </a>
+
+    <a href="{{ url_for('stats', days=365) }}">
+      <button>Last 365 Days</button>
+    </a>
+
     <div style="margin-top: 30px;">
         {{ func.back_button("← Back") }}
     </div>
