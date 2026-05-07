@@ -736,7 +736,7 @@ def delete_user_by_id(user_id: str, DatabasePath: str, TempDirectory: str) -> bo
     except sqlite3.error:
         return False
     
-def get_leaderboard(stat_field: str, limit: int = 10):
+def get_leaderboard(stat_field: str, DatabasePath: str, limit: int = 10):
     """
     Retrieve a leaderboard ranking users by their name instead of their user ID number.
     """
