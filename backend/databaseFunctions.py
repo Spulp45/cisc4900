@@ -768,7 +768,14 @@ def get_leaderboard(stat_field: str, DatabasePath: str, limit: int = 10):
     valid_fields = {
         "length_2d": "TOTAL(t.length_2d)",
         "moving_time": "TOTAL(t.moving_time)",
-        "uphill": "TOTAL(t.uphill)"
+        "uphill": "TOTAL(t.uphill)",
+        "length_3d": "TOTAL(t.length_2d)",
+        "stopped_time": "TOTAL(t.stopped_time)",
+        "moving_distance": "TOTAL(t.moving_distance)",
+        "stopped_distance": "TOTAL(t.stopped_distance)",
+        "max_speed": "TOTAL(t.max_speed)",
+        "downhill": "TOTAL(t.downhill)",
+        "points": "TOTAL(t.points)"
     }
     
     if stat_field not in valid_fields:
