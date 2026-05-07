@@ -140,21 +140,221 @@ canvas {
     border-bottom: 1px solid #333; 
 }
 
-#play-btn {
+#play-btn,
+#forward-btn,
+#rewind-btn {
     width: 100%;
     padding: 10px;
-    background: #111; 
-    color: #f1c40f;   
+    background: #111;
+    color: #f1c40f;
     border: 1px solid #f1c40f;
     font-family: 'Orbitron', sans-serif;
     text-transform: uppercase;
     cursor: pointer;
-    transition: 0.3s;
+
+    transition:
+        transform 0.1s ease,
+        box-shadow 0.2s ease,
+        background 0.3s ease,
+        color 0.3s ease;
 }
 
-#play-btn:hover {
+#play-btn:hover,
+#forward-btn:hover,
+#rewind-btn:hover {
     background: #f1c40f;
     color: #111;
+    box-shadow: 0 0 10px rgba(241, 196, 15, 0.7);
+}
+
+#play-btn:active,
+#forward-btn:active,
+#rewind-btn:active {
+    transform: scale(0.96);
+    box-shadow: 0 0 5px rgba(241, 196, 15, 0.4);
+}
+
+/* Timeline Slider */
+#timeline-slider {
+    width: 100%;
+    height: 6px;
+    margin: 12px 0;
+    background: #111;
+    border: 1px solid #f1c40f;
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+
+    transition:
+        box-shadow 0.2s ease,
+        background 0.3s ease;
+}
+
+/* Hover glow */
+#timeline-slider:hover {
+    box-shadow: 0 0 10px rgba(241, 196, 15, 0.7);
+}
+
+/* Webkit Track */
+#timeline-slider::-webkit-slider-runnable-track {
+    height: 6px;
+    background: #222;
+    border-radius: 5px;
+}
+
+/* Webkit Thumb */
+#timeline-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+
+    width: 16px;
+    height: 16px;
+    margin-top: -5px;
+
+    background: #f1c40f;
+    border: 2px solid #111;
+    border-radius: 50%;
+
+    transition:
+        transform 0.1s ease,
+        box-shadow 0.2s ease;
+}
+
+/* Thumb hover */
+#timeline-slider::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 10px rgba(241, 196, 15, 0.9);
+}
+
+/* Click effect */
+#timeline-slider::-webkit-slider-thumb:active {
+    transform: scale(1.15);
+}
+
+/* Firefox Track */
+#timeline-slider::-moz-range-track {
+    height: 6px;
+    background: #222;
+    border-radius: 5px;
+}
+
+/* Firefox Thumb */
+#timeline-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+
+    background: #f1c40f;
+    border: 2px solid #111;
+    border-radius: 50%;
+    cursor: pointer;
+
+    transition:
+        transform 0.1s ease,
+        box-shadow 0.2s ease;
+}
+
+#timeline-slider::-moz-range-thumb:hover {
+    box-shadow: 0 0 10px rgba(241, 196, 15, 0.9);
+}
+
+#timeline-slider::-moz-range-thumb:active {
+    transform: scale(1.15);
+}
+
+/* Speed Controls Container */
+#speed-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+/* Input Field */
+#custom-speed {
+    flex: 1;
+    padding: 10px;
+    background: #111;
+    color: #f1c40f;
+    border: 1px solid #f1c40f;
+    border-radius: 4px;
+
+    font-family: 'Orbitron', sans-serif;
+    outline: none;
+
+    transition:
+        box-shadow 0.2s ease,
+        border-color 0.3s ease,
+        transform 0.1s ease;
+}
+
+/* Placeholder */
+#custom-speed::placeholder {
+    color: rgba(241, 196, 15, 0.6);
+}
+
+/* Input Focus */
+#custom-speed:focus {
+    box-shadow: 0 0 10px rgba(241, 196, 15, 0.7);
+    border-color: #f7d84a;
+}
+
+/* Apply Button */
+#custom-speed-btn {
+    padding: 10px 16px;
+    background: #111;
+    color: #f1c40f;
+    border: 1px solid #f1c40f;
+    border-radius: 4px;
+
+    font-family: 'Orbitron', sans-serif;
+    text-transform: uppercase;
+    cursor: pointer;
+
+    transition:
+        transform 0.1s ease,
+        box-shadow 0.2s ease,
+        background 0.3s ease,
+        color 0.3s ease;
+}
+
+#speed-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+#timeline-slider {
+    width: 100%;
+    flex-basis: 100%;
+}
+
+/* Controls layout */
+#controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Forward + Rewind row */
+#seek-controls {
+    display: flex;
+    gap: 10px;
+}
+
+/* Make both buttons share space evenly */
+#forward-btn,
+#rewind-btn {
+    flex: 1;
+}
+
+/* Hover */
+#custom-speed-btn:hover {
+    background: #f1c40f;
+    color: #111;
+    box-shadow: 0 0 10px rgba(241, 196, 15, 0.7);
+}
+
+/* Click */
+#custom-speed-btn:active {
+    transform: scale(0.96);
+    box-shadow: 0 0 5px rgba(241, 196, 15, 0.4);
 }
 
 .follow-label {
@@ -168,4 +368,37 @@ canvas {
     /* This pushes elements away from the top and bottom of the label */
     margin-top: 12px;
     margin-bottom: 12px;
+}
+
+/* Unit Toggle Buttons */
+.unit-btn {
+    display: inline-block;
+    padding: 8px 15px;
+    margin-right: 10px;
+    background: #222;
+    color: #f1c40f;
+    border: 1px solid #f1c40f;
+    text-decoration: none;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    transition: 
+        transform 0.1s ease,
+        box-shadow 0.2s ease,
+        background 0.3s ease,
+        color 0.3s ease;
+    cursor: pointer;
+}
+
+/* Hover effect */
+.unit-btn:hover {
+    background: #f1c40f;
+    color: #222;
+    box-shadow: 0 0 10px rgba(241, 196, 15, 0.7);
+}
+
+/* Click / press effect */
+.unit-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 0 5px rgba(241, 196, 15, 0.4);
 }

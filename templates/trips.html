@@ -11,32 +11,59 @@
 
 <body>
   <!-- Map + side panel -->
-  <div id="map-container">
-    <div id="map"></div>
-    
-    <div id="track-details">
-      <h1>Track Point Info</h1>
-     <div id="controls">
+<div id="map-container">
+  <div id="map"></div>
 
-    <button id="play-btn">▶ Play</button>
-    <button id="forward-btn">Forward</button>
-    <button id="rewind-btn">Rewind</button>
+  <div id="track-details">
+    <h1>Track Point Info</h1>
 
-    <div id="speed-controls">
-    <input type="number" id="custom-speed" placeholder="Custom speed" step="0.1" value="1" />
-    <button id="custom-speed-btn">Apply</button>
-    <input type="range" id="timeline-slider" min="0" max="0" value="0" step="1" />
+    <div id="controls">
+
+      <!-- Play Button -->
+      <button id="play-btn">▶ Play</button>
+
+      <!-- Forward / Rewind Row -->
+      <div id="seek-controls">
+        <button id="rewind-btn">Rewind</button>
+        <button id="forward-btn">Forward</button>
+      </div>
+
+      <!-- Speed Controls -->
+      <div id="speed-controls">
+        <input 
+          type="number" 
+          id="custom-speed" 
+          placeholder="Custom speed" 
+          step="0.1" 
+          value="1" 
+        />
+
+        <button id="custom-speed-btn">Apply</button>
+      </div>
+
+      <!-- Timeline Slider -->
+      <input 
+        type="range" 
+        id="timeline-slider" 
+        min="0" 
+        max="0" 
+        value="0" 
+        step="1" 
+      />
+
     </div>
-     </div>
-     <label class="follow-label">
-        <input type="checkbox" id="follow-car-toggle" checked>
-        Follow Vehicle
-      </label>  
-     <div id = "point-readout">
+
+    <label class="follow-label">
+      <input type="checkbox" id="follow-car-toggle" checked>
+      Follow Vehicle
+    </label>
+
+    <div id="point-readout">
       <p>Click a point on the map to see details here.</p>
-     </div>
     </div>
+
   </div>
+</div>
 
 <!-- Stats display -->
 <div class="stats-display">
