@@ -33,6 +33,18 @@
         }
     }
 
+    function field(label, value, formatter, type) {
+    let displayValue = value;
+
+    if (value == null || value === "") {
+        displayValue = "—";
+    } else if (formatter) {
+        displayValue = formatter(value, type);
+    }
+
+    return `<p><b>${label}:</b> ${displayValue}</p>`;
+}
+
     // 3. UI Rendering (Original)
     function renderTrackPanel(point) {
         if (!point) return;
@@ -40,19 +52,19 @@
         const userUnits = getUnits();
         panel.innerHTML = `
             <h3>Track Point</h3>
-                                                        
-            ${point.lat != null ? `<p><b>Latitude:</b> ${point.lat}</p>` : ""}
-            ${point.lon != null ? `<p><b>Longitude:</b> ${point.lon}</p>` : ""}
-            ${point.speed != null ? `<p><b>Speed:</b> ${formatValue(point.speed, "speed", userUnits)}</p>` : ""}
-            ${point.ele != null ? `<p><b>Elevation:</b> ${formatValue(point.ele, "elevation", userUnits)}</p>` : ""}
-            ${point.timestamp != null ? `<p><b>Time:</b> ${formatValue(point.timestamp, "timestamp", userUnits)}</p>` : ""}
-            ${point.course != null ? `<p><b>Course:</b> ${point.course}</p>` : ""}
-            ${point.geoidheight != null ? `<p><b>Geoid Height:</b> ${point.geoidheight}</p>` : ""}
-            ${point.src != null ? `<p><b>Source:</b> ${point.src}</p>` : ""}
-            ${point.sat != null ? `<p><b>Satellites:</b> ${point.sat}</p>` : ""}
-            ${point.hdop != null ? `<p><b>HDOP:</b> ${point.hdop}</p>` : ""}
-            ${point.vdop != null ? `<p><b>VDOP:</b> ${point.vdop}</p>` : ""}
-            ${point.pdop != null ? `<p><b>PDOP:</b> ${point.pdop}</p>` : ""}
+
+            ${field("Latitude", point.lat)}
+            ${field("Longitude", point.lon)}
+            ${field("Speed", point.speed, formatValue, "speed")}
+            ${field("Elevation", point.ele, formatValue, "elevation")}
+            ${field("Time", point.timestamp, formatValue, "timestamp")}
+            ${field("Course", point.course)}
+            ${field("Geoid Height", point.geoidheight)}
+            ${field("Source", point.src)}
+            ${field("Satellites", point.sat)}
+            ${field("HDOP", point.hdop)}
+            ${field("VDOP", point.vdop)}
+            ${field("PDOP", point.pdop)}
             `;
     }
 
@@ -198,24 +210,31 @@ if (forwardBtn) {
     });
 }
 
+
 const slider = document.getElementById("timeline-slider");
 slider.max = track_points.length - 1;
 slider.value = 0;
 
 
 slider.addEventListener("input", () => {
-    isPlaying = false;                 // stop animation when scrubbing
-    clearTimeout(animationTimer);      
+    isPlaying = false;
+    clearTimeout(animationTimer);
 
     animationIndex = parseInt(slider.value);
 
     const p = track_points[animationIndex];
 
-    // instant UI update
     carMarker.setLatLng([p.lat, p.lon]);
     renderTrackPanel(p);
 
+    updateSliderProgress(slider);
 });
+
+function updateSliderProgress(slider) {
+    const percent = (slider.value / slider.max) * 100;
+    slider.style.setProperty("--progress", `${percent}%`);
+}
+
 
 // Calculate Angle 
 function calculateBearing(lat1, lon1, lat2, lon2) {
@@ -277,7 +296,7 @@ function animateCar() {
 
     // 2. Rotate arrow
     const p1 = track_points[animationIndex];
-    const p2 = track_points[Math.min(animationIndex + 1, track_points.length - 1)];
+    const p2 = track_points[Math.min(animationIndex + 5, track_points.length - 5)];
 
     const baseHeading = calculateBearing(p1.lat, p1.lon, p2.lat, p2.lon);
     
