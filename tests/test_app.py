@@ -149,12 +149,12 @@ def test_upload_corrupted_gpx(client):
 
     login(client, username, password)
 
-    bad_path = os.path.join("demoGPX", "bad.gpx")
+    bad_path = os.path.join("demoGPX", "corruptedFile.gpx")
 
     with open(bad_path, "rb") as f:
         response = client.post(
             "/upload",
-            data={"files": (f, "bad.gpx")},
+            data={"files": (f, "corruptedFile.gpx")},
             content_type="multipart/form-data"
         )
 
