@@ -1,0 +1,108 @@
+{
+  "faq_data": [
+    {
+      "section": "General",
+      "questions": [
+        {
+          "q": "Where are all uploaded files uploaded to?",
+          "a": "They are all in the uploads folder"
+        },
+        {
+          "q": "Can I upload more than one GPX file?",
+          "a": "Yes you can upload more than one file at a time!"
+        },
+        {
+          "q": "What type of GPX files are supported?",
+          "a": "GPX 1.0 and GPX 1.1"
+        },
+        {
+          "q": "What is the difference between GPX 1.0 and 1.1?",
+          "a": "The speed attribute is missing in GPX 1.1 but we are still able to get it back through GPX 1.1 extensions. Bearing is also missing in 1.1"
+        },
+        {
+          "q": "What happens when I delete my account?",
+          "a": "After account deletion all user information is deleted, then all the deleted users files are moved to the temp folder where they can be recovered one last time"
+        }
+      ]
+    },
+    {
+      "section": "Limitations of GPS data",
+      "questions": [
+        {
+          "q": "Why is my max speed an absurd amount like 5000 mph?",
+          "a": "This is due to GPS jumps, we try to filter out the most we can"
+        },
+        {
+          "q": "GPS Drift",
+          "a": "This means when the GPS device reports that is moving but actually is just stationary, a high stopped distance may indicate a poor recording"
+        },
+        {
+          "q": "GPS Jump",
+          "a": "Can be caused when a GPS signal is weak, so the calculations for speed, distance and others may be entirely incorrect"
+        }
+      ]
+    },
+    {
+      "section": "Understanding GPS data types",
+      "questions": [
+        {
+          "q": "How do I view my tracks?",
+          "a": "Go to the home page."
+        },
+        {
+          "q": "Can I delete a track?",
+          "a": "Yes, use the delete button. Deleting a track would also delete the file"
+        }
+      ]
+    }
+  ],
+
+  "types": [
+    {
+      "section": "Track",
+      "trackTypes": [
+        {
+          "k": "Filename",
+          "v": "Name of the track"
+        },
+        {
+          "k": "Filepath",
+          "v": "Path of where a track is saved on disk"
+        },
+        {
+          "k": "Description",
+          "v": "Custom field, you can write whatever you want here"
+        },
+        {
+          "k": "Average Moving Speed",
+          "v": "Average Speed when you were moving"
+        },
+        {
+          "k": "Total Distance 2D",
+          "v": "Total distance traveled in 2 Dimensions (Altitude & Longitude)"
+        },
+        {
+          "k": "Total Distance 3D",
+          "v": "Total distance traveled in 3 Dimensions (Altitude, Longitude & Elevation)"
+        }
+      ]
+    },
+    {
+      "section": "Track Points",
+      "trackTypes": [
+        {
+          "k": "Latitude",
+          "v": "A geographic coordinate"
+        },
+        {
+          "k": "Longitude",
+          "v": "A geographic coordinate"
+        },
+        {
+          "k": "Elevation",
+          "v": "Height at that trackpoint"
+        }
+      ]
+    }
+  ]
+}
