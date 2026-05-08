@@ -384,8 +384,10 @@ def stats():
 def account_settings():
     user_id = session.get('user_id')
     user_db = databaseFunctions.get_user_by_id(user_id, app.config['DATABASE_PATH'])[0]
+    track_count = len(databaseFunctions.get_tracks(user_id, app.config['DATABASE_PATH']))
     username = session.get('username')
     password_hash = user_db['password_hash']
+
     
     if request.method == 'POST':
         
@@ -397,13 +399,15 @@ def account_settings():
              return render_template('account_settings.html',
                                     username=username,
                                     user_id=user_id,
-                                    error="Current password is incorrect")
+                                    error="Current password is incorrect",
+                                    track_count=track_count)
 
         if new_password != confirm_password:
             return render_template('account_settings.html',
                                    username=username,
                                    user_id=user_id,
-                                   error="New password does not match")
+                                   error="New password does not match",
+                                   track_count=track_count)
      
         result = databaseFunctions.update_user_password(user_id, new_password, app.config['DATABASE_PATH'])
 
@@ -411,19 +415,22 @@ def account_settings():
             return render_template('account_settings.html',
                                    user_id=user_id,
                                    username=username,
-                                   error="Failed to update password, database error")
+                                   error="Failed to update password, database error",
+                                   track_count=track_count)
         
         return render_template('account_settings.html',
                                username=username,
                                user_id=user_id,
                                error=None, 
-                               success="Password updated Successfully")
+                               success="Password updated Successfully",
+                               track_count=track_count)
 
     return render_template('account_settings.html',
                            username=username,
                            user_id=user_id,
                            error=None,
-                           success=None)
+                           success=None,
+                           track_count=track_count)
 
 @app.route('/download_all_tracks', methods=['GET', 'POST'])
 @login_required

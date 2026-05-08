@@ -30,14 +30,7 @@
       <div class="top-header">
         <h1>Welcome {{ username }}</h1>
 
-        <div class="user-actions">
-          <form action="{{ url_for('account_settings') }}" method="get">
-            <button type="submit">Account Settings</button>
-          </form>
-
-          <form action="{{ url_for('logout') }}" method="post">
-            <button type="submit">Logout</button>
-          </form>
+        {{ func.user_actions() }}
         </div>
       </div>
 
