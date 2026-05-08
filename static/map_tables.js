@@ -270,7 +270,8 @@ function animateCar() {
 
     // Update the slider as we run the animation
     if (slider) {
-    slider.value = animationIndex;
+        slider.value = animationIndex;
+        updateSliderProgress(slider); 
     }
 
     // Stop at bounds
