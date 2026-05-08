@@ -4,16 +4,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styleForWeb/show_msg.css') }}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
     <title>Information</title>
 </head>
-<body>
-    <h1>Error Screen</h1>
-    
-    {% if msg %}
-    <p> {{ msg }}</p>
-    {% else %}
-    
-    {% endif %}
-{{ func.back_button("← Back") }}
+<body class="error-page">
+    <div class="error-container">
+        <div class="error-icon">!</div>
+        <h1>System Message</h1>
+        
+        <div class="error-box">
+            {% if msg %}
+                <p class="error-msg">{{ msg }}</p>
+            {% else %}
+                <p class="error-msg">An unexpected error has occurred. Please try again.</p>
+            {% endif %}
+        </div>
+
+        <div class="error-footer">
+            {{ func.back_button("← Back to Safety") }}
+        </div>
+    </div>
 </body>
 </html>

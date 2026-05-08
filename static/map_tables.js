@@ -143,7 +143,7 @@
 
         // --- CAR ANIMATION ---
         const carIcon = L.icon({
-        iconUrl: '/static/test_arrow.png',
+        iconUrl: '/static/arrow.png',
         shadowUrl: '/static/car.png',
 
         iconSize:     [24, 24], // size of the icon

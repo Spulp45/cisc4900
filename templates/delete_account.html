@@ -4,67 +4,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styleForWeb/delete_account.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
     <title>Document</title>
 </head>
-<body>
+<body class="delete-page">
+    <div class="delete-container">
+        {% if message %}
+            <div class="message-banner">{{ message }}</div>
+        {% endif %}
 
-    <!-- Error or Info Message -->
-    {% if message %}
-        <p>{{ message }}</p>
-    {% endif %}
+        {% if step == 1 %}
+            <h1 class="danger-title">Delete Account</h1>
+            <p class="warning-text">Are you sure you want to delete your account? This action is <strong>irreversible</strong>.</p>
 
-    {% if step == 1 %}
-        <h1>Delete Account</h1>
-        <p>Are you sure you want to delete your account? This action is irreversible.</p>
+            <form method="POST">
+                <input type="hidden" name="step" value="1">
+                <button type="submit" class="btn-danger-outline">Continue to Verification</button>
+            </form>
 
-        <form method="POST">
-            <input type="hidden" name="step" value="1">
-            <button type="submit">Continue to Verification</button>
-        </form>
-
-        <br>
-        {{ func.back_button(label="← Back") }}
-
-    {% elif step == 2 %}
-        <h1>Verify Your Identity</h1>
-        <p>Please enter your credentials to continue.</p>
-
-        <form method="POST">
-            <input type="hidden" name="step" value="2">
-
-            <div>
-                <label>Username:</label><br>
-                <input type="text" name="username" required>
+            <div class="nav-links">
+                {{ func.back_button(label="← Back") }}
             </div>
 
-            <br>
+        {% elif step == 2 %}
+            <h1>Verify Your Identity</h1>
+            <p>Please enter your credentials to continue.</p>
 
-            <div>
-                <label>Password:</label><br>
-                <input type="password" name="password" required>
+            <form method="POST" class="verify-form">
+                <input type="hidden" name="step" value="2">
+
+                <div class="input-field">
+                    <label>Username</label>
+                    <input type="text" name="username" required placeholder="Enter username">
+                </div>
+
+                <div class="input-field">
+                    <label>Password</label>
+                    <input type="password" name="password" required placeholder="Enter password">
+                </div>
+
+                <button type="submit" class="btn-danger-outline">Verify & Continue</button>
+            </form>
+
+            <div class="nav-links">
+                <a href="{{ url_for('delete_account') }}" class="cancel-link">Back</a>
             </div>
 
-            <br>
+        {% elif step == 3 %}
+            <h1 class="final-warning">FINAL WARNING</h1>
+            <div class="warning-box">
+                <p>This action cannot be undone.</p>
+                <p>Do you want to <strong>permanently</strong> delete your account?</p>
+            </div>
 
-            <button type="submit">Verify & Continue</button>
-        </form>
+            <form method="POST">
+                <input type="hidden" name="step" value="3">
+                <button type="submit" class="btn-final-delete">YES, DELETE MY ACCOUNT</button>
+            </form>
 
-        <br>
-        <a href="{{ url_for('delete_account') }}">Back</a>
-
-    {% elif step == 3 %}
-        <h1>FINAL WARNING</h1>
-        <p>This action cannot be undone.</p>
-        <p>Do you want to permanently delete your account?</p>
-
-        <form method="POST">
-            <input type="hidden" name="step" value="3">
-            <button type="submit">YES, DELETE MY ACCOUNT</button>
-        </form>
-
-        <br>
-        <a href="{{ url_for('delete_account') }}">Cancel</a>
-
-    {% endif %}
-
+            <div class="nav-links">
+                <a href="{{ url_for('delete_account') }}" class="cancel-link">Cancel</a>
+            </div>
+        {% endif %}
+    </div>
+</body>
 </html>
