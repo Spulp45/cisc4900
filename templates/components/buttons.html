@@ -26,3 +26,18 @@
         </button>
     </a>
 {% endmacro %}
+
+{% macro action_button(endpoint, label, method="get") %}
+<form action="{{ url_for(endpoint) }}" method="{{ method }}">
+    <button type="submit">{{ label }}</button>
+</form>
+{% endmacro %}
+
+
+{% macro user_actions() %}
+<div class="user-actions">
+    {{ action_button('faq', 'FAQ') }}
+    {{ action_button('account_settings', 'Account Settings') }}
+    {{ action_button('logout', 'Logout', 'post') }}
+</div>
+{% endmacro %}
