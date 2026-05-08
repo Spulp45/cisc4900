@@ -128,3 +128,33 @@ form[action*="delete"] button:hover {
     color: white;
     border-color: #fff;
 }
+
+/* Top Header (Welcome + Actions) */
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px; /* space before navbar */
+}
+
+/* user actions macro */
+.user-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.user-actions button {
+    background: #222;
+    border: 1px solid #555;
+    color: #f1c40f;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.user-actions button:hover {
+    background: #f1c40f;
+    color: #111;
+}

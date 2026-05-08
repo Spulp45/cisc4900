@@ -1,10 +1,15 @@
 "Contains reusable buttons"
 {% macro back_button(label="← Back", fallback_endpoint='home') %}
-    <a href="{{ url_for(fallback_endpoint) }}"
-       onclick="if (document.referrer) { history.back(); return false; }"
-       class="btn btn-primary">
-        {{ label }}
-    </a>
+<a href="{{ url_for(fallback_endpoint) }}"
+    onclick="
+    if (document.referrer) {
+        window.location.replace(document.referrer);
+        return false;
+    }
+    "
+   class="btn btn-primary">
+    {{ label }}
+</a>
 {% endmacro %}
 {% macro stats_select(label="Stats") %}
     <a href="{{ url_for('stats_select') }}" class="btn btn-primary">{{ label }}</a>
@@ -20,4 +25,19 @@
             <span>{{ text }}</span>
         </button>
     </a>
+{% endmacro %}
+
+{% macro action_button(endpoint, label, method="get") %}
+<form action="{{ url_for(endpoint) }}" method="{{ method }}">
+    <button type="submit">{{ label }}</button>
+</form>
+{% endmacro %}
+
+
+{% macro user_actions() %}
+<div class="user-actions">
+    {{ action_button('faq', 'FAQ') }}
+    {{ action_button('account_settings', 'Account Settings') }}
+    {{ action_button('logout', 'Logout', 'post') }}
+</div>
 {% endmacro %}

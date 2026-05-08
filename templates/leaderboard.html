@@ -2,9 +2,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaderboard</title>
+    <title>LeaderBoard</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='styleForWeb/leaderboard.css') }}">
@@ -17,8 +18,13 @@
     <div class="LeaderBoard_container">
         <h2>Global Leaderboards</h2>
         <h3>Rankings are based on the selected statistic</h3>
+        <p>Read more about them here in FAQ: 
+            <div class="user-actions">
+            {{ func.action_button('faq', 'FAQ') }}
+        </div>
+        </p>
 
-
+        
         <div class="sort_by">
 
             {% for field_key in valid_fields.keys() %}

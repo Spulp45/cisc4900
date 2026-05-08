@@ -329,7 +329,8 @@ def get_tracks(user_id: int, DatabasePath: str) -> list[dict]:
                     FROM user_tracks ut
                     JOIN track tr
                     ON ut.track_id = tr.id
-                    WHERE user_id = (?) """
+                    WHERE user_id = (?)
+                    ORDER BY tr.id DESC"""
         
         cur.execute(query, (user_id,))
 
