@@ -1,0 +1,135 @@
+/* --- FAQ & DATA TYPES STYLING --- */
+
+/* This ensures the entire page is dark, not just the cards */
+body {
+    background-color: #111111 !important;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh; /* Ensures background covers full height */
+}
+
+.info-container {
+    max-width: 900px;
+    margin: 0 auto; /* Centers the content */
+    padding: 40px 20px;
+    background-color: #111111; /* Match the body */
+    color: #eeeeee;
+}
+
+/* Adjust the headers to stand out against the new dark background */
+.page-title {
+    color: #f1c40f;
+    border-bottom: 1px solid #333;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+}
+
+.section-header {
+    color: #f1c40f;
+    margin-top: 40px;
+    letter-spacing: 1px;
+}
+
+.page-title {
+    color: #f1c40f;
+    font-family: 'Orbitron', sans-serif;
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+    margin-top: 40px;
+}
+
+.section-header {
+    color: #f1c40f;
+    text-transform: uppercase;
+    font-size: 1.2rem;
+    margin-top: 30px;
+}
+
+/* FAQ Items */
+.faq-item {
+    background: #1a1a1a;
+    border-left: 4px solid #f1c40f;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    border-radius: 0 4px 4px 0;
+}
+
+.question {
+    color: #ffffff;
+    margin: 0 0 10px 0;
+    font-size: 1.1rem;
+}
+
+.answer {
+    color: #cbd5e0; 
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Data Types Grid */
+.data-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+
+.type-row {
+    display: flex;
+    align-items: flex-start; 
+    padding: 12px 0;
+    border-bottom: 1px solid #222;
+    gap: 20px; 
+
+.type-key {
+    color: #f1c40f;
+    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    
+    
+    min-width: 140px; 
+    flex-shrink: 0; 
+}
+
+.type-val {
+    color: #ffffff;
+    line-height: 1.4;
+    font-size: 0.95rem;
+}
+
+
+.data-card {
+    
+    background-color: #1a1a1a; 
+    
+    
+    border: 1px solid #333; 
+    
+    border-radius: 8px;
+    padding: 25px;
+    
+   
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+
+
+.divider {
+    border: 0;
+    height: 1px;
+    background: #333;
+    margin: 50px 0;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 30px;
+    color: #f1c40f;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}

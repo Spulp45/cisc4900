@@ -2,64 +2,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>User Settings</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Settings</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styleForWeb/account_settings.css') }}" />
+    
 </head>
 <body>
+    <div class="settings-container">
+        <h1>User Settings</h1>
 
-  <h1>User Settings</h1>
+        <form method="POST">
+            <fieldset class="settings-group">
+                <legend>Profile Information</legend>
+                <div class="profile-info">
+                    <p><b>Username:</b> {{ username }}</p>
+                    <p><b>User ID:</b> {{ user_id }}</p>
+                </div>
+            </fieldset>
 
-  <form method="POST">
+            <fieldset class="settings-group">
+                <legend>Change Password</legend>
 
-    <!-- Profile Information -->
-    <fieldset>
-      <legend>Profile Information</legend>
-      <label>Username: {{ username }}</label><br>
-      <label>User ID: {{ user_id }}</label><br>
-    </fieldset>
+                {% if success %}
+                    <p class="status-msg success">{{ success }}</p>
+                {% else %}
+                    <div class="input-group">
+                        <input name="currentPassword" type="password" placeholder="Current Password" required>
+                        <input name="newPassword" type="password" placeholder="New Password" required>
+                        <input name="confirmPassword" type="password" placeholder="Confirm New Password" required>
+                    </div>
 
-    <br>
+                    <button type="submit" class="save-btn">Update Password</button>
+                    <p class="hint-text">Your session will remain active after the update.</p>
+                {% endif %}
 
-    <!-- Change Password -->
-  <fieldset>
-    <legend>Change Password</legend>
+                {% if error %}
+                    <p class="status-msg error">Error: {{ error }}</p>
+                {% endif %}
+            </fieldset>
 
-    {% if success %}
-      <p>{{ success }}</p>
-    {% else %}
-
-      <input name="currentPassword" type="password" placeholder="Current Password" required><br><br>
-      <input name="newPassword" type="password" placeholder="New Password" required><br><br>
-      <input name="confirmPassword" type="password" placeholder="Confirm New Password" required><br><br>
-
-      <button type="submit">Update Password</button>
-
-      <p>If successful, your password will be updated.</p>
-
-    {% endif %}
-
-    {% if error %}
-      <p>Error: {{ error }}</p>
-    {% endif %}
-
-  </fieldset>
-    
-    <br>
-
-    <!-- Account Options -->
-    <fieldset>
-      <legend>Account Options</legend>
-
-      <a href="{{ url_for('download_all_tracks') }}">
-      <button type="button">Download All Tracks</button>
-      </a>
-       <a href="{{ url_for('delete_account') }}">
-      <button type="button">Delete Account</button>
-       </a>
-      {{ func.back_button(label="← Back") }}
-    </fieldset>
-
-  </form>
-  
+            <fieldset class="settings-group">
+                <legend>Account Options</legend>
+                <div class="action-buttons">
+                    <a href="{{ url_for('download_all_tracks') }}" class="no-underline">
+                        <button type="button" class="action-btn">Download All Tracks</button>
+                    </a>
+                    <a href="{{ url_for('delete_account') }}" class="no-underline">
+                        <button type="button" class="action-btn danger">Delete Account</button>
+                    </a>
+                </div>
+            </fieldset>
+        </form>
+        
+        <div class="back-navigation">
+            {{ func.back_button(label="← Back") }}
+        </div>
+    </div>
 </body>
 </html>
