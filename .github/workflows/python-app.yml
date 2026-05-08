@@ -33,6 +33,9 @@ jobs:
         echo "UPLOAD_DIRECTORY=tests/test_uploads" >> $GITHUB_ENV
         echo "TEMP_FOLDER=tests/test_temp" >> $GITHUB_ENV
         echo "FLASK_ENV=testing" >> $GITHUB_ENV
+    - name: Create secret.json
+      run: |
+        echo '{"SECRET_KEY": "test-secret"}' > secret.json
 
     - name: Run pytest
       run: |
