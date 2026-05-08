@@ -12,6 +12,10 @@
           "a": "Yes you can upload more than one file at a time!"
         },
         {
+          "q": "Are files that I upload ever modified or altered?",
+          "a": "No all files are kept intact, they are never modified in any way"
+        },
+        {
           "q": "What type of GPX files are supported?",
           "a": "GPX 1.0 and GPX 1.1"
         },
@@ -47,7 +51,7 @@
       "questions": [
         {
           "q": "How do I view my tracks?",
-          "a": "Go to the home page."
+          "a": "Go to the home page"
         },
         {
           "q": "Can I delete a track?",
@@ -84,7 +88,52 @@
         {
           "k": "Total Distance 3D",
           "v": "Total distance traveled in 3 Dimensions (Altitude, Longitude & Elevation)"
+        },
+        {
+          "k": "Moving Time",
+          "v": "Time spent moving"
+        },
+        {
+          "k": "Stopped Time",
+          "v": "Time spent NOT moving"
+        },
+        {
+          "k": "Stopped Distance",
+          "v": "Should always be 0, if not then GPS drift happened (Read more about this in GPS Limitations -> GPS drift)"
+        },
+        {
+          "k": "Max Speed",
+          "v": "Maximum speed reached in a trip, can sometimes be incorrect (Read more about this in GPS Limitations -> GPS Jump)"
+        },
+        {
+          "k": "Average Speed",
+          "v": "Average speed throughout the entire trip"
+        },
+        {
+          "k": "Uphill",
+          "v": "Total elevation change (increaase) during the entire trip"
+        },
+        {
+          "k": "Downhill",
+          "v": "Total elevation change (decrease) during the entire trip"
+        },
+        {
+          "k": "Start Time",
+          "v": "Time of when the trip started WARNING: The timezone used is based on the browser's, otherwise is 00:00 UTC"
+        },
+        {
+          "k": "End Time",
+          "v": "Time of when the trip started WARNING: The timezone used is based on the browser's, otherwise is 00:00 UTC"
+        },
+        {
+          "k": "Points",
+          "v": "The total number of track points (GPS data points) recorded on that trip"
+        },
+        {
+          "k": "GPX Version",
+          "v": "The version of that GPX file"
         }
+        
       ]
     },
     {
@@ -101,6 +150,38 @@
         {
           "k": "Elevation",
           "v": "Height at that trackpoint"
+        },
+        {
+          "k": "Time",
+          "v": "When that track point was recored  WARNING: The timezone used is based on the browser's, otherwise is 00:00 UTC"
+        },
+        {
+          "k": "Course",
+          "v": "Angle of the device when the point was recorded"
+        },
+        {
+          "k": "Speed",
+          "v": "Speed at that track point"
+        },
+        {
+          "k": "Source",
+          "v": "What did the device use to record that track point Eg. Cell towers, GPS, etc..."
+        },
+        {
+          "k": "Satellites",
+          "v": "Count of how many satellites were in sight during the recording of that track point"
+        },
+        {
+          "k": "HDOP",
+          "v": "Horizontal dilution of precision (lower values mean more accurate data)"
+        },
+        {
+          "k": "VDOP",
+          "v": "Vertical dilution of precision (lower values mean more accurate data)"
+        },
+        {
+          "k": "PDOP",
+          "v": "Position dilution of precision (lower values mean more accurate data)"
         }
       ]
     }
