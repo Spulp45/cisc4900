@@ -10,18 +10,36 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styleForWeb/home.css') }}" />
     <script src="{{ url_for('static', filename='js/htmx/htmx.min.js') }}"></script>
 
+    <style>
+      .top-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .user-actions {
+        display: flex;
+        gap: 10px;
+      }
+    </style>
   </head>
   <body>
     <div class="container">
-      <h1>Welcome {{ username }} 
-         <form class="action-buttons" action="{{ url_for('logout') }}" method="post">
-      <button type="submit">Logout</button>
-    </form>
-      </h1>
 
-      <form class="action-buttons" action="{{ url_for('account_settings') }}" method="get">
-      <button type="submit">Account Settings</button>
-    </form>
+      <div class="top-header">
+        <h1>Welcome {{ username }}</h1>
+
+        <div class="user-actions">
+          <form action="{{ url_for('account_settings') }}" method="get">
+            <button type="submit">Account Settings</button>
+          </form>
+
+          <form action="{{ url_for('logout') }}" method="post">
+            <button type="submit">Logout</button>
+          </form>
+        </div>
+      </div>
 
       <div class="NovBar">
         {{ func.home_page_button("All Trips", link = url_for('all_trips')) }}
@@ -30,18 +48,14 @@
         {{ func.home_page_button("leaderboard", link = url_for('leaderboard')) }}
       </div>
 
-      <form action="{{ url_for('logout') }}" method="get" style="display:inline;">
-      </form>
-      </form>
-
       <!-- GPX Upload Form -->
-    <div class="upload-section">
-      <h2>Upload GPX File(s)</h2>
-      <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
-        <input type="file" name="files" accept=".gpx" multiple required />
-        <button type="submit">Upload</button>
-      </form>
-    </div>
+      <div class="upload-section">
+        <h2>Upload GPX File(s)</h2>
+        <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+          <input type="file" name="files" accept=".gpx" multiple required />
+          <button type="submit">Upload</button>
+        </form>
+      </div>
 
       <hr/>
 
@@ -62,9 +76,11 @@
         hx-trigger="keyup changed delay:500ms"
         hx-target="#results"
       >
+
       <div id="results">
-  {{ tables.render_tracks_table(tracks) }}
+        {{ tables.render_tracks_table(tracks) }}
       </div>
+
       <hr/>
     </div>
 
@@ -75,7 +91,6 @@
       document.getElementById(`desc-text-${id}`).style.display = 'none';
       document.getElementById(`desc-input-${id}`).style.display = 'inline';
       document.getElementById(`save-btn-${id}`).style.display = 'inline';
-
       document.getElementById(`edit-btn-${id}`).style.display = 'none';
     }
 
@@ -98,7 +113,6 @@
           document.getElementById(`desc-text-${id}`).style.display = 'inline';
           document.getElementById(`desc-input-${id}`).style.display = 'none';
           document.getElementById(`save-btn-${id}`).style.display = 'none';
-
           document.getElementById(`edit-btn-${id}`).style.display = 'inline';
         } else {
           alert("Update failed");
