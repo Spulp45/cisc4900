@@ -6,6 +6,13 @@
         {{ label }}
     </a>
 {% endmacro %}
+
+{% macro home_button(label="← Home") %}
+    <a href="{{ url_for('home') }}" class="btn-primary">
+        {{ label }}
+    </a>
+{% endmacro %}
+
 {% macro stats_select(label="Stats") %}
     <a href="{{ url_for('stats_select') }}" class="btn btn-primary">{{ label }}</a>
 {% endmacro %}
