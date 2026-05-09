@@ -602,7 +602,6 @@ def leaderboard():
         "stopped_time": "TOTAL(t.stopped_time)",
         "moving_distance": "TOTAL(t.moving_distance)",
         "stopped_distance": "TOTAL(t.stopped_distance)",
-        "max_speed": "TOTAL(t.max_speed)",
         "downhill": "TOTAL(t.downhill)",
         "points": "TOTAL(t.points)"
     }
