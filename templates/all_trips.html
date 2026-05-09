@@ -1,103 +1,106 @@
 {% import 'components/buttons.html' as func %}
 
-<div class="container All-Stats">
-  <head>
-    <title>My Driving Tracker</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}"
-    />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Total Statistics | Driving Tracker</title>
+    
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icon.png') }}">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='styleForWeb/all_trips.css') }}" />
-  </head>
+</head>
 
-  <h2>Total Statistics</h2>
+<body>
+    <div class="container All-Stats">
+        <h2>Total Statistics</h2>
 
-  <div class="unit-toggle">
- <span>Units:</span>
-<a href="/set_units/metric" class="unit-btn">Metric</a>
-<a href="/set_units/imperial" class="unit-btn">Imperial</a>
-<a href="/set_units/raw" class="unit-btn">Raw</a>
-  </div>
+        <div class="unit-toggle">
+            <span>Units:</span>
+            <a href="/set_units/metric" class="unit-btn">Metric</a>
+            <a href="/set_units/imperial" class="unit-btn">Imperial</a>
+            <a href="/set_units/raw" class="unit-btn">Raw</a>
+        </div>
 
-  <hr />
+        <hr />
 
-  <!-- Distance Stats -->
-  <div class="stats-group card">
-    <h3>Distances</h3>
-    <table class="vertical-table">
-      <tr>
-        <th>Distance (2D)</th>
-        <td>{{ totals.length_2d | distance }}</td>
-      </tr>
-      <tr>
-        <th>Distance (3D)</th>
-        <td>{{ totals.length_3d | distance }}</td>
-      </tr>
-      <tr>
-        <th>Moving Distance</th>
-        <td>{{ totals.moving_distance | distance }}</td>
-      </tr>
-      <tr>
-        <th>Stopped Distance</th>
-        <td>{{ totals.stopped_distance | distance }}</td>
-      </tr>
-      <tr>
-        <th>Uphill</th>
-        <td>{{ totals.uphill | elevation }}</td>
-      </tr>
-      <tr>
-        <th>Downhill</th>
-        <td>{{ totals.downhill | elevation }}</td>
-      </tr>
-    </table>
-  </div>
+        <div class="stats-group card">
+            <h3>Distances</h3>
+            <table class="vertical-table">
+                <tr>
+                    <th>Distance (2D)</th>
+                    <td>{{ totals.length_2d | distance }}</td>
+                </tr>
+                <tr>
+                    <th>Distance (3D)</th>
+                    <td>{{ totals.length_3d | distance }}</td>
+                </tr>
+                <tr>
+                    <th>Moving Distance</th>
+                    <td>{{ totals.moving_distance | distance }}</td>
+                </tr>
+                <tr>
+                    <th>Stopped Distance</th>
+                    <td>{{ totals.stopped_distance | distance }}</td>
+                </tr>
+                <tr>
+                    <th>Uphill</th>
+                    <td>{{ totals.uphill | elevation }}</td>
+                </tr>
+                <tr>
+                    <th>Downhill</th>
+                    <td>{{ totals.downhill | elevation }}</td>
+                </tr>
+            </table>
+        </div>
 
-  <!-- Time Stats -->
-  <div class="stats-group card">
-    <h3>Time</h3>
-    <table class="vertical-table">
-      <tr>
-        <th>Moving Time</th>
-        <td>{{ totals.moving_time | time }}</td>
-      </tr>
-      <tr>
-        <th>Stopped Time</th>
-        <td>{{ totals.stopped_time | time }}</td>
-      </tr>
-    </table>
-  </div>
+        <div class="stats-group card">
+            <h3>Time</h3>
+            <table class="vertical-table">
+                <tr>
+                    <th>Moving Time</th>
+                    <td>{{ totals.moving_time | time }}</td>
+                </tr>
+                <tr>
+                    <th>Stopped Time</th>
+                    <td>{{ totals.stopped_time | time }}</td>
+                </tr>
+            </table>
+        </div>
 
-  <!-- Speed Stats -->
-  <div class="stats-group card">
-    <h3>Speed</h3>
-    <table class="vertical-table">
-      <tr>
-      </tr>
-      <tr>
-        <th>Average Speed Overall</th>
-        <td>{{ totals.overall_avg_speed | speed }}</td>
-      </tr>
-    </table>
-  </div>
+        <div class="stats-group card">
+            <h3>Speed</h3>
+            <table class="vertical-table">
+                <tr>
+                    <th>Average Speed Overall</th>
+                    <td>{{ totals.overall_avg_speed | speed }}</td>
+                </tr>
+            </table>
+        </div>
 
-  <!-- Misc Stats -->
-  <div class="stats-group card">
-    <h3>Misc</h3>
-    <table class="vertical-table">
-      <tr>
-        <th>GPS Track Points</th>
-        <td>{{ totals.points | int }}</td>
-      </tr>
-      <tr>
-        <th>GPX 1.0 Files</th>
-        <td>{{ totals.gpx_1_0_count | int }}</td>
-      </tr>
-      <tr>
-        <th>GPX 1.1 Files</th>
-        <td>{{ totals.gpx_1_1_count | int }}</td>
-      </tr>
-    </table>
-  </div>
+        <div class="stats-group card">
+            <h3>Misc</h3>
+            <table class="vertical-table">
+                <tr>
+                    <th>GPS Track Points</th>
+                    <td>{{ totals.points | int }}</td>
+                </tr>
+                <tr>
+                    <th>GPX 1.0 Files</th>
+                    <td>{{ totals.gpx_1_0_count | int }}</td>
+                </tr>
+                <tr>
+                    <th>GPX 1.1 Files</th>
+                    <td>{{ totals.gpx_1_1_count | int }}</td>
+                </tr>
+            </table>
+        </div>
 
-  {{ func.home_button() }}
-</div>
+        <div class="footer-nav">
+            {{ func.home_button() }}
+        </div>
+    </div>
+</body>
+</html>
