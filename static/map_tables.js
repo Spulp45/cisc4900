@@ -175,6 +175,36 @@
     const rewindBtn = document.getElementById("rewind-btn");
     const forwardBtn = document.getElementById("forward-btn");
 
+    // --- CAR SHADOW CUSTOMIZATION ---
+    const colorSelect = document.getElementById("car-color-select");
+
+    if (colorSelect) {
+        colorSelect.addEventListener("change", (e) => {
+            
+            const newShadowUrl = `/static/${e.target.value}`;
+            
+            const updatedIcon = L.icon({
+                iconUrl: '/static/arrow.png',    // The arrow stays the same
+                shadowUrl: newShadowUrl,        // The car (shadow) changes
+                
+                iconSize:     [24, 24],
+                shadowSize:   [32, 32],
+                iconAnchor:   [8, 8],
+                shadowAnchor: [16, 16], 
+            });
+
+            // Apply the update
+            carMarker.setIcon(updatedIcon);
+            
+            
+            const el = carMarker.getElement();
+            if (el) {
+                const base = el.style.transform.replace(/rotate\(.*?\)/, "");
+                el.style.transform = `${base} rotate(${currentAngle}deg)`;
+            }
+        });
+    }
+
     if (playBtn) {
         playBtn.addEventListener("click", () => {
             clearTimeout(animationTimer); 
