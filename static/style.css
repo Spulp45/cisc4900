@@ -109,10 +109,3 @@
     position: relative;
     z-index: 1;
 }
-
-.racing-btn:hover {
-    background-color: #f1c40f;
-    color: #111;
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(241, 196, 15, 0.4);
-}
