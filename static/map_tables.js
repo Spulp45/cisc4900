@@ -201,6 +201,7 @@ const customSpeedInput = document.getElementById("custom-speed");
 const customSpeedBtn = document.getElementById("custom-speed-btn");
 
 if (customSpeedBtn && customSpeedInput) {
+
     customSpeedBtn.addEventListener("click", () => {
         const val = parseFloat(customSpeedInput.value);
 
@@ -215,6 +216,17 @@ if (customSpeedBtn && customSpeedInput) {
             customSpeedBtn.click();
         }
     });
+
+
+    customSpeedInput.addEventListener("input", () => {
+        const val = parseFloat(customSpeedInput.value);
+
+        if (!isNaN(val) && val > 0) {
+            playbackSpeed = val;
+            console.log("Custom speed set to:", playbackSpeed);
+        }
+    });
+
 }
 
 if (forwardBtn) {
