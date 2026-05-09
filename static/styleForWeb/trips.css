@@ -397,6 +397,9 @@ canvas {
         color 0.3s ease;
     cursor: pointer;
 }
+.unit-toggle {
+    margin-bottom: 16px;
+}
 
 /* Hover effect */
 .unit-btn:hover {
@@ -409,4 +412,74 @@ canvas {
 .unit-btn:active {
     transform: scale(0.95);
     box-shadow: 0 0 5px rgba(241, 196, 15, 0.4);
+}
+/* ===== Legend ===== */
+
+#map-legend {
+    margin-bottom: 18px;
+
+    background: #111;
+    border: 1px solid #333;
+    border-left: 4px solid #f1c40f;
+
+    border-radius: 8px;
+
+    padding: 12px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+
+    color: #eee;
+}
+
+/* Shared marker style */
+.legend-dot {
+    width: 14px;
+    height: 14px;
+
+    border-radius: 50%;
+    border: 2px solid #222;
+}
+
+/* >= max speed */
+.legend-dot.max-speed {
+    background: #E53935;
+    box-shadow: 0 0 10px rgba(229, 57, 53, 0.7);
+}
+
+/* stopped */
+.legend-dot.stopped {
+    background: #FB8C00;
+    box-shadow: 0 0 10px rgba(251, 140, 0, 0.7);
+}
+
+/* moving */
+.legend-dot.moving {
+    background: #145A32;
+    box-shadow: 0 0 10px rgba(27, 94, 32, 0.7);
+}
+
+/* route line */
+.legend-line {
+    width: 24px;
+    height: 4px;
+
+    border-radius: 4px;
+
+    background: #607D8B;
+
+    box-shadow: 0 0 8px rgba(96, 125, 139, 0.5);
 }

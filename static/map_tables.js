@@ -72,12 +72,6 @@
         const table = document.getElementById("stats-table");
         if (!table) return;
         table.innerHTML = `
-            <div class="unit-toggle">
-            <span>Units:</span>
-            <button type="button" class="unit-btn" data-unit="metric">Metric</button>
-            <button type="button" class="unit-btn" data-unit="imperial">Imperial</button>
-            <button type="button" class="unit-btn" data-unit="raw">Raw</button>
-            </div>
             <tr><th>Data</th><th>Value</th></tr>
             <tr><td>Filename</td><td>${track.filename}</td></tr>
             <tr><td>Filepath</td><td>${track.filepath}</td></tr>
@@ -109,7 +103,7 @@
         map = L.map("map", { center: [track_points[0].lat, track_points[0].lon], zoom: 13, layers: [osm], fullscreenControl: true });
 
         const trackPointsLayer = L.layerGroup();
-        const polyline = L.polyline(track_points.map(p => [p.lat, p.lon]), { color: "#008e00", weight: 7 }).addTo(map);
+        const polyline = L.polyline(track_points.map(p => [p.lat, p.lon]), { color: "#607D8B", weight: 7 }).addTo(map);
 
         // --- ADDED START & END WAYPOINTS BACK ---
         if (track_points.length > 0) {
@@ -125,13 +119,37 @@
 
         function renderTrackPoints() {
             trackPointsLayer.clearLayers();
-            if (map.getZoom() < 14) return;
+            if (map.getZoom() < 12) return;
             track_points.forEach((point) => {
-                const marker = L.circleMarker([point.lat, point.lon], { radius: 4, color: "#1f3145", weight: 1, fillOpacity: 0.7 });
-                marker.on("mouseover", () => marker.setStyle({ radius: 14, color: "yellow" }));
-                marker.on("mouseout", () => marker.setStyle({ radius: 4, color: "#1f3145" }));
-                marker.on("click", () => { lastClickedPoint = point; renderTrackPanel(point); });
-                trackPointsLayer.addLayer(marker);
+                 
+                // if statement (check if point.speed >= track.max_speed)
+                    // set it to red color (indicating >= max speed was reached here)
+
+                if(point.speed >= track.max_speed)
+                {   
+                    const marker = L.circleMarker([point.lat, point.lon], { radius: 4, color: "#E53935", weight: 1, fillOpacity: 0.7 });
+                    trackPointsLayer.addLayer(marker);
+                    marker.on("mouseover", () => marker.setStyle({ radius: 14, color: "yellow" }));
+                    marker.on("mouseout", () => marker.setStyle({ radius: 4, color: "#E53935" }));
+                    marker.on("click", () => { lastClickedPoint = point; renderTrackPanel(point); });
+                }
+                else if(point.speed == 0.0)
+                {   
+                    const marker = L.circleMarker([point.lat, point.lon], { radius: 4, color: "#FB8C00", weight: 1, fillOpacity: 0.7 });
+                    trackPointsLayer.addLayer(marker);
+                    marker.on("mouseover", () => marker.setStyle({ radius: 14, color: "yellow" }));
+                    marker.on("mouseout", () => marker.setStyle({ radius: 4, color: "#FB8C00" }));
+                    marker.on("click", () => { lastClickedPoint = point; renderTrackPanel(point); });
+                }
+                else {
+                    const marker = L.circleMarker([point.lat, point.lon], { radius: 4, color: "#145A32", weight: 1, fillOpacity: 0.7 });
+                    trackPointsLayer.addLayer(marker);
+                    marker.on("mouseover", () => marker.setStyle({ radius: 14, color: "yellow" }));
+                    marker.on("mouseout", () => marker.setStyle({ radius: 4, color: "#145A32" }));
+                    marker.on("click", () => { lastClickedPoint = point; renderTrackPanel(point); });
+                }
+                
+               
             });
             if (!map.hasLayer(trackPointsLayer)) trackPointsLayer.addTo(map);
         }

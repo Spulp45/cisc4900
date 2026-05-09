@@ -16,12 +16,32 @@
 
   <div id="track-details">
     <h1>Track Point Info</h1>
+    <div id="map-legend">
+      <h1>Legend</h1>
+  <div class="legend-item">
+    <span class="legend-dot stopped"></span>
+    <span>Stopped</span>
+  </div>
 
+  <div class="legend-item">
+    <span class="legend-dot max-speed"></span>
+    <span>Max Speed</span>
+  </div>
+
+  <div class="legend-item">
+    <span class="legend-dot moving"></span>
+    <span>Moving</span>
+  </div>
+
+  <div class="legend-item">
+    <span class="legend-line"></span>
+    <span>Route</span>
+  </div>
+</div>
     <div id="controls">
 
       <!-- Play Button -->
       <button id="play-btn">▶ Play</button>
-
       <!-- Forward / Rewind Row -->
       <div id="seek-controls">
         <button id="rewind-btn">Rewind</button>
@@ -64,16 +84,26 @@
 <!-- Stats display -->
 <div class="stats-display">
   <h2>STATS</h2>
-</div>
+  <div class="unit-toggle">
+            <span>Units:</span>
+            <button type="button" class="unit-btn" data-unit="metric">Metric</button>
+            <button type="button" class="unit-btn" data-unit="imperial">Imperial</button>
+            <button type="button" class="unit-btn" data-unit="raw">Raw</button>
+  </div>
   <!-- Stats table -->
   <table id="stats-table"></table>
-<div class="chart-box">
-  <canvas id="tripsChart"></canvas>
-</div>
 
-<div class="chart-box">
+  <div class="chart-box">
+  <canvas id="tripsChart"></canvas>
+  </div>
+
+  <div class="chart-box">
   <canvas id="tripsChart2"></canvas>
+  </div>
+
 </div>
+  
+
 
   <!-- Leaflet JS -->
   <script src="{{ url_for('static', filename='js/leaflet/leaflet.js') }}"></script>
