@@ -115,13 +115,38 @@ Instructions on how to run are on Run Locally Section
 
 ![App Screenshot](screenshots/overview.png)
 
-## Total Statistics Table
+## Overview
+
+![App Screenshot](screenshots/overview.png)
+
+![App Screenshot](screenshots/overview2.png)
+
+![App Screenshot](screenshots/overview3.png)
+
+## Total Statistics 
+
 
 ![App Screenshot](screenshots/totaltable.png)
+
+## Leaderboard
+
+![App Screenshot](screenshots/leaderboard.png)
+
+## Track Comparison Feature
+
+![App Screenshot](screenshots/track_comparison.png)
+
+## Misc Screenshots
+
+![App Screenshot](screenshots/recent_stats1.png)
+
+![App Screenshot](screenshots/recent_stats2.png)
+
 
 ## Libraries Used
 
 * Leaflet.js https://leafletjs.com/
 * Flask https://flask.palletsprojects.com/
 * gpxpy https://github.com/tkrajina/gpxpy
-* PLACEHOLDER
+* Chart JS https://www.chartjs.org/
+* HTMX https://htmx.org/
