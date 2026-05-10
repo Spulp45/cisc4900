@@ -118,8 +118,6 @@ Instructions on how to run are on Run Locally Section
 
 ## Overview
 
-![App Screenshot](screenshots/overview.png)
-
 ![App Screenshot](screenshots/overview2.png)
 
 ![App Screenshot](screenshots/overview3.png)
