@@ -14,6 +14,7 @@ A Python app that reads and parses GPX files, stores data in a database, and dis
 - Calculate Statistics (distance, average speed, etc).
 - Store GPS data in a database.
 - Supports GPX 1.0 and 1.1 Files.
+- Support for multiple users
 
 
 ## Run Locally
